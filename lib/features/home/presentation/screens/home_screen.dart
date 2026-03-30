@@ -845,28 +845,43 @@ class _PhotoCategory {
 class _PhotographySection extends StatelessWidget {
   const _PhotographySection();
 
-  static const _categories = [
-    _PhotoCategory(
-      label: 'Moments',
-      subtitle: 'ABES Campus',
-      imagePath: 'assets/images/aabes.jpeg',
-    ),
-    _PhotoCategory(
-      label: 'Casual',
-      subtitle: 'Cafe Frames',
-      imagePath: 'assets/images/cafe.jpeg',
-    ),
-    _PhotoCategory(
-      label: 'Nature',
-      subtitle: 'Mountain Escapes',
-      imagePath: 'assets/images/mount.jpeg',
-    ),
-    _PhotoCategory(
-      label: 'Details',
-      subtitle: 'Natural Beauty',
-      imagePath: 'assets/images/flower.jpeg',
-    ),
-  ];
+ static const _categories = [
+  _PhotoCategory(
+    label: 'Moments',
+    subtitle: 'Campus Life',
+    imagePath: 'assets/images/aabes.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Casual',
+    subtitle: 'Cafe Vibes',
+    imagePath: 'assets/images/cafe.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Nature',
+    subtitle: 'Mountain Escapes',
+    imagePath: 'assets/images/mount.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Details',
+    subtitle: 'Floral Close-ups',
+    imagePath: 'assets/images/flower.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Cutie',
+    subtitle: 'Adorable Moments',
+    imagePath: 'assets/images/cat.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Lunch',
+    subtitle: 'Food Stories',
+    imagePath: 'assets/images/sq.jpeg',
+  ),
+  _PhotoCategory(
+    label: 'Heat',
+    subtitle: 'Fire & Energy',
+    imagePath: 'assets/images/fire.jpg',
+  ),
+];
 
   @override
   Widget build(BuildContext context) {

@@ -14,17 +14,19 @@ class ContributionGraph extends StatefulWidget {
 
 class _ContributionGraphState extends State<ContributionGraph> {
   ContributionDay? _hoveredDay;
-  OverlayEntry? _tooltipEntry;
   final ScrollController _scrollController = ScrollController();
 
-  // Fixed cell dimensions
-  static const double _cellSize = 10.0;
+  // We'll compute cell size dynamically to fill available width.
+  // These are the constraints we work within:
+  static const int _rows = 7; // days of week
+  static const double _minCellSize = 8.0;
+  static const double _maxCellSize = 14.0;
   static const double _cellGap = 3.0;
-  static const double _weekWidth = _cellSize + _cellGap;
 
   @override
   void initState() {
     super.initState();
+    // Scroll to end (latest date) after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -34,55 +36,47 @@ class _ContributionGraphState extends State<ContributionGraph> {
 
   @override
   void dispose() {
-    _tooltipEntry?.remove();
-    _tooltipEntry = null;
     _scrollController.dispose();
     super.dispose();
   }
 
-  // ─── Build week groups ───────────────────────────────────────────────────
+  // ─── Group contributions into weeks ────────────────────────────────────
 
   List<List<ContributionDay?>> _buildWeeks() {
     final days = widget.contributions;
+    if (days.isEmpty) return [];
+
     final weeks = <List<ContributionDay?>>[];
-    if (days.isEmpty) return weeks;
+    // Sun=0 in our grid (Dart weekday: Mon=1…Sun=7, so Sun = 7%7 = 0)
+    final firstWeekday = days.first.date.weekday % 7;
 
-    // In Dart, DateTime.weekday: Mon=1 … Sun=7. We want Sun=0.
-    final firstWeekday = days.first.date.weekday % 7; // Sun=0, Mon=1 …
-
-    List<ContributionDay?> currentWeek = List.filled(7, null);
-
-    // Pad the first week
+    var current = List<ContributionDay?>.filled(7, null);
     int wIdx = firstWeekday;
+
     for (final day in days) {
-      currentWeek[wIdx] = day;
+      current[wIdx] = day;
       wIdx++;
       if (wIdx == 7) {
-        weeks.add(List.from(currentWeek));
-        currentWeek = List.filled(7, null);
+        weeks.add(List.from(current));
+        current = List.filled(7, null);
         wIdx = 0;
       }
     }
-    if (wIdx > 0) weeks.add(List.from(currentWeek));
+    if (wIdx > 0) weeks.add(List.from(current));
     return weeks;
   }
 
-  // ─── Month labels — one per calendar month, placed at the first week
-  //     where a day ≤ 7 exists for that month. ───────────────────────────
+  // ─── Month labels ────────────────────────────────────────────────────────
 
   Map<int, String> _buildMonthLabels(List<List<ContributionDay?>> weeks) {
     final labels = <int, String>{};
     final seen = <String>{};
-
     for (int w = 0; w < weeks.length; w++) {
       for (final day in weeks[w]) {
         if (day == null) continue;
         if (day.date.day <= 7) {
           final key = '${day.date.year}-${day.date.month}';
-          if (!seen.contains(key)) {
-            seen.add(key);
-            labels[w] = _monthAbbr(day.date.month);
-          }
+          if (seen.add(key)) labels[w] = _monthAbbr(day.date.month);
         }
       }
     }
@@ -91,13 +85,33 @@ class _ContributionGraphState extends State<ContributionGraph> {
 
   // ─── Colour ──────────────────────────────────────────────────────────────
 
-  Color _colorForCount(int count, bool isDark) {
-    if (count == 0) return isDark ? AppColors.contrib0Dark : AppColors.contrib0Light;
-    if (count == 1) return isDark ? AppColors.contrib1Dark : AppColors.contrib1Light;
-    if (count == 2) return isDark ? AppColors.contrib2Dark : AppColors.contrib2Light;
-    if (count == 3) return isDark ? AppColors.contrib3Dark : AppColors.contrib3Light;
-    return isDark ? AppColors.contrib4Dark : AppColors.contrib4Light;
+  Color _colorForLevel(int level, bool isDark) {
+    if (isDark) {
+      switch (level) {
+        case 0: return AppColors.contrib0Dark;
+        case 1: return AppColors.contrib1Dark;
+        case 2: return AppColors.contrib2Dark;
+        case 3: return AppColors.contrib3Dark;
+        default: return AppColors.contrib4Dark;
+      }
+    } else {
+      switch (level) {
+        case 0: return AppColors.contrib0Light;
+        case 1: return AppColors.contrib1Light;
+        case 2: return AppColors.contrib2Light;
+        case 3: return AppColors.contrib3Light;
+        default: return AppColors.contrib4Light;
+      }
+    }
   }
+
+  String _monthAbbr(int m) => const [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ][m - 1];
+
+  String _formatDate(DateTime d) =>
+      '${_monthAbbr(d.month)} ${d.day}, ${d.year}';
 
   // ─── Build ───────────────────────────────────────────────────────────────
 
@@ -105,131 +119,226 @@ class _ContributionGraphState extends State<ContributionGraph> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final weeks = _buildWeeks();
+    if (weeks.isEmpty) return const SizedBox(height: 80);
+
     final monthLabels = _buildMonthLabels(weeks);
+    final labelColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
+    final dayLabelColor =
+        isDark ? AppColors.textTerDark : AppColors.textTerLight;
 
-    // The total pixel width of the graph — MUST match what the Stack uses.
-    final double graphWidth = weeks.length * _weekWidth;
+    return LayoutBuilder(builder: (context, constraints) {
+      final availableWidth = constraints.maxWidth;
 
-    return SingleChildScrollView(
-      controller: _scrollController,
-      scrollDirection: Axis.horizontal,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Month label row ──────────────────────────────────────────────
-          // Use a Stack with an explicit width so labels are positioned at
-          // exactly weekIndex * _weekWidth and never overlap the cells below.
-          SizedBox(
-            height: 16,
-            width: graphWidth,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: monthLabels.entries.map((e) {
-                return Positioned(
-                  left: e.key * _weekWidth,
-                  top: 0,
-                  child: Text(
-                    e.value,
-                    style: TextStyle(
-                      fontFamily: 'JetBrainsMono',
-                      fontSize: 9,
-                      letterSpacing: 0.04,
-                      color: isDark
-                          ? AppColors.textTerDark
-                          : AppColors.textTerLight,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
+      // ── Compute cell size to fill available width ──
+      // availableWidth = weekCount * (cellSize + gap) - gap + dayLabelWidth
+      // We reserve 24px on the left for day-of-week labels (S M T W T F S)
+      const dayLabelWidth = 20.0;
+      final gridWidth = availableWidth - dayLabelWidth;
+      final weekCount = weeks.length;
 
-          const SizedBox(height: 5),
+      // cellSize that fills exactly: gridWidth = weekCount*(cellSize+gap) - gap
+      double cellSize = (gridWidth + _cellGap) / weekCount - _cellGap;
+      cellSize = cellSize.clamp(_minCellSize, _maxCellSize);
 
-          // ── Cell grid ───────────────────────────────────────────────────
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: weeks.map((week) {
-              return Padding(
-                padding: const EdgeInsets.only(right: _cellGap),
+      final weekStep = cellSize + _cellGap;
+      final totalGridWidth = weekCount * weekStep - _cellGap;
+
+      // Label row height
+      const labelRowHeight = 16.0;
+      const labelRowGap = 6.0;
+      final rowStep = cellSize + _cellGap;
+      final gridHeight = _rows * rowStep - _cellGap;
+
+      return SizedBox(
+        width: availableWidth,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Day-of-week labels (S M T W T F S) ──────────────────────
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: labelRowHeight + labelRowGap + 1),
+              child: SizedBox(
+                width: dayLabelWidth,
                 child: Column(
-                  children: List.generate(7, (d) {
-                    final day = week[d];
-
-                    // Empty slot — invisible placeholder keeps the grid aligned
-                    if (day == null) {
-                      return const SizedBox(
-                        width: _cellSize,
-                        height: _cellSize + _cellGap,
-                      );
-                    }
-
-                    final color = _colorForCount(day.level, isDark);
-                    final isHovered = _hoveredDay == day;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: _cellGap),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.basic,
-                        onEnter: (_) => setState(() => _hoveredDay = day),
-                        onExit: (_) => setState(() => _hoveredDay = null),
-                        child: Tooltip(
-                          message:
-                              '${_formatDate(day.date)} · ${day.count} contribution${day.count == 1 ? '' : 's'}',
-                          preferBelow: false,
-                          textStyle: TextStyle(
-                            fontFamily: 'JetBrainsMono',
-                            fontSize: 10,
-                            color: isDark
-                                ? AppColors.textPrimaryDark
-                                : AppColors.textPrimaryLight,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.surfaceElevDark
-                                : AppColors.surfaceElevLight,
-                            border: Border.all(
-                              color: isDark
-                                  ? AppColors.borderDark
-                                  : AppColors.borderLight,
-                              width: 1,
-                            ),
-                          ),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 120),
-                            width: _cellSize,
-                            height: _cellSize,
-                            color: isHovered
-                                ? (isDark
-                                    ? AppColors.textPrimaryDark
-                                    : AppColors.textPrimaryLight)
-                                : color,
-                          ),
-                        ),
-                      ),
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(_rows, (i) {
+                    const labels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                    // Only show M, W, F to avoid clutter
+                    final show = i == 1 || i == 3 || i == 5;
+                    return SizedBox(
+                      height: rowStep,
+                      child: show
+                          ? Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                labels[i],
+                                style: TextStyle(
+                                  fontFamily: 'JetBrainsMono',
+                                  fontSize: 8,
+                                  color: dayLabelColor,
+                                  letterSpacing: 0,
+                                ),
+                              ),
+                            )
+                          : null,
                     );
                   }),
                 ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
+              ),
+            ),
 
-  // ─── Helpers ─────────────────────────────────────────────────────────────
+            // ── Graph ────────────────────────────────────────────────────
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                child: SizedBox(
+                  width: totalGridWidth,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // ── Month labels ────────────────────────────────
+                      SizedBox(
+                        height: labelRowHeight,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: monthLabels.entries.map((e) {
+                            return Positioned(
+                              left: e.key * weekStep,
+                              top: 0,
+                              child: Text(
+                                e.value,
+                                style: TextStyle(
+                                  fontFamily: 'JetBrainsMono',
+                                  fontSize: 9,
+                                  color: labelColor,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
 
-  String _monthAbbr(int month) {
-    const abbrs = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    return abbrs[month - 1];
-  }
+                      const SizedBox(height: 6),
 
-  String _formatDate(DateTime date) {
-    final month = _monthAbbr(date.month);
-    return '$month ${date.day}, ${date.year}';
+                      // ── Cell grid ───────────────────────────────────
+                      SizedBox(
+                        height: gridHeight,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.max,
+                          children: weeks.asMap().entries.map((weekEntry) {
+                            final wIdx = weekEntry.key;
+                            final week = weekEntry.value;
+                            final isLastWeek = wIdx == weeks.length - 1;
+
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                  right: isLastWeek ? 0 : _cellGap),
+                              child: SizedBox(
+                                width: cellSize,
+                                height: gridHeight,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.start,
+                                  children: List.generate(_rows, (d) {
+                                    final day = week[d];
+                                    final isLast = d == _rows - 1;
+
+                                    if (day == null) {
+                                      return SizedBox(
+                                        width: cellSize,
+                                        height: cellSize +
+                                            (isLast ? 0 : _cellGap),
+                                      );
+                                    }
+
+                                    final color =
+                                        _colorForLevel(day.level, isDark);
+                                    final isHovered = _hoveredDay == day;
+
+                                    return Padding(
+                                      padding: EdgeInsets.only(
+                                          bottom: isLast ? 0 : _cellGap),
+                                      child: MouseRegion(
+                                        cursor: SystemMouseCursors.basic,
+                                        onEnter: (_) => setState(
+                                            () => _hoveredDay = day),
+                                        onExit: (_) =>
+                                            setState(() => _hoveredDay =
+                                                null),
+                                        child: Tooltip(
+                                          message:
+                                              '${_formatDate(day.date)} · ${day.count} contribution${day.count == 1 ? '' : 's'}',
+                                          preferBelow: false,
+                                          waitDuration: Duration.zero,
+                                          textStyle: TextStyle(
+                                            fontFamily: 'JetBrainsMono',
+                                            fontSize: 10,
+                                            color: isDark
+                                                ? AppColors.textPrimaryDark
+                                                : AppColors
+                                                    .textPrimaryLight,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? AppColors.surfaceElevDark
+                                                : AppColors.surfaceElevLight,
+                                            border: Border.all(
+                                              color: isDark
+                                                  ? AppColors.borderDark
+                                                  : AppColors.borderLight,
+                                            ),
+                                          ),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(
+                                                milliseconds: 100),
+                                            width: cellSize,
+                                            height: cellSize,
+                                            decoration: BoxDecoration(
+                                              color: isHovered
+                                                  ? (isDark
+                                                      ? Colors.white
+                                                          .withValues(
+                                                              alpha: 0.9)
+                                                      : Colors.black
+                                                          .withValues(
+                                                              alpha: 0.7))
+                                                  : color,
+                                              // Subtle border on non-zero cells
+                                              border: day.level > 0
+                                                  ? Border.all(
+                                                      color: color
+                                                          .withValues(
+                                                              alpha: 0.4),
+                                                      width: 0.5,
+                                                    )
+                                                  : null,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
