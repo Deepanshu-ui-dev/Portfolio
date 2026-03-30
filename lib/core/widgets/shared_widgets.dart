@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 
 // ─────────────────────────────────────────────
@@ -496,9 +494,8 @@ class _CollapsibleCardState extends State<CollapsibleCard>
 
 class _TypewriterLine extends StatefulWidget {
   final List<String> phrases;
-  final TextStyle? style;
 
-  const _TypewriterLine({required this.phrases, this.style});
+  const _TypewriterLine({required this.phrases});
 
   @override
   State<_TypewriterLine> createState() => _TypewriterLineState();
@@ -539,7 +536,6 @@ class _TypewriterLineState extends State<_TypewriterLine> {
         setState(() => _displayed = full.substring(0, _displayed.length + 1));
         _schedule(_typeSpeed);
       } else {
-        _schedule(_pauseFull);
         _deleting = true;
         _schedule(_pauseFull);
       }
@@ -557,12 +553,14 @@ class _TypewriterLineState extends State<_TypewriterLine> {
 
   @override
   Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodySmall;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(_displayed, style: widget.style),
-        _Cursor(style: widget.style),
+        Text(_displayed, style: style),
+        _Cursor(style: style),
       ],
     );
   }
@@ -606,11 +604,10 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
 }
 
 // ─────────────────────────────────────────────
-// PORTFOLIO FOOTER  — dark, compact, typewriter
+// PORTFOLIO FOOTER  — dark, compact, single line
 // ─────────────────────────────────────────────
 
 class PortfolioFooter extends StatelessWidget {
-  // Theme toggle is kept for API compatibility but footer is dark-only.
   final bool isDark;
   final VoidCallback onToggleTheme;
 
@@ -620,16 +617,10 @@ class PortfolioFooter extends StatelessWidget {
     required this.onToggleTheme,
   });
 
-  // Dark-only palette — no theme switching inside footer.
-  static const Color _bg         = Color(0xFF0A0A09);
-  static const Color _surface    = Color(0xFF111110);
-  static const Color _border     = Color(0x12FFFFFF);   // ~7% white
-  static const Color _borderHi   = Color(0x24FFFFFF);   // ~14% white
-  static const Color _text1      = Color(0xFFE8E6DF);
-  static const Color _text2      = Color(0xFF7A7870);
-  static const Color _text3      = Color(0xFF4A4845);
-  static const Color _green      = Color(0xFF1DB954);
-  static const Color _greenDim   = Color(0x1F1DB954);   // 12%
+  static const Color _bg       = Color(0xFF0A0A09);
+  static const Color _border   = Color(0x12FFFFFF);
+  static const Color _text2    = Color(0xFF7A7870);
+  static const Color _text3    = Color(0xFF4A4845);
 
   @override
   Widget build(BuildContext context) {
@@ -640,39 +631,35 @@ class PortfolioFooter extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── top dashed rule ──
           _DashedRule(color: _border),
-
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: AppSpacing.horizontalPadding(context),
-              vertical: 28,
+              vertical: 20,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // ── Always a single Row: copyright left, Built with right ──
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // ── Row 1: availability pill + typewriter ──
-                // ── Row 1: socials left / copyright + Built with right ──
-                LayoutBuilder(builder: (context, constraints) {
-                  final isWide = constraints.maxWidth > 520;
-                  return isWide
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            _SocialRow(),
-                            const Spacer(),
-                            const _BuiltWithText(),
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _SocialRow(),
-                            const SizedBox(height: 16),
-                            const _BuiltWithText(),
-                          ],
-                        );
-                }),
+                Text(
+                  '© 2026 — Deepanshu',
+                  style: const TextStyle(
+                    color: _text3,
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const Text(
+                  'Built with 🤍',
+                  style: TextStyle(
+                    color: _text2,
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                    letterSpacing: 0.4,
+                  ),
+                ),
               ],
             ),
           ),
@@ -682,52 +669,7 @@ class PortfolioFooter extends StatelessWidget {
   }
 }
 
-// ── Availability pill ──────────────────────────────────────────────────────
-
-// ── Typewriter section ────────────────────────────────────────────────────
-
-// ── Social row ────────────────────────────────────────────────────────────
-
-class _SocialRow extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          '© 2026 — Deepanshu',
-          style: const TextStyle(
-            color: PortfolioFooter._text3,
-            fontFamily: 'monospace',
-            fontSize: 10,
-            letterSpacing: 0.4,
-          ),
-        ),
-        const SizedBox(width: 16),
-      ],
-    );
-  }
-}
-
-class _BuiltWithText extends StatelessWidget {
-  const _BuiltWithText();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'Built with 🤍',
-      style: TextStyle(
-        color: PortfolioFooter._text2,
-        fontFamily: 'monospace',
-        fontSize: 10,
-        letterSpacing: 0.4,
-      ),
-    );
-  }
-}
-
-// ── Theme toggle ──────────────────────────────────────────────────────────
+// ── Theme toggle (kept for external use) ─────────────────────────────────
 
 class _ThemeToggle extends StatefulWidget {
   final VoidCallback onTap;
@@ -739,6 +681,11 @@ class _ThemeToggle extends StatefulWidget {
 
 class _ThemeToggleState extends State<_ThemeToggle> {
   bool _hovered = false;
+
+  static const Color _border   = Color(0x12FFFFFF);
+  static const Color _borderHi = Color(0x24FFFFFF);
+  static const Color _text1    = Color(0xFFE8E6DF);
+  static const Color _text2    = Color(0xFF7A7870);
 
   @override
   Widget build(BuildContext context) {
@@ -753,9 +700,7 @@ class _ThemeToggleState extends State<_ThemeToggle> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             border: Border.all(
-              color: _hovered
-                  ? PortfolioFooter._borderHi
-                  : PortfolioFooter._border,
+              color: _hovered ? _borderHi : _border,
               width: 1,
             ),
           ),
@@ -765,8 +710,8 @@ class _ThemeToggleState extends State<_ThemeToggle> {
               Icon(Icons.nightlight_round,
                   size: 11,
                   color: _hovered
-                      ? PortfolioFooter._text1
-                      : PortfolioFooter._text2),
+                      ? _text1
+                      : _text2),
             ],
           ),
         ),

@@ -87,11 +87,12 @@ class _IdentityBlock extends StatelessWidget {
 
         LayoutBuilder(builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 500;
+          final sectionGap = isMobile ? AppSpacing.lg : AppSpacing.xxl;
           final avatar = MonofolioCornersBox(
             padding: const EdgeInsets.all(4),
             child: Container(
               width: isMobile ? double.infinity : 160,
-              height: isMobile ? 160 : 200,
+              height: isMobile ? null : 200,
               decoration: BoxDecoration(
                 color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
                 border: Border.all(color: border),
@@ -106,7 +107,8 @@ class _IdentityBlock extends StatelessWidget {
                   ]),
                   child: Image.asset(
                     'assets/images/profile.png',
-                    fit: BoxFit.cover,
+                    fit: isMobile ? BoxFit.contain : BoxFit.cover,
+                    width: isMobile ? double.infinity : null,
                     cacheWidth: 400,
                     errorBuilder: (context, error, stackTrace) => Center(
                       child: Icon(Icons.person_outline, size: 48, color: textSec.withValues(alpha: 0.5)),
@@ -136,7 +138,7 @@ class _IdentityBlock extends StatelessWidget {
             return Column(
               children: [
                 avatar,
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacing.lg),
                 details,
               ],
             );
@@ -146,7 +148,7 @@ class _IdentityBlock extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               avatar,
-              const SizedBox(width: AppSpacing.xxl),
+              SizedBox(width: sectionGap),
               Expanded(child: details),
             ],
           );
@@ -172,6 +174,7 @@ class _DetailRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isCompact = MediaQuery.sizeOf(context).width < 430;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
@@ -185,7 +188,7 @@ class _DetailRow extends StatelessWidget {
             child: Text(index, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec)),
           ),
           SizedBox(
-            width: 80,
+            width: isCompact ? 64 : 80,
             child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 1.5)),
           ),
           Expanded(
@@ -231,23 +234,33 @@ class _AboutBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final pad = AppSpacing.isMobile(context) ? 16.0 : 24.0;
 
     return MonofolioCornersBox(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: EdgeInsets.all(pad),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 560;
+
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              SectionHeader('I love what I do.'),
-              Padding(
-                padding: EdgeInsets.only(bottom: 18, top: 4),
-                child: _ResumePulsingButton(),
-              ),
-            ],
-          ),
+            children: [
+              if (isCompact) ...[
+                const SectionHeader('I love what I do.'),
+                const SizedBox(height: 8),
+                const _ResumePulsingButton(),
+              ] else
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader('I love what I do.'),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 18, top: 4),
+                      child: _ResumePulsingButton(),
+                    ),
+                  ],
+                ),
           const SizedBox(height: 8),
           Text(
             'Simple as that. I enjoy building things that look good and work even better. If you vibe with my work or just want to chat about tech, I\'m always open.',
@@ -285,7 +298,9 @@ class _AboutBlock extends StatelessWidget {
               ),
             ],
           ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

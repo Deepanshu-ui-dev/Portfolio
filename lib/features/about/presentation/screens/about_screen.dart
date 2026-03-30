@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
@@ -58,7 +56,12 @@ class _AboutScreenState extends State<AboutScreen>
                 Text(
                   "My personal digital space.",
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontSize: 36,
+                        fontSize: AppSpacing.headlineSize(
+                          context,
+                          mobile: 30,
+                          tablet: 34,
+                          laptop: 36,
+                        ),
                         fontWeight: FontWeight.w800,
                         letterSpacing: -2,
                         height: 1.0,
@@ -245,7 +248,9 @@ class _BucketItemState extends State<_BucketItem> {
                 border: Border.all(
                     color: widget.isDone
                         ? accent
-                        : textSec.withOpacity(0.4)),
+                    : _hovered
+                      ? accent.withOpacity(0.7)
+                      : textSec.withOpacity(0.4)),
                 color: widget.isDone
                     ? accent.withOpacity(0.15)
                     : Colors.transparent,
@@ -258,7 +263,11 @@ class _BucketItemState extends State<_BucketItem> {
               child: Text(
                 widget.text,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: widget.isDone ? textSec : textPri,
+                    color: widget.isDone
+                      ? textSec
+                      : _hovered
+                        ? accent
+                        : textPri,
                       decoration: widget.isDone
                           ? TextDecoration.lineThrough
                           : null,
@@ -308,6 +317,10 @@ class _VolunteerExperienceFeed extends StatelessWidget {
               '### Current Role',
               'Today, as a Co-Organizer, I help lead the community I once joined as a curious attendee. GDG isn\'t just a club for me anymore, it\'s where I grew, designed, learned, and got inspired to create things that matter.',
             ],
+            stats: [
+              _VolunteerStat(value: '670+', label: 'Attendees'),
+              _VolunteerStat(value: '2019', label: 'Founded'),
+            ],
           );
 
           const codeChef = _MomentCard(
@@ -330,6 +343,10 @@ class _VolunteerExperienceFeed extends StatelessWidget {
               'That one challenge pushed me into the world of logic-building, patterns, and structured thinking, and it quickly became a place where I wanted to learn more and grow.',
               '### Design & Identity',
               'Today, I proudly serve as the Graphics Lead, shaping the chapter\'s visual identity and contributing to the same community that once introduced me to the world of CP.',
+            ],
+            stats: [
+              _VolunteerStat(value: '750+', label: 'Learners'),
+              _VolunteerStat(value: '2018', label: 'Founded'),
             ],
           );
 

@@ -87,6 +87,9 @@ class ThemeNotifier extends ChangeNotifier {
 // ─────────────────────────────────────────────
 
 class AppSpacing {
+  static const double mobileMax = 650;
+  static const double tabletMax = 1100;
+
   static const double xs   = 4;
   static const double sm   = 8;
   static const double md   = 12;
@@ -96,13 +99,41 @@ class AppSpacing {
   static const double xxl  = 40;
   static const double xxxl = 56;
   static const double section = 80;
-  static const double maxContentWidth = 900;
+  static const double maxContentWidth = 1080;
+
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < mobileMax;
+
+  static bool isTablet(BuildContext context) {
+    final w = MediaQuery.sizeOf(context).width;
+    return w >= mobileMax && w < tabletMax;
+  }
+
+  static bool isLaptop(BuildContext context) =>
+      MediaQuery.sizeOf(context).width >= tabletMax;
 
   static double horizontalPadding(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
-    if (w > 900) return (w - 780) / 2;
-    if (w > 600) return 40;
-    return 20;
+    final w = MediaQuery.sizeOf(context).width;
+
+    if (w >= 1400) {
+      return (w - maxContentWidth) / 2;
+    }
+    if (w >= tabletMax) return 64;
+    if (w >= 900) return 48;
+    if (w >= mobileMax) return 32;
+    if (w >= 390) return 20;
+    return 14;
+  }
+
+  static double headlineSize(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double laptop,
+  }) {
+    if (isLaptop(context)) return laptop;
+    if (isTablet(context)) return tablet;
+    return mobile;
   }
 }
 

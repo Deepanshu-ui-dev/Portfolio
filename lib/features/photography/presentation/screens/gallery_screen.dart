@@ -85,7 +85,12 @@ class GalleryScreen extends StatelessWidget {
                   Text(
                     "Bits of life.",
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontSize: 44,
+                          fontSize: AppSpacing.headlineSize(
+                            context,
+                            mobile: 30,
+                            tablet: 38,
+                            laptop: 44,
+                          ),
                           fontWeight: FontWeight.w800,
                           letterSpacing: -2,
                           height: 1.0,
@@ -107,18 +112,32 @@ class GalleryScreen extends StatelessWidget {
             
             // Grid Section
             Expanded(
-              child: GridView.builder(
-                padding: EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
-                physics: const BouncingScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 0.8,
-                ),
-                itemCount: _images.length,
-                itemBuilder: (context, index) {
-                  return _GalleryImageCard(imagePath: _images[index]);
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < AppSpacing.mobileMax;
+                  final isTablet =
+                      constraints.maxWidth >= AppSpacing.mobileMax &&
+                          constraints.maxWidth < AppSpacing.tabletMax;
+
+                  return GridView.builder(
+                    padding:
+                        EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
+                    physics: const BouncingScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: isMobile
+                          ? 220
+                          : isTablet
+                              ? 250
+                              : 300,
+                      mainAxisSpacing: isMobile ? 12 : 16,
+                      crossAxisSpacing: isMobile ? 12 : 16,
+                      childAspectRatio: isMobile ? 0.74 : 0.8,
+                    ),
+                    itemCount: _images.length,
+                    itemBuilder: (context, index) {
+                      return _GalleryImageCard(imagePath: _images[index]);
+                    },
+                  );
                 },
               ),
             ),

@@ -56,7 +56,12 @@ class VolunteerDetailScreen extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontSize: 40,
+                        fontSize: AppSpacing.headlineSize(
+                          context,
+                          mobile: 30,
+                          tablet: 34,
+                          laptop: 40,
+                        ),
                         fontWeight: FontWeight.w800,
                         letterSpacing: -1.5,
                         height: 1.1,

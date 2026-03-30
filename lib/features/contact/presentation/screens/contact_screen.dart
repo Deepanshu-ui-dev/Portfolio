@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -66,7 +65,12 @@ class _ContactScreenState extends State<ContactScreen>
                 Text(
                   "Let's work together.",
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontSize: 44,
+                      fontSize: AppSpacing.headlineSize(
+                        context,
+                        mobile: 30,
+                        tablet: 38,
+                        laptop: 44,
+                      ),
                       fontWeight: FontWeight.w800,
                       letterSpacing: -2,
                       height: 1.0,

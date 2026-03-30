@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
-import '../../../../core/widgets/monofolio_collapsible_card.dart';
 import '../../../github/data/github_repository.dart';
 import '../../../photography/presentation/screens/gallery_screen.dart';
 import '../widgets/contribution_graph.dart';
@@ -45,7 +44,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return FadeTransition(
       opacity: _fadeAnim,

@@ -100,7 +100,6 @@ class _SkillsScreenState extends State<SkillsScreen>
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return FadeTransition(
       opacity: _fade,
@@ -195,7 +194,6 @@ class _SkillsHero extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final borderCol = isDark ? AppColors.borderDark : AppColors.borderLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +221,12 @@ class _SkillsHero extends StatelessWidget {
         Text(
           "Tools of the trade.",
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontSize: 44,
+                fontSize: AppSpacing.headlineSize(
+                  context,
+                  mobile: 30,
+                  tablet: 38,
+                  laptop: 44,
+                ),
                 fontWeight: FontWeight.w800,
                 letterSpacing: -2,
                 height: 1.0,

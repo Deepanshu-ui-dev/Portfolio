@@ -76,41 +76,61 @@ class GitHubStats {
 class GitHubRepository {
   static const _base = 'https://api.github.com';
 
+  // Optional: flutter build web --dart-define=GH_TOKEN=ghp_xxx
+  // Not required — contributions use a token-free public proxy.
+  // Adding a token only increases REST rate limit (60 → 5000 req/hr).
+  static const _token = String.fromEnvironment('GH_TOKEN', defaultValue: '');
+
   Future<GitHubStats> fetchStats(String username) async {
     try {
-      // ───────── USER + REPOS (parallel fetch) ─────────
+      final authHeaders = _token.isNotEmpty
+          ? {'Authorization': 'bearer $_token'}
+          : <String, String>{};
+
+      // ── Parallel fetch ──────────────────────────────────────────────
       final results = await Future.wait([
+        // 1. User profile (REST — works unauthenticated, CORS-safe)
         http.get(
           Uri.parse('$_base/users/$username'),
-          headers: {'Accept': 'application/vnd.github.v3+json'},
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+            ...authHeaders,
+          },
         ),
+
+        // 2. Public repos (REST — works unauthenticated, CORS-safe)
         http.get(
           Uri.parse(
               '$_base/users/$username/repos?sort=stars&per_page=6&type=owner'),
-          headers: {'Accept': 'application/vnd.github.v3+json'},
-        ),
-        http.get(
-          Uri.parse('https://github.com/users/$username/contributions'),
           headers: {
-            'User-Agent':
-                'Mozilla/5.0 (compatible; portfolio-app/1.0)',
-            'Accept': 'text/html,application/xhtml+xml',
-            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept': 'application/vnd.github.v3+json',
+            ...authHeaders,
           },
+        ),
+
+        // 3. Contributions via jogruber's public proxy
+        //    • No token needed
+        //    • Returns CORS headers — works from Flutter Web
+        //    • Response: { "total": {...}, "contributions": [...] }
+        //    • ?y=last  → last 12 months only
+        http.get(
+          Uri.parse(
+              'https://github-contributions-api.jogruber.de/v4/$username?y=last'),
+          headers: {'Accept': 'application/json'},
         ),
       ]);
 
-      final userRes = results[0];
-      final reposRes = results[1];
-      final heatmapRes = results[2];
+      final userRes          = results[0];
+      final reposRes         = results[1];
+      final contributionsRes = results[2];
 
-      // ───────── PARSE USER ─────────
+      // ── Parse user ──────────────────────────────────────────────────
       Map<String, dynamic> user = {};
       if (userRes.statusCode == 200) {
         user = jsonDecode(userRes.body) as Map<String, dynamic>;
       }
 
-      // ───────── PARSE REPOS ─────────
+      // ── Parse repos ─────────────────────────────────────────────────
       List<GitHubRepo> repos = [];
       if (reposRes.statusCode == 200) {
         final list = jsonDecode(reposRes.body) as List<dynamic>;
@@ -121,17 +141,17 @@ class GitHubRepository {
             .toList();
       }
 
-      // ───────── PARSE CONTRIBUTIONS ─────────
+      // ── Parse contributions ──────────────────────────────────────────
       List<ContributionDay> contributions = [];
       int totalContributions = 0;
 
-      if (heatmapRes.statusCode == 200) {
-        final parsed = _parseContributions(heatmapRes.body);
+      if (contributionsRes.statusCode == 200) {
+        final parsed = _parseContributionsProxy(contributionsRes.body);
         contributions = parsed.$1;
         totalContributions = parsed.$2;
       }
 
-      // Fallback to mock data if parsing yielded nothing
+      // Fallback to mock data only if proxy failed
       if (contributions.isEmpty) {
         contributions = _generateMockContributions();
         totalContributions =
@@ -161,121 +181,82 @@ class GitHubRepository {
   }
 
   // ─────────────────────────────────────────────
-  // HTML PARSING
-  // Returns (contributions list, total count)
+  // PARSER — github-contributions-api.jogruber.de
+  //
+  // Response shape:
+  // {
+  //   "total": { "2025": 312, "2024": 198 },
+  //   "contributions": [
+  //     { "date": "2024-04-01", "count": 3, "level": 2 },
+  //     ...
+  //   ]
+  // }
   // ─────────────────────────────────────────────
 
-  (List<ContributionDay>, int) _parseContributions(String html) {
-    final contributions = <ContributionDay>[];
-    int total = 0;
+  (List<ContributionDay>, int) _parseContributionsProxy(String body) {
+    try {
+      final json = jsonDecode(body) as Map<String, dynamic>;
 
-    // ── Step 1: Extract the total from the summary text ──
-    // GitHub renders something like:
-    //   "1,234 contributions in the last year"
-    final totalRegex = RegExp(
-      r'([\d,]+)\s+contributions?\s+in\s+the\s+last\s+year',
-      caseSensitive: false,
-    );
-    final totalMatch = totalRegex.firstMatch(html);
-    if (totalMatch != null) {
-      total = int.tryParse(
-              totalMatch.group(1)!.replaceAll(RegExp(r'[,\s]'), '')) ??
-          0;
-    }
-
-    // ── Step 2: Extract per-day data ──
-    // GitHub's current HTML uses <td> with data-date and data-level.
-    // The count lives in the tooltip text or in the data-count attr
-    // (older versions). We try both approaches.
-
-    // Approach A — data-count attribute (present in some GitHub variants)
-    final tdWithCountRegex = RegExp(
-      r'<td[^>]+data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"[^>]*data-count="(\d+)"[^>]*/?>',
-    );
-
-    for (final m in tdWithCountRegex.allMatches(html)) {
-      final date = DateTime.tryParse(m.group(1)!);
-      final level = int.tryParse(m.group(2)!) ?? 0;
-      final count = int.tryParse(m.group(3)!) ?? 0;
-      if (date != null) {
-        contributions.add(
-            ContributionDay(date: date, count: count, level: level));
-      }
-    }
-
-    // Approach B — tooltip text (current GitHub structure as of 2024-2025)
-    // <rect ... data-date="2024-03-01" data-level="2" />
-    // <tool-tip for="contribution-day-component-2024-03-01">
-    //   3 contributions on March 1, 2024
-    // </tool-tip>
-    if (contributions.isEmpty) {
-      // Build a date → count map from <tool-tip> elements first
-      // Also capture the date embedded in the for="..." attribute
-      final tooltipWithDateRegex = RegExp(
-        r'<tool-tip[^>]+for="[^"]*(\d{4}-\d{2}-\d{2})[^"]*"[^>]*>\s*([\d,]+|No)[^<]*<\/tool-tip>',
-        caseSensitive: false,
-      );
-
-      final countByDate = <String, int>{};
-      for (final m in tooltipWithDateRegex.allMatches(html)) {
-        final dateStr = m.group(1)!;
-        final raw = m.group(2)!.toLowerCase();
-        final count = raw == 'no'
-            ? 0
-            : int.tryParse(raw.replaceAll(',', '')) ?? 0;
-        countByDate[dateStr] = count;
+      // Sum total across all years in the response
+      int total = 0;
+      final totalMap = json['total'] as Map<String, dynamic>?;
+      if (totalMap != null) {
+        for (final v in totalMap.values) {
+          total += (v as int? ?? 0);
+        }
       }
 
-      // Now match the <rect> / <td> elements for dates + levels
-      final cellRegex = RegExp(
-        r'data-date="(\d{4}-\d{2}-\d{2})"[^>]*data-level="(\d)"',
-      );
-      for (final m in cellRegex.allMatches(html)) {
-        final dateStr = m.group(1)!;
+      final rawDays = json['contributions'] as List<dynamic>? ?? [];
+      final days = <ContributionDay>[];
+
+      for (final item in rawDays) {
+        final map     = item as Map<String, dynamic>;
+        final dateStr = map['date'] as String?;
+        final count   = map['count'] as int? ?? 0;
+        final level   = map['level'] as int? ?? 0;
+
+        if (dateStr == null) continue;
         final date = DateTime.tryParse(dateStr);
-        final level = int.tryParse(m.group(2)!) ?? 0;
         if (date == null) continue;
 
-        // Prefer tooltip count; fall back to level as a proxy
-        final count = countByDate[dateStr] ?? level;
-        contributions.add(
-            ContributionDay(date: date, count: count, level: level));
+        days.add(ContributionDay(date: date, count: count, level: level));
       }
-    }
 
-    // ── Step 3: Deduplicate and sort chronologically ──
-    final seen = <String>{};
-    final unique = <ContributionDay>[];
-    for (final day in contributions) {
-      final key = day.date.toIso8601String().substring(0, 10);
-      if (seen.add(key)) unique.add(day);
-    }
-    unique.sort((a, b) => a.date.compareTo(b.date));
+      // Sort chronologically just in case
+      days.sort((a, b) => a.date.compareTo(b.date));
 
-    // ── Step 4: If no total was found in the HTML, compute from cells ──
-    if (total == 0 && unique.isNotEmpty) {
-      total = unique.fold(0, (sum, d) => sum + d.count);
-    }
+      // Compute total from days if not present in response
+      if (total == 0 && days.isNotEmpty) {
+        total = days.fold(0, (sum, d) => sum + d.count);
+      }
 
-    return (unique, total);
+      return (days, total);
+    } catch (_) {
+      return (<ContributionDay>[], 0);
+    }
   }
 
   // ─────────────────────────────────────────────
-  // MOCK DATA (SAFE FALLBACK)
+  // MOCK DATA — shown when token is missing or
+  // GraphQL call fails (e.g. during local dev
+  // without --dart-define=GH_TOKEN)
   // ─────────────────────────────────────────────
 
   static List<ContributionDay> _generateMockContributions() {
     final days = <ContributionDay>[];
-    final now = DateTime.now();
-    const pattern = [0, 0, 1, 2, 0, 3, 0, 1, 5, 2, 0, 0, 7, 3, 1, 0, 4, 2, 8, 0];
+    final now  = DateTime.now();
+    const pattern = [
+      0, 0, 1, 2, 0, 3, 0, 1, 5, 2,
+      0, 0, 7, 3, 1, 0, 4, 2, 8, 0,
+    ];
 
     for (int i = 365; i >= 0; i--) {
-      final date = now.subtract(Duration(days: i));
-      final base = pattern[(i + date.weekday) % pattern.length];
+      final date  = now.subtract(Duration(days: i));
+      final base  = pattern[(i + date.weekday) % pattern.length];
       final noise = (i * 7 + date.day) % 5;
       final count = (base + (noise > 3 ? noise - 2 : 0)).clamp(0, 12);
       days.add(ContributionDay(
-        date: date,
+        date:  date,
         count: count,
         level: (count / 3).clamp(0, 4).toInt(),
       ));
