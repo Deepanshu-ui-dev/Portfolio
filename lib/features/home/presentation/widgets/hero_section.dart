@@ -27,7 +27,7 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 650),
+      duration: const Duration(milliseconds: 450),
     );
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.08),
@@ -100,10 +100,10 @@ class _IdentityBlock extends StatelessWidget {
               child: RepaintBoundary(
                 child: ColorFiltered(
                   colorFilter: const ColorFilter.matrix(<double>[
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0,      0,      0,      1, 0,
+                    0.33, 0.33, 0.33, 0, 0,
+                    0.33, 0.33, 0.33, 0, 0,
+                    0.33, 0.33, 0.33, 0, 0,
+                    0,    0,    0,    1, 0,
                   ]),
                   child: Image.asset(
                     'assets/images/profile.png',

@@ -192,13 +192,15 @@ class _ContactScreenState extends State<ContactScreen>
                   _LocationCard(),
                 ];
                 if (isWide) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: cards[0]),
-                      const SizedBox(width: 12),
-                      Expanded(child: cards[1]),
-                    ],
+                  return IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: cards[0]),
+                        const SizedBox(width: 12),
+                        Expanded(child: cards[1]),
+                      ],
+                    ),
                   );
                 }
                 return Column(children: [

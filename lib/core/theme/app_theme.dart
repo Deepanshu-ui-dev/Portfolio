@@ -333,7 +333,7 @@ class AppTheme {
           color: textPrimary,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        waitDuration: const Duration(milliseconds: 600),
+        waitDuration: const Duration(milliseconds: 200),
       ),
     );
   }

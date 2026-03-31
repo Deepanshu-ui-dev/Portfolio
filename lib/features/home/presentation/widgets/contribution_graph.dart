@@ -226,23 +226,20 @@ class _ContributionGraphState extends State<ContributionGraph> {
                       const SizedBox(height: 6),
 
                       // ── Cell grid ───────────────────────────────────
-                      SizedBox(
-                        height: gridHeight,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.max,
-                          children: weeks.asMap().entries.map((weekEntry) {
-                            final wIdx = weekEntry.key;
-                            final week = weekEntry.value;
-                            final isLastWeek = wIdx == weeks.length - 1;
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.max,
+                        children: weeks.asMap().entries.map((weekEntry) {
+                          final wIdx = weekEntry.key;
+                          final week = weekEntry.value;
+                          final isLastWeek = wIdx == weeks.length - 1;
 
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                  right: isLastWeek ? 0 : _cellGap),
-                              child: SizedBox(
-                                width: cellSize,
-                                height: gridHeight,
-                                child: Column(
+                          return Padding(
+                            padding: EdgeInsets.only(
+                                right: isLastWeek ? 0 : _cellGap),
+                            child: SizedBox(
+                              width: cellSize,
+                              child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
                                       MainAxisAlignment.start,
@@ -297,10 +294,11 @@ class _ContributionGraphState extends State<ContributionGraph> {
                                           ),
                                           child: AnimatedContainer(
                                             duration: const Duration(
-                                                milliseconds: 100),
+                                                milliseconds: 50),
                                             width: cellSize,
                                             height: cellSize,
                                             decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(2),
                                               color: isHovered
                                                   ? (isDark
                                                       ? Colors.white
@@ -330,7 +328,6 @@ class _ContributionGraphState extends State<ContributionGraph> {
                             );
                           }).toList(),
                         ),
-                      ),
                     ],
                   ),
                 ),

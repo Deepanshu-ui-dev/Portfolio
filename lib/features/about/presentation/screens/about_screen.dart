@@ -21,7 +21,7 @@ class _AboutScreenState extends State<AboutScreen>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+        vsync: this, duration: const Duration(milliseconds: 400));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -459,10 +459,10 @@ class _MomentCardState extends State<_MomentCard> {
                 child: ClipRect(
                   child: ColorFiltered(
                     colorFilter: const ColorFilter.matrix(<double>[
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0.2126, 0.7152, 0.0722, 0, 0,
-                      0,      0,      0,      1, 0,
+                      0.33, 0.33, 0.33, 0, 0,
+                      0.33, 0.33, 0.33, 0, 0,
+                      0.33, 0.33, 0.33, 0, 0,
+                      0,    0,    0,    1, 0,
                     ]),
                     child: SizedBox.expand(
                       child: Image.asset(

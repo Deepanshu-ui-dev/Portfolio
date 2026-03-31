@@ -30,7 +30,7 @@ class PortfolioApp extends ConsumerWidget {
     AppColors.isDarkMode = isDark;
 
     return MaterialApp(
-      title: 'Portfolio',
+      title: 'Deepanshu Kaushik | Portfolio',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
       darkTheme: AppTheme.dark(),

@@ -8,10 +8,10 @@ class PortfolioConfig {
   static const String phone = '+91 9582405021';
 
   static const String githubUrl = 'https://github.com/Deepanshu-ui-dev';
-  static const String resumeUrl = 'https://github.com/Deepanshu-ui-dev/portfolio/raw/main/resume.pdf';
+  static const String resumeUrl = 'https://drive.google.com/file/d/1m_iLq3_Z2h1pRbKN9SRJ6AUs69pZX6-k/view?usp=drivesdk';
   static const String githubUsername = 'Deepanshu-ui-dev';
-  static const String linkedinUrl = 'https://linkedin.com/in/deepanshu-kaushik';
-  static const String twitterUrl = 'https://twitter.com/deepanshu_ui';
+  static const String linkedinUrl = 'https://www.linkedin.com/in/deepanshu-kaushik-174059297/';
+  static const String twitterUrl = 'https://x.com/Deepanshu25u';
   static const String websiteUrl = 'https://deepanshui.framer.website/';
 
   static const String bio =
@@ -38,6 +38,14 @@ class PortfolioConfig {
       tags: ['CLI', 'Algorithm'],
       badge: 'Public',
       githubUrl: 'https://github.com/Deepanshu-ui-dev/Document-Search-Engine',
+    ),
+    ProjectItem(
+      name: 'Deepanshu-Kaushik-Portfolio',
+      description: 'A minimal, interactive, high-refresh-rate personal portfolio built with Flutter and Dart, showcasing a custom glassmorphic design system and GitHub contribution integration.',
+      tags: ['Flutter', 'Dart', 'UI/UX'],
+      badge: 'Public',
+      githubUrl: 'https://github.com/Deepanshu-ui-dev/Deepanshu-Kaushik-Portfolio',
+      liveUrl: 'https://www.deepanshux.tech/',
     ),
     ProjectItem(
       name: 'Chat-app-flutter',
