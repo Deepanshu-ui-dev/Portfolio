@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
 
@@ -33,96 +33,97 @@ class GalleryScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: [
             // Header Section
-            Padding(
+            SliverPadding(
               padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Text(
-                              '[ 05 ]',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelSmall
-                                  ?.copyWith(color: accent, letterSpacing: 1.5),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'SHORTS & GALLERY',
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                '[ 05 ]',
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelSmall
-                                    ?.copyWith(color: textSec, letterSpacing: 2),
+                                    ?.copyWith(color: accent, letterSpacing: 1.5),
                               ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'SHORTS & GALLERY',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelSmall
+                                      ?.copyWith(color: textSec, letterSpacing: 2),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Back Button
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Icon(
+                              LucideIcons.x,
+                              color: textSec,
+                              size: 24,
                             ),
-                          ],
-                        ),
-                      ),
-                      // Back Button
-                      MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Icon(
-                            Icons.close,
-                            color: textSec,
-                            size: 24,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    "Bits of life.",
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontSize: AppSpacing.headlineSize(
-                            context,
-                            mobile: 30,
-                            tablet: 38,
-                            laptop: 44,
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      "Bits of life.",
+                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                            fontSize: AppSpacing.headlineSize(
+                              context,
+                              mobile: 30,
+                              tablet: 38,
+                              laptop: 44,
+                            ),
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -2,
+                            height: 1.0,
                           ),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -2,
-                          height: 1.0,
-                        ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Moments captured through the lens, random shots, and videos.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: textSec, height: 1.65),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  const DashedDivider(),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Moments captured through the lens, random shots, and videos.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: textSec, height: 1.65),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    const DashedDivider(),
+                  ],
+                ),
               ),
             ),
             
             // Grid Section
-            Expanded(
-              child: LayoutBuilder(
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
+              sliver: SliverLayoutBuilder(
                 builder: (context, constraints) {
-                  final isMobile = constraints.maxWidth < AppSpacing.mobileMax;
+                  final isMobile = constraints.crossAxisExtent < AppSpacing.mobileMax;
                   final isTablet =
-                      constraints.maxWidth >= AppSpacing.mobileMax &&
-                          constraints.maxWidth < AppSpacing.tabletMax;
+                      constraints.crossAxisExtent >= AppSpacing.mobileMax &&
+                          constraints.crossAxisExtent < AppSpacing.tabletMax;
 
-                  return GridView.builder(
-                    padding:
-                        EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
-                    physics: const BouncingScrollPhysics(),
+                  return SliverGrid(
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                       maxCrossAxisExtent: isMobile
                           ? 220
@@ -133,10 +134,12 @@ class GalleryScreen extends StatelessWidget {
                       crossAxisSpacing: isMobile ? 12 : 16,
                       childAspectRatio: isMobile ? 0.74 : 0.8,
                     ),
-                    itemCount: _images.length,
-                    itemBuilder: (context, index) {
-                      return _GalleryImageCard(imagePath: _images[index]);
-                    },
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return _GalleryImageCard(imagePath: _images[index]);
+                      },
+                      childCount: _images.length,
+                    ),
                   );
                 },
               ),
@@ -165,44 +168,55 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
 
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: border, width: 1),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Base colorful image
-            Image.asset(
-              widget.imagePath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Center(child: Icon(Icons.broken_image_outlined)),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _hovered = true),
+        onTapUp: (_) => setState(() => _hovered = false),
+        onTapCancel: () => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: _hovered ? 0.98 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: border, width: 1),
             ),
-            // Black and white filter fading out on hover
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 250),
-              opacity: _hovered ? 0.0 : 1.0,
-              child: RepaintBoundary(
-                child: ColorFiltered(
-                  colorFilter: const ColorFilter.matrix(<double>[
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0.2126, 0.7152, 0.0722, 0, 0,
-                    0,      0,      0,      1, 0,
-                  ]),
-                  child: Image.asset(
-                    widget.imagePath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        const Center(child: Icon(Icons.broken_image_outlined)),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Base colorful image
+                Image.asset(
+                  widget.imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Center(child: Icon(LucideIcons.imageOff)),
+                ),
+                // Black and white filter fading out on hover
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  opacity: _hovered ? 0.0 : 1.0,
+                  child: RepaintBoundary(
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0,      0,      0,      1, 0,
+                      ]),
+                      child: Image.asset(
+                        widget.imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(child: Icon(LucideIcons.imageOff)),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

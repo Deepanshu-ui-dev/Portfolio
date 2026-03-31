@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../theme/app_theme.dart';
 
 // ─────────────────────────────────────────────
@@ -370,6 +371,8 @@ class _CollapsibleCardState extends State<CollapsibleCard>
     _expanded ? _ctrl.forward() : _ctrl.reverse();
   }
 
+  bool _isPressed = false;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -394,37 +397,45 @@ class _CollapsibleCardState extends State<CollapsibleCard>
           children: [
             InkWell(
               onTap: _toggle,
+              onTapDown: (_) => setState(() => _isPressed = true),
+              onTapUp: (_) => setState(() => _isPressed = false),
+              onTapCancel: () => setState(() => _isPressed = false),
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(
-                  children: [
-                    widget.leading,
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(widget.title, style: Theme.of(context).textTheme.headlineMedium),
-                          if (widget.subtitle != null) ...[
-                            const SizedBox(height: 3),
-                            Text(widget.subtitle!,
-                                style: Theme.of(context).textTheme.labelMedium?.copyWith(color: textSec)),
+              child: AnimatedScale(
+                scale: _isPressed ? 0.98 : 1.0,
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOutCubic,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    children: [
+                      widget.leading,
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.title, style: Theme.of(context).textTheme.headlineMedium),
+                            if (widget.subtitle != null) ...[
+                              const SizedBox(height: 3),
+                              Text(widget.subtitle!,
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: textSec)),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(widget.rightLabel,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec)),
-                    const SizedBox(width: 10),
-                    AnimatedRotation(
-                      turns: _expanded ? 0.5 : 0,
-                      duration: const Duration(milliseconds: 220),
-                      child: Icon(Icons.keyboard_arrow_down, size: 14, color: textSec),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Text(widget.rightLabel,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec)),
+                      const SizedBox(width: 10),
+                      AnimatedRotation(
+                        turns: _expanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 220),
+                        child: Icon(LucideIcons.chevronDown, size: 14, color: textSec),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -707,8 +718,8 @@ class _ThemeToggleState extends State<_ThemeToggle> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.nightlight_round,
-                  size: 11,
+              Icon(LucideIcons.moon,
+                  size: 13,
                   color: _hovered
                       ? _text1
                       : _text2),

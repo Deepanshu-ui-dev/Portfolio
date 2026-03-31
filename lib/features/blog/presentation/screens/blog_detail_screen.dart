@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../data/blog_repository.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -26,35 +27,16 @@ class BlogDetailScreen extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xxxl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () => context.go('/blog'),
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.arrow_back, color: AppColors.textSecondary, size: 16),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      'BACK TO LOGS',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            letterSpacing: 2,
-                          ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xxl),
-            Text(
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xxxl),
+          sliver: SliverList.list(
+            children: [
+              _AnimatedBackButton(onTap: () => context.go('/blog')),
+              const SizedBox(height: AppSpacing.xxl),
+              Text(
               post.title,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: AppColors.textPrimary,
@@ -153,7 +135,54 @@ class BlogDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.section),
-          ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AnimatedBackButton extends StatefulWidget {
+  final VoidCallback onTap;
+  const _AnimatedBackButton({required this.onTap});
+
+  @override
+  State<_AnimatedBackButton> createState() => _AnimatedBackButtonState();
+}
+
+class _AnimatedBackButtonState extends State<_AnimatedBackButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _hovered = true),
+      onTapUp: (_) => setState(() => _hovered = false),
+      onTapCancel: () => setState(() => _hovered = false),
+      onTap: widget.onTap,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: _hovered ? 0.95 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(LucideIcons.arrowLeft, color: AppColors.textSecondary, size: 16),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'BACK TO LOGS',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      letterSpacing: 2,
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );

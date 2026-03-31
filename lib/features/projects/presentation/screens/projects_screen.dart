@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/portfolio_config.dart';
@@ -58,60 +59,61 @@ class _ProjectsScreenState extends State<ProjectsScreen>
       opacity: _fade,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: pad, vertical: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── HERO ─────────────────────────────────────────
-              _ProjectsHero(count: filtered.length)
-                  .animate()
-                  .fade(duration: 400.ms)
-                  .slideY(
-                      begin: 0.04,
-                      end: 0,
-                      duration: 400.ms,
-                      curve: Curves.easeOut),
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: pad, vertical: AppSpacing.xl),
+              sliver: SliverList.list(
+                children: [
+                  // ── HERO ─────────────────────────────────────────
+                  _ProjectsHero(count: filtered.length)
+                      .animate()
+                      .fade(duration: 400.ms)
+                      .slideY(
+                          begin: 0.04,
+                          end: 0,
+                          duration: 400.ms,
+                          curve: Curves.easeOut),
 
-              const SizedBox(height: AppSpacing.xxl),
-              const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
 
-              // ── FILTER ───────────────────────────────────────
-              _FilterSection(
-                tags: _filterTags,
-                active: _activeFilter,
-                onSelect: (t) => setState(
-                    () => _activeFilter = _activeFilter == t ? null : t),
-              ).animate().fade(duration: 400.ms, delay: 100.ms),
+                  // ── FILTER ───────────────────────────────────────
+                  _FilterSection(
+                    tags: _filterTags,
+                    active: _activeFilter,
+                    onSelect: (t) => setState(
+                        () => _activeFilter = _activeFilter == t ? null : t),
+                  ).animate().fade(duration: 400.ms, delay: 100.ms),
 
-              const DashedDivider(),
-              const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-              // ── GRID / EMPTY ──────────────────────────────────
-              if (filtered.isEmpty)
-                const _EmptyState()
-              else
-                _ProjectGrid(projects: filtered),
+                  // ── GRID / EMPTY ──────────────────────────────────
+                  if (filtered.isEmpty)
+                    const _EmptyState()
+                  else
+                    _ProjectGrid(projects: filtered),
 
-              const SizedBox(height: AppSpacing.xxl),
-              const DashedDivider(),
-              const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-              const SizedBox(height: AppSpacing.xxl),
-              const DashedDivider(),
-              const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-              // ── OPEN SOURCE CALLOUT ───────────────────────────
-              const _OpenSourceSection(),
+                  // ── OPEN SOURCE CALLOUT ───────────────────────────
+                  const _OpenSourceSection(),
 
-              const SizedBox(height: AppSpacing.xl),
-            ],
-          ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
       ),
     );
   }
@@ -624,13 +626,13 @@ class _ProjectLinkRow extends StatelessWidget {
     if (githubUrl == null && liveUrl == null && figmaUrl == null && installUrl == null) return const SizedBox.shrink();
     return Wrap(spacing: 16, runSpacing: 8, children: [
       if (githubUrl != null)
-        _LinkBtn(icon: Icons.code, label: 'GitHub', url: githubUrl!),
+        _LinkBtn(icon: LucideIcons.code2, label: 'GitHub', url: githubUrl!),
       if (liveUrl != null)
-        _LinkBtn(icon: Icons.arrow_outward, label: 'Live', url: liveUrl!),
+        _LinkBtn(icon: LucideIcons.arrowUpRight, label: 'Live', url: liveUrl!),
       if (installUrl != null)
-        _LinkBtn(icon: Icons.download, label: 'Install', url: installUrl!),
+        _LinkBtn(icon: LucideIcons.download, label: 'Install', url: installUrl!),
       if (figmaUrl != null)
-        _LinkBtn(icon: Icons.brush, label: 'Figma', url: figmaUrl!),
+        _LinkBtn(icon: LucideIcons.palette, label: 'Figma', url: figmaUrl!),
     ]);
   }
 }
@@ -660,28 +662,36 @@ class _LinkBtnState extends State<_LinkBtn> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        onTapDown: (_) => setState(() => _hovered = true),
+        onTapUp: (_) => setState(() => _hovered = false),
+        onTapCancel: () => setState(() => _hovered = false),
         onTap: () async {
           final uri = Uri.parse(widget.url);
           if (await canLaunchUrl(uri)) await launchUrl(uri);
         },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            border: Border.all(color: accent),
-            color: _hovered ? accent.withOpacity(0.15) : Colors.transparent,
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(widget.icon, size: 14, color: _hovered ? accent : textPri),
-              const SizedBox(width: 8),
-              Text(
-                widget.label.toUpperCase(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: _hovered ? accent : textPri, letterSpacing: 1.2, fontWeight: FontWeight.w600),
-              ),
-            ],
+        child: AnimatedScale(
+          scale: _hovered ? 0.96 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              border: Border.all(color: accent),
+              color: _hovered ? accent.withOpacity(0.15) : Colors.transparent,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(widget.icon, size: 14, color: _hovered ? accent : textPri),
+                const SizedBox(width: 8),
+                Text(
+                  widget.label.toUpperCase(),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: _hovered ? accent : textPri, letterSpacing: 1.2, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
           ),
         ),
       ),

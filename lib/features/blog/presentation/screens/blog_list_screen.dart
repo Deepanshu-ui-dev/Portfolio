@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -23,70 +24,71 @@ class BlogScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Page title
-            Text(
-              'Articles',
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Disclaimer
-            RichText(
-              text: TextSpan(
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      height: 1.8,
-                      fontSize: 11,
+    return CustomScrollView(
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xl),
+          sliver: SliverList.list(
+            children: [
+              // Page title
+              Text(
+                'Articles',
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                children: [
-                  TextSpan(
-                    text: 'Disclaimer',
-                    style: TextStyle(
-                      color: AppColors.textPrimary,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.textSecondary,
-                    ),
-                  ),
-                  const TextSpan(
-                    text:
-                        ': I write about the tech I build and my experiences in development. I am not a professional writer, so if I write something inaccurate, please feel free to ',
-                  ),
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.baseline,
-                    baseline: TextBaseline.alphabetic,
-                    child: _InlineLink(
-                      label: 'email me',
-                      url: 'mailto:bilal@example.com',
-                    ),
-                  ),
-                  const TextSpan(text: '.'),
-                ],
               ),
-            ),
 
-            const SizedBox(height: AppSpacing.xxl),
+              const SizedBox(height: 16),
 
-            // Article list
-            ..._articles.map((a) => _ArticleRow(data: a)),
+              // Disclaimer
+              RichText(
+                text: TextSpan(
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.8,
+                        fontSize: 11,
+                      ),
+                  children: [
+                    TextSpan(
+                      text: 'Disclaimer',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.textSecondary,
+                      ),
+                    ),
+                    const TextSpan(
+                      text:
+                          ': I write about the tech I build and my experiences in development. I am not a professional writer, so if I write something inaccurate, please feel free to ',
+                    ),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.baseline,
+                      baseline: TextBaseline.alphabetic,
+                      child: _InlineLink(
+                        label: 'email me',
+                        url: 'mailto:bilal@example.com',
+                      ),
+                    ),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
+              ),
 
-            const SizedBox(height: AppSpacing.xxxl),
+              const SizedBox(height: AppSpacing.xxl),
 
-            // Footer
-            const _FooterWidget(),
-            const SizedBox(height: AppSpacing.xl),
-          ],
+              // Article list
+              ..._articles.map((a) => _ArticleRow(data: a)),
+
+              const SizedBox(height: AppSpacing.xxxl),
+
+              // Footer
+              const _FooterWidget(),
+              const SizedBox(height: AppSpacing.xl),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -127,49 +129,57 @@ class _ArticleRowState extends State<_ArticleRow> {
       onExit: (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        onTapDown: (_) => setState(() => _hovered = true),
+        onTapUp: (_) => setState(() => _hovered = false),
+        onTapCancel: () => setState(() => _hovered = false),
         onTap: () => launchUrl(Uri.parse(widget.data.url)),
-        child: AnimatedContainer(
+        child: AnimatedScale(
+          scale: _hovered ? 0.98 : 1.0,
           duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          decoration: BoxDecoration(
-            color: _hovered
-                ? AppColors.surface.withValues(alpha: 0.4)
-                : Colors.transparent,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Date
-              Text(
-                widget.data.date,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontSize: 11,
-                    ),
-              ),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? AppColors.surface.withValues(alpha: 0.4)
+                  : Colors.transparent,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Date
+                Text(
+                  widget.data.date,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 11,
+                      ),
+                ),
 
-              const SizedBox(height: 6),
+                const SizedBox(height: 6),
 
-              // Title
-              Text(
-                widget.data.title,
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-              ),
+                // Title
+                Text(
+                  widget.data.title,
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                ),
 
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // Excerpt
-              Text(
-                widget.data.excerpt,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      height: 1.7,
-                      fontSize: 11,
-                    ),
-              ),
-            ],
+                // Excerpt
+                Text(
+                  widget.data.excerpt,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.7,
+                        fontSize: 11,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -242,7 +252,7 @@ class _FooterWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.surfaceBorder, width: 1),
                 ),
-                child: Icon(Icons.grid_view,
+                child: Icon(LucideIcons.layoutGrid,
                     size: 13, color: AppColors.textSecondary),
               ),
               const SizedBox(width: 12),
@@ -264,10 +274,10 @@ class _FooterWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              Icon(Icons.wb_sunny_outlined,
+              Icon(LucideIcons.sun,
                   size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 8),
-              Icon(Icons.nightlight_round,
+              Icon(LucideIcons.moon,
                   size: 14, color: AppColors.textPrimary),
             ],
           ),

@@ -105,43 +105,44 @@ class _SkillsScreenState extends State<SkillsScreen>
       opacity: _fade,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: padding, vertical: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── HERO ──────────────────────────────────────────
-              const _SkillsHero(),
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: padding, vertical: AppSpacing.xl),
+              sliver: SliverList.list(
+                children: [
+                  // ── HERO ──────────────────────────────────────────
+                  const _SkillsHero(),
 
-              const SizedBox(height: AppSpacing.xxl),
-              const DashedDivider(),
-              const SizedBox(height: AppSpacing.xxl),
-
-              // ── SKILL SECTIONS ────────────────────────────────
-              for (int i = 0; i < _sections.length; i++) ...[
-                _SkillSection(data: _sections[i]),
-                if (i < _sections.length - 1) ...[
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
+
+                  // ── SKILL SECTIONS ────────────────────────────────
+                  for (int i = 0; i < _sections.length; i++) ...[
+                    _SkillSection(data: _sections[i]),
+                    if (i < _sections.length - 1) ...[
+                      const SizedBox(height: AppSpacing.xxl),
+                      const DashedDivider(),
+                      const SizedBox(height: AppSpacing.xxl),
+                    ],
+                  ],
+
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+
+                  // ── CALLOUT ROW ───────────────────────────────────
+                  const _PhilosophyCallout(),
+
+                  const SizedBox(height: AppSpacing.xl),
                 ],
-              ],
-
-              const SizedBox(height: AppSpacing.xxl),
-              const DashedDivider(),
-              const SizedBox(height: AppSpacing.xxl),
-
-              // ── CALLOUT ROW ───────────────────────────────────
-              const _PhilosophyCallout(),
-
-              const SizedBox(height: AppSpacing.xl),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
-      ),
       ),
     );
   }
@@ -382,105 +383,115 @@ class _SkillCardState extends State<_SkillCard> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        margin: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          color: _hovered
-              ? (widget.skill.highlight
-                  ? (isDark
-                      ? const Color(0xFF1A2A1A)
-                      : const Color(0xFFE8F5E9))
-                  : surfaceEl)
-              : Colors.transparent,
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-          // Corner brackets
-          _Bracket(top: true, left: true, color: bracketColor),
-          _Bracket(top: true, left: false, color: bracketColor),
-          _Bracket(top: false, left: true, color: bracketColor),
-          _Bracket(top: false, left: false, color: bracketColor),
-
-          // Content
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 24, 12, 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _hovered = true),
+        onTapUp: (_) => setState(() => _hovered = false),
+        onTapCancel: () => setState(() => _hovered = false),
+        child: AnimatedScale(
+          scale: _hovered ? 0.96 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            margin: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? (widget.skill.highlight
+                      ? (isDark
+                          ? const Color(0xFF1A2A1A)
+                          : const Color(0xFFE8F5E9))
+                      : surfaceEl)
+                  : Colors.transparent,
+            ),
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                // Icon crossfade greyscale → color
-                SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      AnimatedOpacity(
-                        opacity: _hovered ? 0.0 : 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: SvgPicture.network(
-                          greyUrl,
-                          width: 34,
-                          height: 34,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (_) => _Fallback(
-                              label: widget.skill.label, color: textSec),
-                        ),
+              // Corner brackets
+              _Bracket(top: true, left: true, color: bracketColor),
+              _Bracket(top: true, left: false, color: bracketColor),
+              _Bracket(top: false, left: true, color: bracketColor),
+              _Bracket(top: false, left: false, color: bracketColor),
+
+              // Content
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 24, 12, 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Icon crossfade greyscale → color
+                    SizedBox(
+                      width: 44,
+                      height: 44,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          AnimatedOpacity(
+                            opacity: _hovered ? 0.0 : 1.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: SvgPicture.network(
+                              greyUrl,
+                              width: 34,
+                              height: 34,
+                              fit: BoxFit.contain,
+                              placeholderBuilder: (_) => _Fallback(
+                                  label: widget.skill.label, color: textSec),
+                            ),
+                          ),
+                          AnimatedOpacity(
+                            opacity: _hovered ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: SvgPicture.network(
+                              colorUrl,
+                              width: 34,
+                              height: 34,
+                              fit: BoxFit.contain,
+                              placeholderBuilder: (_) => _Fallback(
+                                  label: widget.skill.label, color: brand),
+                            ),
+                          ),
+                        ],
                       ),
-                      AnimatedOpacity(
-                        opacity: _hovered ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: SvgPicture.network(
-                          colorUrl,
-                          width: 34,
-                          height: 34,
-                          fit: BoxFit.contain,
-                          placeholderBuilder: (_) => _Fallback(
-                              label: widget.skill.label, color: brand),
-                        ),
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    // Label
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 180),
+                      style:
+                          (Theme.of(context).textTheme.labelSmall ?? const TextStyle())
+                              .copyWith(
+                        color: _hovered
+                            ? (widget.skill.highlight ? accent : textPri)
+                            : textSec,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                        fontSize: 9,
+                      ),
+                      child: Text(
+                        widget.skill.label.toUpperCase(),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+
+                    if (widget.skill.sublabel != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        widget.skill.sublabel!,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: textSec.withValues(alpha: 0.55),
+                              fontSize: 8,
+                              fontStyle: FontStyle.italic,
+                            ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-
-                const SizedBox(height: 14),
-
-                // Label
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  style:
-                      (Theme.of(context).textTheme.labelSmall ?? const TextStyle())
-                          .copyWith(
-                    color: _hovered
-                        ? (widget.skill.highlight ? accent : textPri)
-                        : textSec,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.0,
-                    fontSize: 9,
-                  ),
-                  child: Text(
-                    widget.skill.label.toUpperCase(),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-
-                if (widget.skill.sublabel != null) ...[
-                  const SizedBox(height: 3),
-                  Text(
-                    widget.skill.sublabel!,
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: textSec.withValues(alpha: 0.55),
-                          fontSize: 8,
-                          fontStyle: FontStyle.italic,
-                        ),
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ]),
           ),
-        ]),
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
@@ -42,79 +43,80 @@ class _AboutScreenState extends State<AboutScreen>
       opacity: _fade,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: padding, vertical: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── 01 / Header ──
-                _SectionLabel(index: '01', label: 'THE PERSON BEHIND THE PIXELS'),
-                const SizedBox(height: 14),
-                Text(
-                  "My personal digital space.",
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontSize: AppSpacing.headlineSize(
-                          context,
-                          mobile: 30,
-                          tablet: 34,
-                          laptop: 36,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: padding, vertical: AppSpacing.xl),
+              sliver: SliverList.list(
+                children: [
+                  // ── 01 / Header ──
+                  _SectionLabel(index: '01', label: 'THE PERSON BEHIND THE PIXELS'),
+                  const SizedBox(height: 14),
+                  Text(
+                    "My personal digital space.",
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          fontSize: AppSpacing.headlineSize(
+                            context,
+                            mobile: 30,
+                            tablet: 34,
+                            laptop: 36,
+                          ),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -2,
+                          height: 1.0,
                         ),
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -2,
-                        height: 1.0,
-                      ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'No corporate jargon. Just a quiet corner of the internet where I dump my thoughts, track my life goals, and share the vibes I\'m currently listening to.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: textSec, height: 1.65),
-                ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No corporate jargon. Just a quiet corner of the internet where I dump my thoughts, track my life goals, and share the vibes I\'m currently listening to.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: textSec, height: 1.65),
+                  ),
 
-                const SizedBox(height: AppSpacing.xxl),
-                const DashedDivider(),
-                const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-                // ── 02 / Bucket List ──
-                _SectionLabel(index: '02', label: 'BUCKET LIST'),
-                const SizedBox(height: 16),
-                const _BucketListSection(),
+                  // ── 02 / Bucket List ──
+                  _SectionLabel(index: '02', label: 'BUCKET LIST'),
+                  const SizedBox(height: 16),
+                  const _BucketListSection(),
 
-                const SizedBox(height: AppSpacing.xxl),
-                const DashedDivider(),
-                const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-                // ── 04 / Volunteer Experience ──
-                _SectionLabel(index: '03', label: 'COMMUNITY CONTRIBUTIONS'),
-                const SizedBox(height: 6),
-                Text(
-                  'Communities I\'ve helped build and grown in.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(color: textSec, height: 1.5),
-                ),
-                const SizedBox(height: 20),
-                const _VolunteerExperienceFeed(),
+                  // ── 04 / Volunteer Experience ──
+                  _SectionLabel(index: '03', label: 'COMMUNITY CONTRIBUTIONS'),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Communities I\'ve helped build and grown in.',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: textSec, height: 1.5),
+                  ),
+                  const SizedBox(height: 20),
+                  const _VolunteerExperienceFeed(),
 
-                const SizedBox(height: AppSpacing.xxl),
-                const DashedDivider(),
-                const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
 
-                // ── 05 / Brain Dumps ──
-                _SectionLabel(index: '04', label: 'BRAIN DUMPS'),
-                const SizedBox(height: 16),
-                const _JournalFeed(),
+                  // ── 05 / Brain Dumps ──
+                  _SectionLabel(index: '04', label: 'BRAIN DUMPS'),
+                  const SizedBox(height: 16),
+                  const _JournalFeed(),
 
-                const SizedBox(height: AppSpacing.xxxl),
-              ],
+                  const SizedBox(height: AppSpacing.xxxl),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -256,7 +258,7 @@ class _BucketItemState extends State<_BucketItem> {
                     : Colors.transparent,
               ),
               child: widget.isDone
-                  ? Icon(Icons.check, size: 10, color: accent)
+                  ? Icon(LucideIcons.check, size: 10, color: accent)
                   : null,
             ),
             Expanded(
@@ -441,42 +443,50 @@ class _MomentCardState extends State<_MomentCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: GestureDetector(
+        onTapDown: (_) => setState(() => _hovered = true),
+        onTapUp: (_) => setState(() => _hovered = false),
+        onTapCancel: () => setState(() => _hovered = false),
         onTap: () => _openDetails(context),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: _hovered
-                ? surfaceElev.withOpacity(0.5)
-                : Colors.transparent,
-            border: Border.all(color: _hovered ? border2 : border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── Cover image (Black & White) ──
-              AspectRatio(
-                aspectRatio: widget.isSecondary ? 4 / 3 : 16 / 9,
-                child: ClipRect(
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[
-                      0.33, 0.33, 0.33, 0, 0,
-                      0.33, 0.33, 0.33, 0, 0,
-                      0.33, 0.33, 0.33, 0, 0,
-                      0,    0,    0,    1, 0,
-                    ]),
-                    child: SizedBox.expand(
-                      child: Image.asset(
-                        widget.imageAsset,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => ColoredBox(
-                          color: isDark
-                              ? const Color(0xFF1A1A1A)
-                              : const Color(0xFFDDDDDD),
-                          child: Center(
-                            child: Icon(
-                              Icons.photo_camera_back_outlined,
-                              color: textSec.withOpacity(0.3),
-                              size: 32,
+        child: AnimatedScale(
+          scale: _hovered ? 0.98 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            decoration: BoxDecoration(
+              color: _hovered
+                  ? surfaceElev.withOpacity(0.5)
+                  : Colors.transparent,
+              border: Border.all(color: _hovered ? border2 : border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ── Cover image (Black & White) ──
+                AspectRatio(
+                  aspectRatio: widget.isSecondary ? 4 / 3 : 16 / 9,
+                  child: ClipRect(
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.33, 0.33, 0.33, 0, 0,
+                        0.33, 0.33, 0.33, 0, 0,
+                        0.33, 0.33, 0.33, 0, 0,
+                        0,    0,    0,    1, 0,
+                      ]),
+                      child: SizedBox.expand(
+                        child: Image.asset(
+                          widget.imageAsset,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => ColoredBox(
+                            color: isDark
+                                ? const Color(0xFF1A1A1A)
+                                : const Color(0xFFDDDDDD),
+                            child: Center(
+                              child: Icon(
+                                LucideIcons.image,
+                                color: textSec.withOpacity(0.3),
+                                size: 32,
+                              ),
                             ),
                           ),
                         ),
@@ -484,118 +494,118 @@ class _MomentCardState extends State<_MomentCard> {
                     ),
                   ),
                 ),
-              ),
 
-              // ── Card body ──
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Role pill
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: accent.withOpacity(0.4)),
-                        color: accent.withOpacity(0.06),
-                      ),
-                      child: Text(
-                        widget.role.toUpperCase(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(
-                                color: accent,
-                                fontSize: 9,
-                                letterSpacing: 1.5),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Title
-                    Text(
-                      widget.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: textPri,
-                              fontSize: 15,
-                              height: 1.2),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Period
-                    Text(
-                      widget.period,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(
-                              color: textSec.withOpacity(0.6),
-                              fontSize: 11),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // Tagline
-                    Text(
-                      widget.tagline,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(
-                              color: textSec, fontSize: 13, height: 1.5),
-                    ),
-
-                    // Stats row
-                    if (widget.stats.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Row(
-                        children: widget.stats
-                            .map((s) => Expanded(
-                                  child: _StatCell(
-                                    value: s.value,
-                                    label: s.label,
-                                  ),
-                                ))
-                            .toList(),
-                      ),
-                    ],
-
-                    const SizedBox(height: 14),
-
-                    // Read more
-                    Row(
-                      children: [
-                        Text(
-                          'READ MORE',
+                // ── Card body ──
+                Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Role pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: accent.withOpacity(0.4)),
+                          color: accent.withOpacity(0.06),
+                        ),
+                        child: Text(
+                          widget.role.toUpperCase(),
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
                               ?.copyWith(
-                                  color: _hovered ? textPri : textSec,
-                                  letterSpacing: 1.5,
-                                  fontSize: 9),
+                                  color: accent,
+                                  fontSize: 9,
+                                  letterSpacing: 1.5),
                         ),
-                        const SizedBox(width: 6),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          transform: Matrix4.translationValues(
-                              _hovered ? 3 : 0, 0, 0),
-                          child: Icon(
-                            Icons.arrow_forward,
-                            size: 12,
-                            color: _hovered ? textPri : textSec,
-                          ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Title
+                      Text(
+                        widget.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: textPri,
+                                fontSize: 15,
+                                height: 1.2),
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Period
+                      Text(
+                        widget.period,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(
+                                color: textSec.withOpacity(0.6),
+                                fontSize: 11),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Tagline
+                      Text(
+                        widget.tagline,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                                color: textSec, fontSize: 13, height: 1.5),
+                      ),
+
+                      // Stats row
+                      if (widget.stats.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Row(
+                          children: widget.stats
+                              .map((s) => Expanded(
+                                    child: _StatCell(
+                                      value: s.value,
+                                      label: s.label,
+                                    ),
+                                  ))
+                              .toList(),
                         ),
                       ],
-                    ),
-                  ],
+
+                      const SizedBox(height: 14),
+
+                      // Read more
+                      Row(
+                        children: [
+                          Text(
+                            'READ MORE',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(
+                                    color: _hovered ? textPri : textSec,
+                                    letterSpacing: 1.5,
+                                    fontSize: 9),
+                          ),
+                          const SizedBox(width: 6),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            transform: Matrix4.translationValues(
+                                _hovered ? 3 : 0, 0, 0),
+                            child: Icon(
+                              LucideIcons.arrowRight,
+                              size: 12,
+                              color: _hovered ? textPri : textSec,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -749,8 +759,8 @@ class _JournalItemState extends State<_JournalItem> {
                 children: [
                   Icon(
                     widget.isThought
-                        ? Icons.format_quote
-                        : Icons.article_outlined,
+                        ? LucideIcons.quote
+                        : LucideIcons.fileText,
                     size: 13,
                     color: widget.isThought ? accent : textSec,
                   ),
