@@ -6,28 +6,28 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // ── Dark theme ────────────────────────────
-  static const Color bgDark           = Color(0xFF0C0C0C); // near-black body
-  static const Color surfaceDark      = Color(0xFF111111); // card bg
-  static const Color surfaceElevDark  = Color(0xFF181818); // hover / elevated
-  static const Color borderDark       = Color(0xFF222222); // default border
-  static const Color border2Dark      = Color(0xFF333333); // hover border
-  static const Color textPrimaryDark  = Color(0xFFEEEEEE); // primary text
-  static const Color textSecDark      = Color(0xFF5A5A5A); // muted labels
-  static const Color textTerDark      = Color(0xFF3E3E3E); // very muted
-  static const Color textMutedDark    = Color(0xFF383838);
-  static const Color accentDark       = Color(0xFF5FBF8F); // green accent
+  static const Color bgDark           = Color(0xFF000000); // OLED black body
+  static const Color surfaceDark      = Color(0xFF0A0A0A); // subtle off-black card
+  static const Color surfaceElevDark  = Color(0xFF141414); // hover / elevated
+  static const Color borderDark       = Color(0xFF1E1E1E); // crisp, clean border
+  static const Color border2Dark      = Color(0xFF2A2A2A); // active border
+  static const Color textPrimaryDark  = Color(0xFFF5F5F5); // pure, sharp white
+  static const Color textSecDark      = Color(0xFFA1A1AA); // distinct visible gray (zinc-400)
+  static const Color textTerDark      = Color(0xFF71717A); // very muted (zinc-500)
+  static const Color textMutedDark    = Color(0xFF52525B); // subtle background elements
+  static const Color accentDark       = Color(0xFF10B981); // striking Emerald green
 
   // ── Light theme ───────────────────────────
-  static const Color bgLight          = Color(0xFFF5F5F2);
-  static const Color surfaceLight     = Color(0xFFEEEEEB);
-  static const Color surfaceElevLight = Color(0xFFE5E5E2);
-  static const Color borderLight      = Color(0xFFD8D8D4);
-  static const Color border2Light     = Color(0xFFC6C6C2);
-  static const Color textPrimaryLight = Color(0xFF0F0F0F);
-  static const Color textSecLight     = Color(0xFF888888);
-  static const Color textTerLight     = Color(0xFFAAAAAA);
-  static const Color textMutedLight   = Color(0xFFC4C4C0);
-  static const Color accentLight      = Color(0xFF1D9E75);
+  static const Color bgLight          = Color(0xFFFAFAFA); // crisp zinc-50
+  static const Color surfaceLight     = Color(0xFFFFFFFF); // pure white card
+  static const Color surfaceElevLight = Color(0xFFF4F4F5); // slightly raised
+  static const Color borderLight      = Color(0xFFE4E4E7); // clean separating line
+  static const Color border2Light     = Color(0xFFD4D4D8); // dense active border
+  static const Color textPrimaryLight = Color(0xFF09090B); // dark heavy contrasting text
+  static const Color textSecLight     = Color(0xFF71717A); // readable secondary
+  static const Color textTerLight     = Color(0xFFA1A1AA);
+  static const Color textMutedLight   = Color(0xFFD4D4D8);
+  static const Color accentLight      = Color(0xFF059669); // sophisticated darker Emerald
 
   // ── Contribution graph ────────────────────
   static const Color contrib0Dark = Color(0xFF161616);
@@ -182,10 +182,10 @@ class AppTheme {
         // ── Hero / page name ──────────────────
         displayLarge: TextStyle(
           fontFamily: mono,
-          fontSize: 32,
-          fontWeight: FontWeight.w700,
+          fontSize: 34,
+          fontWeight: FontWeight.w800,
           color: textPrimary,
-          letterSpacing: -0.5,
+          letterSpacing: -1.0,
           height: 1.1,
         ),
 
@@ -193,9 +193,9 @@ class AppTheme {
         displayMedium: TextStyle(
           fontFamily: mono,
           fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           color: textPrimary,
-          letterSpacing: -0.3,
+          letterSpacing: -0.5,
           height: 1.2,
         ),
 

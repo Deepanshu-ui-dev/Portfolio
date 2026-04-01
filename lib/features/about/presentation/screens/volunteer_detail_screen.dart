@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class VolunteerDetailScreen extends StatelessWidget {
   final String title;
@@ -106,7 +107,7 @@ class VolunteerDetailScreen extends StatelessWidget {
                                       0.2126, 0.7152, 0.0722, 0, 0,
                                       0,      0,      0,      1, 0,
                                     ]),
-                                    child: Image.asset(childImages[index], fit: BoxFit.cover),
+                                    child: Image.asset(childImages[index], fit: BoxFit.cover, cacheWidth: 800),
                                   ),
                                 ),
                               ),
@@ -158,7 +159,7 @@ class VolunteerDetailScreen extends StatelessWidget {
                 const SizedBox(height: 60),
               ],
             ),
-          ),
+          ).animate().fade(duration: 350.ms).slideY(begin: 0.04, end: 0, duration: 350.ms, curve: Curves.easeOutCubic),
         ),
       ),
     );

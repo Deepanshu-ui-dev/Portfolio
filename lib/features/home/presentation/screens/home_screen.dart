@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -118,18 +119,7 @@ class _HomeHeatmapSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         stats.when(
-          loading: () => const _HeatmapShell(
-            child: SizedBox(
-              height: 100,
-              child: Center(
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 1.5),
-                ),
-              ),
-            ),
-          ),
+          loading: () => const _HeatmapShell(child: _HeatmapSkeleton()),
           error: (e, _) => _HeatmapShell(
             child: SizedBox(
               height: 100,
@@ -169,6 +159,92 @@ class _HeatmapShell extends StatelessWidget {
       ),
       child: child,
     );
+  }
+}
+
+class _HeatmapSkeleton extends StatelessWidget {
+  const _HeatmapSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cell = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth < 420 ? 28 : 42;
+        final cellSize = constraints.maxWidth < 420 ? 6.0 : 8.0;
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 2,
+                runSpacing: 2,
+                children: List.generate(columns, (i) {
+                  final alpha = (i % 5 == 0)
+                      ? 0.55
+                      : (i % 3 == 0)
+                          ? 0.42
+                          : 0.3;
+                  return _PulseSkeleton(
+                    width: cellSize,
+                    height: cellSize,
+                    color: cell.withValues(alpha: alpha),
+                  );
+                }),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  _PulseSkeleton(
+                    width: constraints.maxWidth * 0.45,
+                    height: 8,
+                    color: cell.withValues(alpha: 0.4),
+                  ),
+                  const Spacer(),
+                  _PulseSkeleton(
+                    width: constraints.maxWidth * 0.25,
+                    height: 8,
+                    color: cell.withValues(alpha: 0.4),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PulseSkeleton extends StatelessWidget {
+  final double width;
+  final double height;
+  final Color color;
+
+  const _PulseSkeleton({
+    required this.width,
+    required this.height,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    ).animate(onPlay: (controller) => controller.repeat()).shimmer(
+          duration: 1200.ms,
+          color: Colors.white24,
+          angle: 1.0,
+        );
   }
 }
 
@@ -1076,11 +1152,14 @@ class _PhotoCardState extends State<_PhotoCard>
               fit: StackFit.expand,
               children: [
                 // Base colored image
-                Image.asset(
-                  widget.category.imagePath,
+                _SkeletonAssetImage(
+                  assetPath: widget.category.imagePath,
                   fit: BoxFit.cover,
                   cacheWidth: 320,
-                  errorBuilder: (ctx, err, stack) => const SizedBox(),
+                  skeletonColor: widget.isDark
+                      ? AppColors.surfaceElevDark
+                      : AppColors.surfaceElevLight,
+                  errorWidget: const SizedBox(),
                 ),
                 // Grayscale overlay that smoothly fades out on hover
                 AnimatedOpacity(
@@ -1094,11 +1173,14 @@ class _PhotoCardState extends State<_PhotoCard>
                         0.2126, 0.7152, 0.0722, 0, 0,
                         0,      0,      0,      1, 0,
                       ]),
-                      child: Image.asset(
-                        widget.category.imagePath,
+                      child: _SkeletonAssetImage(
+                        assetPath: widget.category.imagePath,
                         fit: BoxFit.cover,
                         cacheWidth: 320,
-                        errorBuilder: (ctx, err, stack) => const SizedBox(),
+                        skeletonColor: widget.isDark
+                            ? AppColors.surfaceElevDark
+                            : AppColors.surfaceElevLight,
+                        errorWidget: const SizedBox(),
                       ),
                     ),
                   ),
@@ -1182,6 +1264,57 @@ class _PhotoCardState extends State<_PhotoCard>
         ),
         ),
       ),
+    );
+  }
+}
+
+class _SkeletonAssetImage extends StatefulWidget {
+  final String assetPath;
+  final BoxFit fit;
+  final int? cacheWidth;
+  final Color skeletonColor;
+  final Widget errorWidget;
+
+  const _SkeletonAssetImage({
+    required this.assetPath,
+    required this.fit,
+    required this.skeletonColor,
+    required this.errorWidget,
+    this.cacheWidth,
+  });
+
+  @override
+  State<_SkeletonAssetImage> createState() => _SkeletonAssetImageState();
+}
+
+class _SkeletonAssetImageState extends State<_SkeletonAssetImage> {
+  bool _showContent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) setState(() => _showContent = true);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      widget.assetPath,
+      fit: widget.fit,
+      cacheWidth: widget.cacheWidth,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (_showContent && (wasSynchronouslyLoaded || frame != null)) {
+          return child.animate().fadeIn(duration: 400.ms, curve: Curves.easeOut);
+        }
+        return Container(color: widget.skeletonColor)
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(duration: 1200.ms, color: Colors.white24, angle: 1.0);
+      },
+      errorBuilder: (_, __, ___) => widget.errorWidget,
     );
   }
 }

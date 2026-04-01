@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:redacted/redacted.dart';
 import '../theme/app_theme.dart';
+export 'skeleton_loaders.dart';
 
 // ─────────────────────────────────────────────
 // DASHED BORDER CONTAINER
@@ -628,21 +630,21 @@ class PortfolioFooter extends StatelessWidget {
     required this.onToggleTheme,
   });
 
-  static const Color _bg       = Color(0xFF0A0A09);
-  static const Color _border   = Color(0x12FFFFFF);
-  static const Color _text2    = Color(0xFF7A7870);
-  static const Color _text3    = Color(0xFF4A4845);
-
   @override
   Widget build(BuildContext context) {
+    final bg = isDark ? AppColors.bgDark : AppColors.bgLight;
+    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final text2 = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final text3 = isDark ? AppColors.textTerDark : AppColors.textTerLight;
+
     return Container(
-      color: _bg,
+      color: bg,
       width: double.infinity,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _DashedRule(color: _border),
+          _DashedRule(color: border),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: AppSpacing.horizontalPadding(context),
@@ -655,17 +657,17 @@ class PortfolioFooter extends StatelessWidget {
               children: [
                 Text(
                   '© 2026 — Deepanshu',
-                  style: const TextStyle(
-                    color: _text3,
+                  style: TextStyle(
+                    color: text3,
                     fontFamily: 'monospace',
                     fontSize: 10,
                     letterSpacing: 0.4,
                   ),
                 ),
-                const Text(
+                Text(
                   'Built with 🤍',
                   style: TextStyle(
-                    color: _text2,
+                    color: text2,
                     fontFamily: 'monospace',
                     fontSize: 10,
                     letterSpacing: 0.4,
@@ -693,13 +695,14 @@ class _ThemeToggle extends StatefulWidget {
 class _ThemeToggleState extends State<_ThemeToggle> {
   bool _hovered = false;
 
-  static const Color _border   = Color(0x12FFFFFF);
-  static const Color _borderHi = Color(0x24FFFFFF);
-  static const Color _text1    = Color(0xFFE8E6DF);
-  static const Color _text2    = Color(0xFF7A7870);
-
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDarkMode;
+    final textPri = AppColors.textPrimary;
+    final textSec = AppColors.textSecondary;
+    final border = AppColors.border;
+    final borderHi = AppColors.border2;
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -711,7 +714,7 @@ class _ThemeToggleState extends State<_ThemeToggle> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             border: Border.all(
-              color: _hovered ? _borderHi : _border,
+              color: _hovered ? borderHi : border,
               width: 1,
             ),
           ),
@@ -721,8 +724,8 @@ class _ThemeToggleState extends State<_ThemeToggle> {
               Icon(LucideIcons.moon,
                   size: 13,
                   color: _hovered
-                      ? _text1
-                      : _text2),
+                      ? textPri
+                      : textSec),
             ],
           ),
         ),
@@ -744,6 +747,36 @@ class _DashedRule extends StatelessWidget {
       width: double.infinity,
       child: CustomPaint(
         painter: _DashedLinePainter(color: color, isHorizontal: true),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// THEME-AWARE REDACTED SKELETON LOADER
+// ─────────────────────────────────────────────
+
+class ThemedSkeletonLoader extends StatelessWidget {
+  final Widget child;
+  final bool isLoading;
+  final Duration animationDuration;
+
+  const ThemedSkeletonLoader({
+    super.key,
+    required this.child,
+    this.isLoading = true,
+    this.animationDuration = const Duration(milliseconds: 800),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!isLoading) return child;
+
+    return child.redacted(
+      context: context,
+      redact: true,
+      configuration: RedactedConfiguration(
+        animationDuration: animationDuration,
       ),
     );
   }

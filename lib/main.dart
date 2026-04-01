@@ -76,15 +76,35 @@ class _AppShell extends ConsumerStatefulWidget {
 class _AppShellState extends ConsumerState<_AppShell> {
   int _idx = 0;
 
+  // Lazily created and cached tabs.
   // Tab order MUST match FloatingNavBar._items exactly:
   //   0 Home | 1 About | 2 Projects | 3 Skills | 4 Contact
-  static const _screens = [
-    HomeScreen(),
-    AboutScreen(),
-    ProjectsScreen(),
-    SkillsScreen(),
-    ContactScreen(),
-  ];
+  late final List<Widget?> _screens = List<Widget?>.filled(5, null)
+    ..[0] = const HomeScreen();
+
+  Widget _buildScreen(int index) {
+    switch (index) {
+      case 0:
+        return const HomeScreen();
+      case 1:
+        return const AboutScreen();
+      case 2:
+        return const ProjectsScreen();
+      case 3:
+        return const SkillsScreen();
+      case 4:
+        return const ContactScreen();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  void _openTab(int index) {
+    if (_screens[index] == null) {
+      _screens[index] = _buildScreen(index);
+    }
+    setState(() => _idx = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +121,14 @@ class _AppShellState extends ConsumerState<_AppShell> {
           children: [
             // ── Screens (Offstage keeps alive, stops painting) ──
             for (int i = 0; i < _screens.length; i++)
-              Offstage(
-                offstage: _idx != i,
-                child: _screens[i],
-              ),
+              if (_screens[i] != null)
+                Offstage(
+                  offstage: _idx != i,
+                  child: TickerMode(
+                    enabled: _idx == i,
+                    child: _screens[i]!,
+                  ),
+                ),
 
             // ── Footer ──────────────────────────────────────────
             Positioned(
@@ -124,7 +148,7 @@ class _AppShellState extends ConsumerState<_AppShell> {
               right: 0,
               child: FloatingNavBar(
                 currentIndex: _idx,
-                onTap: (i) => setState(() => _idx = i),
+                onTap: _openTab,
               ),
             ),
           ],

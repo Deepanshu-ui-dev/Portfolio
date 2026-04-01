@@ -19,6 +19,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   just_audio: ^0.10.5
   lucide_icons: ^0.257.0
+  redacted: ^1.0.12
 
 dev_dependencies:
   flutter_test:

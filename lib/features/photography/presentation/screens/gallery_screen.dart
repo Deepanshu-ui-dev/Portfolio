@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class GalleryScreen extends StatelessWidget {
   const GalleryScreen({super.key});
@@ -136,7 +137,19 @@ class GalleryScreen extends StatelessWidget {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        return _GalleryImageCard(imagePath: _images[index]);
+                        return _GalleryImageCard(imagePath: _images[index])
+                            .animate()
+                            .fade(
+                              duration: 400.ms,
+                              delay: Duration(milliseconds: 50 * index),
+                            )
+                            .slideY(
+                              begin: 0.05,
+                              end: 0,
+                              duration: 400.ms,
+                              delay: Duration(milliseconds: 50 * index),
+                              curve: Curves.easeOutCubic,
+                            );
                       },
                       childCount: _images.length,
                     ),
@@ -187,11 +200,14 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
               fit: StackFit.expand,
               children: [
                 // Base colorful image
-                Image.asset(
-                  widget.imagePath,
+                _SkeletonAssetImage(
+                  assetPath: widget.imagePath,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Center(child: Icon(LucideIcons.imageOff)),
+                  cacheWidth: 450,
+                  skeletonColor: isDark
+                      ? AppColors.surfaceElevDark
+                      : AppColors.surfaceElevLight,
+                  errorWidget: const Center(child: Icon(LucideIcons.imageOff)),
                 ),
                 // Black and white filter fading out on hover
                 AnimatedOpacity(
@@ -205,10 +221,14 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
                         0.2126, 0.7152, 0.0722, 0, 0,
                         0,      0,      0,      1, 0,
                       ]),
-                      child: Image.asset(
-                        widget.imagePath,
+                      child: _SkeletonAssetImage(
+                        assetPath: widget.imagePath,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
+                        cacheWidth: 450,
+                        skeletonColor: isDark
+                            ? AppColors.surfaceElevDark
+                            : AppColors.surfaceElevLight,
+                        errorWidget:
                             const Center(child: Icon(LucideIcons.imageOff)),
                       ),
                     ),
@@ -219,6 +239,58 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SkeletonAssetImage extends StatefulWidget {
+  final String assetPath;
+  final BoxFit fit;
+  final Color skeletonColor;
+  final Widget errorWidget;
+  final int? cacheWidth;
+
+  const _SkeletonAssetImage({
+    required this.assetPath,
+    required this.fit,
+    required this.skeletonColor,
+    required this.errorWidget,
+    this.cacheWidth,
+  });
+
+  @override
+  State<_SkeletonAssetImage> createState() => _SkeletonAssetImageState();
+}
+
+class _SkeletonAssetImageState extends State<_SkeletonAssetImage> {
+  bool _showContent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Force the skeleton to display for 0.5s minimum when showcasing
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) setState(() => _showContent = true);
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      widget.assetPath,
+      fit: widget.fit,
+      cacheWidth: widget.cacheWidth,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (_showContent && (wasSynchronouslyLoaded || frame != null)) {
+          return child.animate().fadeIn(duration: 400.ms, curve: Curves.easeOut);
+        }
+        return Container(color: widget.skeletonColor)
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(duration: 1200.ms, color: Colors.white24, angle: 1.0);
+      },
+      errorBuilder: (_, __, ___) => widget.errorWidget,
     );
   }
 }

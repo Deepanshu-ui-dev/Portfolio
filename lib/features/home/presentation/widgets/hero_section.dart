@@ -105,14 +105,15 @@ class _IdentityBlock extends StatelessWidget {
                     0.33, 0.33, 0.33, 0, 0,
                     0,    0,    0,    1, 0,
                   ]),
-                  child: Image.asset(
-                    'assets/images/profile.png',
+                  child: _LazySkeletonAssetImage(
+                    assetPath: 'assets/images/profile.png',
                     fit: isMobile ? BoxFit.contain : BoxFit.cover,
                     width: isMobile ? double.infinity : null,
                     cacheWidth: 400,
-                    errorBuilder: (context, error, stackTrace) => Center(
-                      child: Icon(Icons.person_outline, size: 48, color: textSec.withValues(alpha: 0.5)),
-                    ),
+                    skeletonColor: isDark
+                        ? AppColors.surfaceElevDark
+                        : AppColors.surfaceElevLight,
+                    errorIconColor: textSec.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -219,6 +220,86 @@ class _DetailRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LazySkeletonAssetImage extends StatelessWidget {
+  final String assetPath;
+  final BoxFit fit;
+  final double? width;
+  final int? cacheWidth;
+  final Color skeletonColor;
+  final Color errorIconColor;
+
+  const _LazySkeletonAssetImage({
+    required this.assetPath,
+    required this.fit,
+    required this.skeletonColor,
+    required this.errorIconColor,
+    this.width,
+    this.cacheWidth,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      assetPath,
+      fit: fit,
+      width: width,
+      cacheWidth: cacheWidth,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        final loaded = wasSynchronouslyLoaded || frame != null;
+        if (loaded) return child;
+
+        return ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 180),
+          child: _PulseSkeletonBox(color: skeletonColor),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) => Center(
+        child: Icon(Icons.person_outline, size: 48, color: errorIconColor),
+      ),
+    );
+  }
+}
+
+class _PulseSkeletonBox extends StatefulWidget {
+  final Color color;
+  const _PulseSkeletonBox({required this.color});
+
+  @override
+  State<_PulseSkeletonBox> createState() => _PulseSkeletonBoxState();
+}
+
+class _PulseSkeletonBoxState extends State<_PulseSkeletonBox>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    )..repeat(reverse: true);
+    _opacity = Tween<double>(begin: 0.3, end: 0.8).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacity,
+      child: Container(color: widget.color),
     );
   }
 }
