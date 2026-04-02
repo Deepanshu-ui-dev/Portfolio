@@ -285,26 +285,26 @@ class _SectionHeaderState extends State<SectionHeader> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 18, top: 4),
+        padding: const EdgeInsets.only(bottom: 20, top: 8),
         child: Row(
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: _hovered ? 12 : 6,
+              duration: const Duration(milliseconds: 160),
+              width: _hovered ? 14 : 6,
               height: 6,
               color: _hovered ? accent : dotColor,
             ),
             const SizedBox(width: 10),
             AnimatedPadding(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 160),
               padding: EdgeInsets.only(left: _hovered ? 6 : 0),
               child: Text(
                 widget.title.toUpperCase(),
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: textColor,
-                      letterSpacing: 1.8,
+                      letterSpacing: 2.0,
                       fontWeight: FontWeight.w700,
-                      fontSize: 10,
+                      fontSize: 11,
                     ),
               ),
             ),
@@ -356,7 +356,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
     _expanded = widget.initiallyExpanded;
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 240),
+      duration: const Duration(milliseconds: 220),
       value: _expanded ? 1.0 : 0.0,
     );
     _heightAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic);
@@ -388,9 +388,9 @@ class _CollapsibleCardState extends State<CollapsibleCard>
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 160),
         margin: const EdgeInsets.only(bottom: 2),
-        transform: Matrix4.translationValues(0, _hovered ? -2.0 : 0.0, 0),
+        transform: Matrix4.translationValues(0, _hovered ? -1.5 : 0.0, 0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: border, width: 1),
@@ -406,7 +406,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
               highlightColor: Colors.transparent,
               child: AnimatedScale(
                 scale: _isPressed ? 0.98 : 1.0,
-                duration: const Duration(milliseconds: 150),
+                duration: const Duration(milliseconds: 120),
                 curve: Curves.easeOutCubic,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -418,18 +418,27 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(widget.title, style: Theme.of(context).textTheme.headlineMedium),
+                            Text(widget.title, style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          )),
                             if (widget.subtitle != null) ...[
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
                               Text(widget.subtitle!,
-                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: textSec)),
+                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                        color: textSec.withValues(alpha: 0.7),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w400,
+                                      )),
                             ],
                           ],
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(widget.rightLabel,
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec)),
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: textSec.withValues(alpha: 0.6),
+                                fontSize: 9,
+                              )),
                       const SizedBox(width: 10),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0,
@@ -444,18 +453,18 @@ class _CollapsibleCardState extends State<CollapsibleCard>
             SizeTransition(
               sizeFactor: _heightAnim,
               child: (widget.bullets.isNotEmpty || widget.tags.isNotEmpty)
-                  ? Padding(
-                      padding: const EdgeInsets.only(left: 58, right: 16, bottom: 16),
+                   ? Padding(
+                      padding: const EdgeInsets.only(left: 64, right: 16, bottom: 16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ...widget.bullets.map((b) => Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
+                                padding: const EdgeInsets.only(bottom: 12),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 5, right: 10),
+                                      padding: const EdgeInsets.only(top: 5, right: 12),
                                       child: Container(width: 4, height: 4, color: textSec),
                                     ),
                                     Expanded(
@@ -469,7 +478,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                                 ),
                               )),
                           if (widget.tags.isNotEmpty) ...[
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 16),
                             Wrap(
                               spacing: 6,
                               runSpacing: 6,

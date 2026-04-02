@@ -3,6 +3,22 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../features/github/data/github_repository.dart';
 
+// ─────────────────────────────────────────────────────────────
+// CONTRIBUTION GRAPH
+//
+// A clean, fully responsive GitHub-style contribution heatmap.
+//
+// Key design decisions:
+//   • Cell size is computed dynamically to FILL available width
+//     — no horizontal scroll needed, no wasted space
+//   • On narrow screens (<380px), we show fewer weeks (last 26
+//     weeks instead of full year) to keep cells readable
+//   • Day-of-week labels hidden on very narrow screens
+//   • Month labels are spaced relative to cell size
+//   • 2px rounded corners on cells, subtle border on active cells
+//   • Hover → inverts to white (dark) / black (light) for clarity
+// ─────────────────────────────────────────────────────────────
+
 class ContributionGraph extends StatefulWidget {
   final List<ContributionDay> contributions;
 
@@ -14,41 +30,18 @@ class ContributionGraph extends StatefulWidget {
 
 class _ContributionGraphState extends State<ContributionGraph> {
   ContributionDay? _hoveredDay;
-  final ScrollController _scrollController = ScrollController();
 
-  // We'll compute cell size dynamically to fill available width.
-  // These are the constraints we work within:
-  static const int _rows = 7; // days of week
-  static const double _minCellSize = 8.0;
-  static const double _maxCellSize = 14.0;
-  static const double _cellGap = 3.0;
+  static const int _rows = 7;
+  static const double _cellGap = 2.5;
 
-  @override
-  void initState() {
-    super.initState();
-    // Scroll to end (latest date) after first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  // ─── Group contributions into weeks ────────────────────────────────────
+  // ─── Group contributions into weeks ──────────────────────
 
   List<List<ContributionDay?>> _buildWeeks() {
     final days = widget.contributions;
     if (days.isEmpty) return [];
 
     final weeks = <List<ContributionDay?>>[];
-    // Sun=0 in our grid (Dart weekday: Mon=1…Sun=7, so Sun = 7%7 = 0)
-    final firstWeekday = days.first.date.weekday % 7;
+    final firstWeekday = days.first.date.weekday % 7; // Sun=0
 
     var current = List<ContributionDay?>.filled(7, null);
     int wIdx = firstWeekday;
@@ -66,7 +59,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
     return weeks;
   }
 
-  // ─── Month labels ────────────────────────────────────────────────────────
+  // ─── Month labels ────────────────────────────────────────
 
   Map<int, String> _buildMonthLabels(List<List<ContributionDay?>> weeks) {
     final labels = <int, String>{};
@@ -83,7 +76,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
     return labels;
   }
 
-  // ─── Colour ──────────────────────────────────────────────────────────────
+  // ─── Colour ──────────────────────────────────────────────
 
   Color _colorForLevel(int level, bool isDark) {
     if (isDark) {
@@ -106,236 +99,268 @@ class _ContributionGraphState extends State<ContributionGraph> {
   }
 
   String _monthAbbr(int m) => const [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-      ][m - 1];
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ][m - 1];
 
   String _formatDate(DateTime d) =>
       '${_monthAbbr(d.month)} ${d.day}, ${d.year}';
 
-  // ─── Build ───────────────────────────────────────────────────────────────
+  // ─── Build ───────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final weeks = _buildWeeks();
-    if (weeks.isEmpty) return const SizedBox(height: 80);
+    final allWeeks = _buildWeeks();
+    if (allWeeks.isEmpty) return const SizedBox(height: 80);
 
-    final monthLabels = _buildMonthLabels(weeks);
     final labelColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
-    final dayLabelColor =
-        isDark ? AppColors.textTerDark : AppColors.textTerLight;
 
     return LayoutBuilder(builder: (context, constraints) {
-      final availableWidth = constraints.maxWidth;
+      final width = constraints.maxWidth;
 
-      // ── Compute cell size to fill available width ──
-      // availableWidth = weekCount * (cellSize + gap) - gap + dayLabelWidth
-      // We reserve 24px on the left for day-of-week labels (S M T W T F S)
-      const dayLabelWidth = 20.0;
-      final gridWidth = availableWidth - dayLabelWidth;
+      // ── Responsive: show fewer weeks on narrow screens ──
+      final showDayLabels = width >= 300;
+      final dayLabelWidth = showDayLabels ? 18.0 : 0.0;
+      final gridWidth = width - dayLabelWidth;
+
+      // Calculate how many weeks we can fit at a minimum cell size of 7px
+      final maxWeeks = ((gridWidth + _cellGap) / (7.0 + _cellGap)).floor();
+      final weeksToShow = maxWeeks.clamp(20, allWeeks.length);
+
+      // Use the most recent weeks
+      final weeks = allWeeks.length > weeksToShow
+          ? allWeeks.sublist(allWeeks.length - weeksToShow)
+          : allWeeks;
+
       final weekCount = weeks.length;
 
-      // cellSize that fills exactly: gridWidth = weekCount*(cellSize+gap) - gap
+      // ── Compute cell size to perfectly fill the grid width ──
+      // gridWidth = weekCount * (cellSize + gap) - gap
       double cellSize = (gridWidth + _cellGap) / weekCount - _cellGap;
-      cellSize = cellSize.clamp(_minCellSize, _maxCellSize);
+      cellSize = cellSize.clamp(5.0, 15.0);
 
       final weekStep = cellSize + _cellGap;
-      final totalGridWidth = weekCount * weekStep - _cellGap;
-
-      // Label row height
-      const labelRowHeight = 16.0;
-      const labelRowGap = 6.0;
       final rowStep = cellSize + _cellGap;
       final gridHeight = _rows * rowStep - _cellGap;
 
-      return SizedBox(
-        width: availableWidth,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Day-of-week labels (S M T W T F S) ──────────────────────
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: labelRowHeight + labelRowGap + 1),
-              child: SizedBox(
-                width: dayLabelWidth,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(_rows, (i) {
-                    const labels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-                    // Only show M, W, F to avoid clutter
-                    final show = i == 1 || i == 3 || i == 5;
-                    return SizedBox(
-                      height: rowStep,
-                      child: show
-                          ? Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                labels[i],
-                                style: TextStyle(
-                                  fontFamily: 'JetBrainsMono',
-                                  fontSize: 8,
-                                  color: dayLabelColor,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                            )
-                          : null,
-                    );
-                  }),
-                ),
+      final monthLabels = _buildMonthLabels(weeks);
+
+      // Month label row
+      const labelRowHeight = 14.0;
+      const labelGap = 4.0;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // ── Month labels ──────────────────────────────────
+          SizedBox(
+            height: labelRowHeight,
+            child: Padding(
+              padding: EdgeInsets.only(left: dayLabelWidth),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: monthLabels.entries.map((e) {
+                  return Positioned(
+                    left: e.key * weekStep,
+                    top: 0,
+                    child: Text(
+                      e.value,
+                      style: TextStyle(
+                        fontFamily: 'JetBrainsMono',
+                        fontSize: cellSize < 9 ? 7 : 8,
+                        color: labelColor,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ),
+          ),
 
-            // ── Graph ────────────────────────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: SizedBox(
-                  width: totalGridWidth,
+          SizedBox(height: labelGap),
+
+          // ── Grid with optional day labels ─────────────────
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Day-of-week labels
+              if (showDayLabels)
+                SizedBox(
+                  width: dayLabelWidth,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // ── Month labels ────────────────────────────────
-                      SizedBox(
-                        height: labelRowHeight,
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: monthLabels.entries.map((e) {
-                            return Positioned(
-                              left: e.key * weekStep,
-                              top: 0,
-                              child: Text(
-                                e.value,
-                                style: TextStyle(
-                                  fontFamily: 'JetBrainsMono',
-                                  fontSize: 9,
-                                  color: labelColor,
-                                  letterSpacing: 0.2,
+                    children: List.generate(_rows, (i) {
+                      const labels = ['', 'M', '', 'W', '', 'F', ''];
+                      return SizedBox(
+                        height: rowStep,
+                        child: labels[i].isNotEmpty
+                            ? Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  labels[i],
+                                  style: TextStyle(
+                                    fontFamily: 'JetBrainsMono',
+                                    fontSize: cellSize < 9 ? 6 : 7,
+                                    color: labelColor,
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                              )
+                            : null,
+                      );
+                    }),
+                  ),
+                ),
 
-                      const SizedBox(height: 6),
-
-                      // ── Cell grid ───────────────────────────────────
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.max,
-                        children: weeks.asMap().entries.map((weekEntry) {
-                          final wIdx = weekEntry.key;
-                          final week = weekEntry.value;
-                          final isLastWeek = wIdx == weeks.length - 1;
-
-                          return Padding(
-                            padding: EdgeInsets.only(
-                                right: isLastWeek ? 0 : _cellGap),
-                            child: SizedBox(
-                              width: cellSize,
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                  children: List.generate(_rows, (d) {
-                                    final day = week[d];
-                                    final isLast = d == _rows - 1;
-
-                                    if (day == null) {
-                                      return SizedBox(
-                                        width: cellSize,
-                                        height: cellSize +
-                                            (isLast ? 0 : _cellGap),
-                                      );
-                                    }
-
-                                    final color =
-                                        _colorForLevel(day.level, isDark);
-                                    final isHovered = _hoveredDay == day;
-
-                                    return Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: isLast ? 0 : _cellGap),
-                                      child: MouseRegion(
-                                        cursor: SystemMouseCursors.basic,
-                                        onEnter: (_) => setState(
-                                            () => _hoveredDay = day),
-                                        onExit: (_) =>
-                                            setState(() => _hoveredDay =
-                                                null),
-                                        child: Tooltip(
-                                          message:
-                                              '${_formatDate(day.date)} · ${day.count} contribution${day.count == 1 ? '' : 's'}',
-                                          preferBelow: false,
-                                          waitDuration: Duration.zero,
-                                          textStyle: TextStyle(
-                                            fontFamily: 'JetBrainsMono',
-                                            fontSize: 10,
-                                            color: isDark
-                                                ? AppColors.textPrimaryDark
-                                                : AppColors
-                                                    .textPrimaryLight,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? AppColors.surfaceElevDark
-                                                : AppColors.surfaceElevLight,
-                                            border: Border.all(
-                                              color: isDark
-                                                  ? AppColors.borderDark
-                                                  : AppColors.borderLight,
-                                            ),
-                                          ),
-                                          child: AnimatedContainer(
-                                            duration: const Duration(
-                                                milliseconds: 50),
-                                            width: cellSize,
-                                            height: cellSize,
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(2),
-                                              color: isHovered
-                                                  ? (isDark
-                                                      ? Colors.white
-                                                          .withValues(
-                                                              alpha: 0.9)
-                                                      : Colors.black
-                                                          .withValues(
-                                                              alpha: 0.7))
-                                                  : color,
-                                              // Subtle border on non-zero cells
-                                              border: day.level > 0
-                                                  ? Border.all(
-                                                      color: color
-                                                          .withValues(
-                                                              alpha: 0.4),
-                                                      width: 0.5,
-                                                    )
-                                                  : null,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                    ],
+              // Cell grid — using CustomPaint for performance
+              Expanded(
+                child: RepaintBoundary(
+                  child: SizedBox(
+                    height: gridHeight,
+                    child: _HeatmapGrid(
+                      weeks: weeks,
+                      cellSize: cellSize,
+                      cellGap: _cellGap,
+                      isDark: isDark,
+                      colorForLevel: _colorForLevel,
+                      hoveredDay: _hoveredDay,
+                      onHover: (day) {
+                        if (_hoveredDay != day) {
+                          setState(() => _hoveredDay = day);
+                        }
+                      },
+                      onExit: () {
+                        if (_hoveredDay != null) {
+                          setState(() => _hoveredDay = null);
+                        }
+                      },
+                      formatDate: _formatDate,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       );
     });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// HEATMAP GRID — Tooltip-aware cell grid
+// ─────────────────────────────────────────────────────────────
+
+class _HeatmapGrid extends StatelessWidget {
+  final List<List<ContributionDay?>> weeks;
+  final double cellSize;
+  final double cellGap;
+  final bool isDark;
+  final Color Function(int level, bool isDark) colorForLevel;
+  final ContributionDay? hoveredDay;
+  final ValueChanged<ContributionDay?> onHover;
+  final VoidCallback onExit;
+  final String Function(DateTime) formatDate;
+
+  const _HeatmapGrid({
+    required this.weeks,
+    required this.cellSize,
+    required this.cellGap,
+    required this.isDark,
+    required this.colorForLevel,
+    required this.hoveredDay,
+    required this.onHover,
+    required this.onExit,
+    required this.formatDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final weekStep = cellSize + cellGap;
+    final rowStep = cellSize + cellGap;
+
+    return MouseRegion(
+      onExit: (_) => onExit(),
+      child: Stack(
+        children: [
+          for (int w = 0; w < weeks.length; w++)
+            for (int d = 0; d < 7; d++)
+              Positioned(
+                left: w * weekStep,
+                top: d * rowStep,
+                child: weeks[w][d] != null
+                    ? _HeatmapCell(
+                        day: weeks[w][d]!,
+                        size: cellSize,
+                        isDark: isDark,
+                        color: colorForLevel(weeks[w][d]!.level, isDark),
+                        isHovered: hoveredDay == weeks[w][d],
+                        onHover: onHover,
+                        formatDate: formatDate,
+                      )
+                    : SizedBox(width: cellSize, height: cellSize),
+              ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeatmapCell extends StatelessWidget {
+  final ContributionDay day;
+  final double size;
+  final bool isDark;
+  final Color color;
+  final bool isHovered;
+  final ValueChanged<ContributionDay?> onHover;
+  final String Function(DateTime) formatDate;
+
+  const _HeatmapCell({
+    required this.day,
+    required this.size,
+    required this.isDark,
+    required this.color,
+    required this.isHovered,
+    required this.onHover,
+    required this.formatDate,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => onHover(day),
+      child: Tooltip(
+        message:
+            '${formatDate(day.date)} · ${day.count} contribution${day.count == 1 ? '' : 's'}',
+        preferBelow: false,
+        waitDuration: Duration.zero,
+        textStyle: TextStyle(
+          fontFamily: 'JetBrainsMono',
+          fontSize: 10,
+          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
+          border: Border.all(
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(2),
+            color: isHovered
+                ? (isDark
+                    ? Colors.white.withValues(alpha: 0.85)
+                    : Colors.black.withValues(alpha: 0.6))
+                : color,
+          ),
+        ),
+      ),
+    );
   }
 }

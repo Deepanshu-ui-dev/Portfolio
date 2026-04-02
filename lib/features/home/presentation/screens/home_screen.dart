@@ -32,7 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void initState() {
     super.initState();
     _fadeCtrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 350));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _fadeAnim = CurvedAnimation(parent: _fadeCtrl, curve: Curves.easeOut);
     _fadeCtrl.forward();
   }
@@ -58,41 +58,65 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               padding: EdgeInsets.symmetric(
                   horizontal: padding, vertical: AppSpacing.xl),
               sliver: SliverList.list(
-                children: const [
-                  HeroSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _HomeHeatmapSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _ExperienceSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _EducationSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _ProjectsSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _AchievementsSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _LeadershipSection(),
-                  SizedBox(height: AppSpacing.xxl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _PhotographySection(),
-                  SizedBox(height: AppSpacing.xl),
-                  DashedDivider(),
-                  SizedBox(height: AppSpacing.xxl),
-                  _HobbiesSection(),
-                  SizedBox(height: AppSpacing.xl),
+                children: [
+                  const HeroSection(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _HomeHeatmapSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 60.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 60.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _ExperienceSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 120.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 120.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _EducationSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 180.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 180.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _ProjectsSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 240.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 240.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _AchievementsSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 300.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 300.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _LeadershipSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 360.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 360.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xxl),
+                  const _PhotographySection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 420.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 420.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xl),
+                  const DashedDivider(),
+                  const SizedBox(height: AppSpacing.xl),
+                  const _HobbiesSection()
+                      .animate()
+                      .fadeIn(duration: 300.ms, delay: 480.ms, curve: Curves.easeOut)
+                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 480.ms, curve: Curves.easeOut),
+                  const SizedBox(height: AppSpacing.xl),
                 ],
               ),
             ),
@@ -122,11 +146,17 @@ class _HomeHeatmapSection extends ConsumerWidget {
           loading: () => const _HeatmapShell(child: _HeatmapSkeleton()),
           error: (e, _) => _HeatmapShell(
             child: SizedBox(
-              height: 100,
+              height: 80,
               child: Center(
                 child: Text(
-                  'Could not load GitHub activity',
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  '// error: failed to fetch activity',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontFamily: 'JetBrainsMono',
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? AppColors.textSecDark
+                            : AppColors.textSecLight,
+                        fontSize: 11,
+                      ),
                 ),
               ),
             ),
@@ -151,8 +181,8 @@ class _HeatmapShell extends StatelessWidget {
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 24),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
         color: surfaceElev.withOpacity(0.3),
         border: Border.all(color: border),
@@ -353,11 +383,11 @@ class _ExperienceSection extends StatelessWidget {
     final iconColor = isDark ? AppColors.textSecDark : AppColors.textSecLight;
 
     Widget iconBox(IconData icon) => Container(
-          width: 28,
-          height: 28,
+          width: 36,
+          height: 36,
           decoration:
               BoxDecoration(border: Border.all(color: border, width: 1)),
-          child: Icon(icon, size: 13, color: iconColor),
+          child: Icon(icon, size: 16, color: iconColor),
         );
 
     return Column(
@@ -418,12 +448,12 @@ class _EducationSection extends StatelessWidget {
         const SectionHeader('Academic Background'),
         CollapsibleCard(
           leading: Container(
-            width: 28,
-            height: 28,
+            width: 36,
+            height: 36,
             decoration:
                 BoxDecoration(border: Border.all(color: border, width: 1)),
             child: Icon(LucideIcons.graduationCap,
-                size: 13,
+                size: 16,
                 color: isDark
                     ? AppColors.textSecDark
                     : AppColors.textSecLight),
@@ -509,8 +539,8 @@ class _ProjectCardState extends State<_ProjectCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(0, _hovered ? -2 : 0, 0),
+        duration: const Duration(milliseconds: 160),
+        transform: Matrix4.translationValues(0, _hovered ? -1.5 : 0, 0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: _hovered ? border2 : border, width: 1),
@@ -736,10 +766,10 @@ class _LinkBtnState extends State<_LinkBtn> {
         },
         child: AnimatedScale(
           scale: _hovered ? 0.96 : 1.0,
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 160),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: accent),
@@ -830,8 +860,8 @@ class _AchievementRowState extends State<_AchievementRow> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.translationValues(_hovered ? 4.0 : 0.0, 0, 0),
+        duration: const Duration(milliseconds: 160),
+        transform: Matrix4.translationValues(_hovered ? 3.0 : 0.0, 0, 0),
         padding: const EdgeInsets.symmetric(vertical: 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1137,8 +1167,8 @@ class _PhotoCardState extends State<_PhotoCard>
         child: MonofolioCornersBox(
           padding: const EdgeInsets.all(4),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            transform: Matrix4.translationValues(0, _hovered ? -4.0 : 0.0, 0),
+            duration: const Duration(milliseconds: 160),
+            transform: Matrix4.translationValues(0, _hovered ? -3.0 : 0.0, 0),
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(

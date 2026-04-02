@@ -73,7 +73,8 @@ class _AppShell extends ConsumerStatefulWidget {
   ConsumerState<_AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends ConsumerState<_AppShell> {
+class _AppShellState extends ConsumerState<_AppShell>
+    with SingleTickerProviderStateMixin {
   int _idx = 0;
 
   // Lazily created and cached tabs.
@@ -81,6 +82,7 @@ class _AppShellState extends ConsumerState<_AppShell> {
   //   0 Home | 1 About | 2 Projects | 3 Skills | 4 Contact
   late final List<Widget?> _screens = List<Widget?>.filled(5, null)
     ..[0] = const HomeScreen();
+
 
   Widget _buildScreen(int index) {
     switch (index) {
@@ -100,11 +102,40 @@ class _AppShellState extends ConsumerState<_AppShell> {
   }
 
   void _openTab(int index) {
+    // Re-tap on active tab → scroll to top
+    if (index == _idx) {
+      _tryScrollToTop(index);
+      return;
+    }
     if (_screens[index] == null) {
       _screens[index] = _buildScreen(index);
     }
-    setState(() => _idx = index);
+    setState(() {
+      _idx = index;
+    });
   }
+
+  void _tryScrollToTop(int index) {
+    // Find the primary scroll controller for the active screen
+    try {
+      final context = _screenKeys[index].currentContext;
+      if (context == null) return;
+      final scrollable = Scrollable.maybeOf(context);
+      final controller = scrollable?.widget.controller ??
+          PrimaryScrollController.maybeOf(context);
+      if (controller != null && controller.hasClients) {
+        controller.animateTo(
+          0,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    } catch (_) {}
+  }
+
+  // Keys to access screen contexts for scroll-to-top
+  final List<GlobalKey> _screenKeys =
+      List.generate(5, (_) => GlobalKey());
 
   @override
   Widget build(BuildContext context) {
@@ -113,20 +144,30 @@ class _AppShellState extends ConsumerState<_AppShell> {
 
     return Scaffold(
       extendBody: true,
-      // Use a single Stack with Offstage children instead of
-      // IndexedStack — Offstage stops layout/paint for hidden
-      // screens while still keeping them alive (no state loss).
       body: SizedBox.expand(
         child: Stack(
           children: [
-            // ── Screens (Offstage keeps alive, stops painting) ──
+            // ── Screens with crossfade transition ──
             for (int i = 0; i < _screens.length; i++)
               if (_screens[i] != null)
                 Offstage(
                   offstage: _idx != i,
                   child: TickerMode(
                     enabled: _idx == i,
-                    child: _screens[i]!,
+                    child: AnimatedOpacity(
+                      key: _screenKeys[i],
+                      opacity: _idx == i ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 250),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedSlide(
+                        offset: _idx == i
+                            ? Offset.zero
+                            : const Offset(0, 0.015),
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        child: _screens[i]!,
+                      ),
+                    ),
                   ),
                 ),
 

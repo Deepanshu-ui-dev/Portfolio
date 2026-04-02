@@ -22,7 +22,7 @@ class _AboutScreenState extends State<AboutScreen>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 400));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -449,10 +449,10 @@ class _MomentCardState extends State<_MomentCard> {
         onTap: () => _openDetails(context),
         child: AnimatedScale(
           scale: _hovered ? 0.98 : 1.0,
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 160),
             decoration: BoxDecoration(
               color: _hovered
                   ? surfaceElev.withOpacity(0.5)
@@ -590,7 +590,7 @@ class _MomentCardState extends State<_MomentCard> {
                           ),
                           const SizedBox(width: 6),
                           AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 160),
                             transform: Matrix4.translationValues(
                                 _hovered ? 3 : 0, 0, 0),
                             child: Icon(
@@ -743,7 +743,7 @@ class _JournalItemState extends State<_JournalItem> {
                 }
               },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 160),
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: _hovered && !widget.isThought
@@ -805,7 +805,7 @@ class _JournalItemState extends State<_JournalItem> {
                     ),
                     const SizedBox(width: 6),
                     AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                      duration: const Duration(milliseconds: 160),
                       transform: Matrix4.translationValues(
                           _hovered ? 3 : 0, 0, 0),
                       child: Icon(Icons.arrow_forward,

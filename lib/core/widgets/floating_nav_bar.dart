@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -80,20 +81,26 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
         padding: const EdgeInsets.only(bottom: 20),
         child: Center(
           child: Container(
-            decoration: BoxDecoration(
-              color: pillBg,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: pillBorder, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.40 : 0.09),
-                  blurRadius: 20,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
             padding: const EdgeInsets.all(4),
-            child: Row(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: pillBg.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: pillBorder, width: 0.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.50 : 0.12),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Row(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(_items.length, (i) {
                 final isActive  = widget.currentIndex == i;
@@ -125,7 +132,7 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
                         border: Border.all(color: pillBorder, width: 0.5),
                       ),
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
+                        duration: const Duration(milliseconds: 120),
                         curve: Curves.easeOut,
                         margin: const EdgeInsets.symmetric(horizontal: 1),
                         width: 44,
@@ -146,7 +153,7 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
                           children: [
                             // Icon — scales between outline ↔ filled variant
                             AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 180),
+                              duration: const Duration(milliseconds: 150),
                               switchInCurve: Curves.easeOutBack,
                               switchOutCurve: Curves.easeIn,
                               transitionBuilder: (child, anim) =>
@@ -168,7 +175,7 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
                             Positioned(
                               bottom: 5,
                               child: AnimatedScale(
-                                duration: const Duration(milliseconds: 220),
+                                duration: const Duration(milliseconds: 180),
                                 curve: Curves.easeOutBack,
                                 scale: isActive ? 1.0 : 0.0,
                                 child: Container(
@@ -188,6 +195,9 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
                   ),
                 );
               }),
+            ),
+          ),
+              ),
             ),
           ),
         ),

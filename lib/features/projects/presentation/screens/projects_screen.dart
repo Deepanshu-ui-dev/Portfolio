@@ -39,7 +39,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -338,13 +338,13 @@ class _ProjectGrid extends StatelessWidget {
             .animate()
             .fade(
               duration: 400.ms,
-              delay: Duration(milliseconds: 120 + i * 70),
+              delay: Duration(milliseconds: 100 + i * 60),
             )
             .slideY(
               begin: 0.05,
               end: 0,
               duration: 400.ms,
-              delay: Duration(milliseconds: 120 + i * 70),
+              delay: Duration(milliseconds: 100 + i * 60),
               curve: Curves.easeOut,
             );
 
@@ -432,8 +432,8 @@ class _ProjectCardState extends State<_ProjectCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.translationValues(0, _hovered ? -4.0 : 0.0, 0),
+        duration: const Duration(milliseconds: 160),
+        transform: Matrix4.translationValues(0, _hovered ? -3.0 : 0.0, 0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: _hovered ? border2 : border, width: 1),
@@ -671,10 +671,10 @@ class _LinkBtnState extends State<_LinkBtn> {
         },
         child: AnimatedScale(
           scale: _hovered ? 0.96 : 1.0,
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+            duration: const Duration(milliseconds: 160),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: accent),

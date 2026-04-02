@@ -27,7 +27,7 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 400),
     );
     _slide = Tween<Offset>(
       begin: const Offset(0, 0.08),
@@ -423,7 +423,7 @@ class _SocialLinkState extends State<_SocialLink> {
       child: GestureDetector(
         onTap: () => launchUrl(Uri.parse(widget.url)),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             border: Border.all(color: _hovered ? active : border),

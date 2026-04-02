@@ -23,7 +23,7 @@ class _SkillsScreenState extends State<SkillsScreen>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -389,10 +389,10 @@ class _SkillCardState extends State<_SkillCard> {
         onTapCancel: () => setState(() => _hovered = false),
         child: AnimatedScale(
           scale: _hovered ? 0.96 : 1.0,
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 120),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
+            duration: const Duration(milliseconds: 160),
             margin: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               color: _hovered
@@ -457,7 +457,7 @@ class _SkillCardState extends State<_SkillCard> {
 
                     // Label
                     AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 180),
+                      duration: const Duration(milliseconds: 160),
                       style:
                           (Theme.of(context).textTheme.labelSmall ?? const TextStyle())
                               .copyWith(

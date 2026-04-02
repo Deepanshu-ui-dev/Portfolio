@@ -20,7 +20,7 @@ class _ContactScreenState extends State<ContactScreen>
   void initState() {
     super.initState();
     _ctrl = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 600));
+        vsync: this, duration: const Duration(milliseconds: 300));
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
     _ctrl.forward();
   }
@@ -42,14 +42,14 @@ class _ContactScreenState extends State<ContactScreen>
       opacity: _fade,
       child: SafeArea(
         bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-                horizontal: padding, vertical: AppSpacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          slivers: [
+            SliverPadding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: padding, vertical: AppSpacing.xl),
+              sliver: SliverList.list(
+                children: [
 
                 // ── [ 04 ] EDITORIAL HEADER ──────────────────────
                 Row(children: [
@@ -264,10 +264,11 @@ class _ContactScreenState extends State<ContactScreen>
               ),
 
               const SizedBox(height: AppSpacing.xl),
-            ],
-          ),
+                ],
+              ),
+            ),
+          ],
         ),
-      ),
       ),
     );
   }
