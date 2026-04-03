@@ -2,7 +2,7 @@ class PortfolioConfig {
   static const String name = 'Deepanshu Kaushik';
   static const String firstName = 'Deepanshu';
   static const int age = 20;
-  static const String location = 'Ghaziabad, India';
+  static const String location = 'Delhi, India';
   static const String role = 'UI/UX Designer • Flutter Developer';
   static const String email = 'imdeepanshu4work@gmail.com';
   static const String phone = '+91 9582405021';

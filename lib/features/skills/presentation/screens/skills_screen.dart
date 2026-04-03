@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/scroll_fade_in.dart';
 import '../../../../core/widgets/shared_widgets.dart';
 
 // ─────────────────────────────────────────────────────────────
@@ -114,7 +115,9 @@ class _SkillsScreenState extends State<SkillsScreen>
               sliver: SliverList.list(
                 children: [
                   // ── HERO ──────────────────────────────────────────
-                  const _SkillsHero(),
+                  const ScrollFadeIn(
+                    child: _SkillsHero(),
+                  ),
 
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
@@ -122,7 +125,10 @@ class _SkillsScreenState extends State<SkillsScreen>
 
                   // ── SKILL SECTIONS ────────────────────────────────
                   for (int i = 0; i < _sections.length; i++) ...[
-                    _SkillSection(data: _sections[i]),
+                    ScrollFadeIn(
+                      delay: Duration(milliseconds: 100 + i * 80),
+                      child: _SkillSection(data: _sections[i]),
+                    ),
                     if (i < _sections.length - 1) ...[
                       const SizedBox(height: AppSpacing.xxl),
                       const DashedDivider(),
@@ -135,7 +141,10 @@ class _SkillsScreenState extends State<SkillsScreen>
                   const SizedBox(height: AppSpacing.xxl),
 
                   // ── CALLOUT ROW ───────────────────────────────────
-                  const _PhilosophyCallout(),
+                  ScrollFadeIn(
+                    delay: Duration(milliseconds: 100 + _sections.length * 80),
+                    child: const _PhilosophyCallout(),
+                  ),
 
                   const SizedBox(height: AppSpacing.xl),
                 ],

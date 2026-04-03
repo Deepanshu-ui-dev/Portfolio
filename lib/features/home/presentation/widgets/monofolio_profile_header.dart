@@ -36,7 +36,7 @@ class MonofolioProfile extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                ),  
                 const SizedBox(width: 8),
                 Text(
                   'Checkout my Article',

@@ -1,6 +1,8 @@
 {
     "name": "Deepanshu Kaushik | Portfolio",
     "short_name": "Deepanshu K.",
+    "id": "/",
+    "categories": ["portfolio", "developer", "design"],
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0D0D0D",

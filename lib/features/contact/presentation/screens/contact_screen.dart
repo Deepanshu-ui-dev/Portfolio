@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/scroll_fade_in.dart';
 import '../../../../core/widgets/shared_widgets.dart';
 
 class ContactScreen extends StatefulWidget {
@@ -52,214 +53,252 @@ class _ContactScreenState extends State<ContactScreen>
                 children: [
 
                 // ── [ 04 ] EDITORIAL HEADER ──────────────────────
-                Row(children: [
-                  Text('[ 04 ]',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: accent, letterSpacing: 1.5)),
-                  const SizedBox(width: 10),
-                  Text('CONTACT',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: textSec, letterSpacing: 2)),
-                ]),
-                const SizedBox(height: 14),
-                Text(
-                  "Let's work together.",
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontSize: AppSpacing.headlineSize(
-                        context,
-                        mobile: 30,
-                        tablet: 38,
-                        laptop: 44,
+                ScrollFadeIn(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Text('[ 04 ]',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: accent, letterSpacing: 1.5)),
+                        const SizedBox(width: 10),
+                        Text('CONTACT',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: textSec, letterSpacing: 2)),
+                      ]),
+                      const SizedBox(height: 14),
+                      Text(
+                        "Let's work together.",
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontSize: AppSpacing.headlineSize(
+                                context,
+                                mobile: 30,
+                                tablet: 38,
+                                laptop: 44,
+                              ),
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -2,
+                              height: 1.0,
+                            ),
                       ),
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -2,
-                      height: 1.0,
-                    ),
-              ),
-              const SizedBox(height: 16),
-
-              // Sub tagline
-              Row(children: [
-                Expanded(
-                  child: Text(
-                    'Open to freelance, full-time & collabs',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: textSec, height: 1.65),
+                      const SizedBox(height: 16),
+                      Row(children: [
+                        Expanded(
+                          child: Text(
+                            'Open to freelance, full-time & collabs',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(color: textSec, height: 1.65),
+                          ),
+                        ),
+                      ]),
+                    ],
                   ),
                 ),
-              ]),
 
               const SizedBox(height: AppSpacing.xxl),
               const DashedDivider(),
               const SizedBox(height: AppSpacing.xxl),
 
               // ── [ 01 ] SOCIAL / LINK GRID ─────────────────────
-              Row(children: [
-                Text('[ 01 ]',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: accent, letterSpacing: 1.5)),
-                const SizedBox(width: 10),
-                Text('REACH OUT',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: textSec, letterSpacing: 2)),
-              ]),
-              const SizedBox(height: 16),
-
-              LayoutBuilder(builder: (context, c) {
-                final links = [
-                  _LinkRow(
-                    index: '01',
-                    platform: 'EMAIL',
-                    handle: PortfolioConfig.email,
-                    icon: Icons.mail_outline_rounded,
-                    url: 'mailto:${PortfolioConfig.email}',
-                  ),
-                  _LinkRow(
-                    index: '02',
-                    platform: 'GITHUB',
-                    handle: PortfolioConfig.githubUrl
-                        .split('github.com/')
-                        .last,
-                    icon: Icons.code_rounded,
-                    url: PortfolioConfig.githubUrl,
-                  ),
-                  _LinkRow(
-                    index: '03',
-                    platform: 'PORTFOLIO',
-                    handle: PortfolioConfig.websiteUrl
-                        .replaceAll('https://', ''),
-                    icon: Icons.language_rounded,
-                    url: PortfolioConfig.websiteUrl,
-                  ),
-                  _LinkRow(
-                    index: '04',
-                    platform: 'PHONE',
-                    handle: PortfolioConfig.phone,
-                    icon: Icons.phone_outlined,
-                    url:
-                        'tel:${PortfolioConfig.phone.replaceAll(' ', '')}',
-                  ),
-                ];
-                return Column(
-                    children: links
-                        .map((l) => Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 2),
-                              child: l,
-                            ))
-                        .toList());
-              }),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Text('[ 01 ]',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: accent, letterSpacing: 1.5)),
+                      const SizedBox(width: 10),
+                      Text('REACH OUT',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: textSec, letterSpacing: 2)),
+                    ]),
+                    const SizedBox(height: 16),
+                    LayoutBuilder(builder: (context, c) {
+                      final links = [
+                        _LinkRow(
+                          index: '01',
+                          platform: 'EMAIL',
+                          handle: PortfolioConfig.email,
+                          icon: Icons.mail_outline_rounded,
+                          url: 'mailto:${PortfolioConfig.email}',
+                        ),
+                        _LinkRow(
+                          index: '02',
+                          platform: 'GITHUB',
+                          handle: PortfolioConfig.githubUrl
+                              .split('github.com/')
+                              .last,
+                          icon: Icons.code_rounded,
+                          url: PortfolioConfig.githubUrl,
+                        ),
+                        _LinkRow(
+                          index: '03',
+                          platform: 'PORTFOLIO',
+                          handle: PortfolioConfig.websiteUrl
+                              .replaceAll('https://', ''),
+                          icon: Icons.language_rounded,
+                          url: PortfolioConfig.websiteUrl,
+                        ),
+                        _LinkRow(
+                          index: '04',
+                          platform: 'PHONE',
+                          handle: PortfolioConfig.phone,
+                          icon: Icons.phone_outlined,
+                          url:
+                              'tel:${PortfolioConfig.phone.replaceAll(' ', '')}',
+                        ),
+                      ];
+                      return Column(
+                          children: links
+                              .map((l) => Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 2),
+                                    child: l,
+                                  ))
+                              .toList());
+                    }),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: AppSpacing.xxl),
               const DashedDivider(),
               const SizedBox(height: AppSpacing.xxl),
 
               // ── [ 02 ] TERMINAL PING BLOCK ────────────────────
-              Row(children: [
-                Text('[ 02 ]',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: accent, letterSpacing: 1.5)),
-                const SizedBox(width: 10),
-                Text('QUICK PING',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: textSec, letterSpacing: 2)),
-              ]),
-              const SizedBox(height: 16),
-              const _TerminalPing(),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Text('[ 02 ]',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: accent, letterSpacing: 1.5)),
+                      const SizedBox(width: 10),
+                      Text('QUICK PING',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: textSec, letterSpacing: 2)),
+                    ]),
+                    const SizedBox(height: 16),
+                    const _TerminalPing(),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: AppSpacing.xxl),
               const DashedDivider(),
               const SizedBox(height: AppSpacing.xxl),
 
               // ── [ 03 ] STATUS + LOCATION ROW ─────────────────
-              Row(children: [
-                Text('[ 03 ]',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: accent, letterSpacing: 1.5)),
-                const SizedBox(width: 10),
-                Text('STATUS',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: textSec, letterSpacing: 2)),
-              ]),
-              const SizedBox(height: 16),
-
-              LayoutBuilder(builder: (context, c) {
-                final isWide = c.maxWidth > 500;
-                final cards = [
-                  _StatusCard(),
-                  _LocationCard(),
-                ];
-                if (isWide) {
-                  return IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: cards[0]),
-                        const SizedBox(width: 12),
-                        Expanded(child: cards[1]),
-                      ],
-                    ),
-                  );
-                }
-                return Column(children: [
-                  cards[0],
-                  const SizedBox(height: 12),
-                  cards[1],
-                ]);
-              }),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 300),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Text('[ 03 ]',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: accent, letterSpacing: 1.5)),
+                      const SizedBox(width: 10),
+                      Text('STATUS',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: textSec, letterSpacing: 2)),
+                    ]),
+                    const SizedBox(height: 16),
+                    LayoutBuilder(builder: (context, c) {
+                      final isWide = c.maxWidth > 500;
+                      final cards = [
+                        _StatusCard(),
+                        _LocationCard(),
+                      ];
+                      if (isWide) {
+                        return IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(child: cards[0]),
+                              const SizedBox(width: 12),
+                              Expanded(child: cards[1]),
+                            ],
+                          ),
+                        );
+                      }
+                      return Column(children: [
+                        cards[0],
+                        const SizedBox(height: 12),
+                        cards[1],
+                      ]);
+                    }),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: AppSpacing.xxl),
               const DashedDivider(),
               const SizedBox(height: AppSpacing.xxl),
 
               // ── [ 04 ] FREQUENTLY ASKED ───────────────────────
-              Row(children: [
-                Text('[ 04 ]',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: accent, letterSpacing: 1.5)),
-                const SizedBox(width: 10),
-                Text('FAQ',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: textSec, letterSpacing: 2)),
-              ]),
-              const SizedBox(height: 16),
-              const _FaqList(),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 400),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      Text('[ 04 ]',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: accent, letterSpacing: 1.5)),
+                      const SizedBox(width: 10),
+                      Text('FAQ',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: textSec, letterSpacing: 2)),
+                    ]),
+                    const SizedBox(height: 16),
+                    const _FaqList(),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: AppSpacing.xxl),
 
               // ── BOTTOM CTA ────────────────────────────────────
-              DashedBorderContainer(
-                padding: const EdgeInsets.all(22),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Got a project in mind?',
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 500),
+                child: DashedBorderContainer(
+                  padding: const EdgeInsets.all(22),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Got a project in mind?',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headlineLarge),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Typical response within 24 hrs.',
                               style: Theme.of(context)
                                   .textTheme
-                                  .headlineLarge),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Typical response within 24 hrs.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(color: textSec),
-                          ),
-                        ],
+                                  .bodyMedium
+                                  ?.copyWith(color: textSec),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    _SendBtn(
-                      onTap: () => launchUrl(Uri.parse(
-                          'mailto:${PortfolioConfig.email}'), mode: LaunchMode.externalApplication),
-                    ),
-                  ],
+                      const SizedBox(width: 16),
+                      _SendBtn(
+                        onTap: () => launchUrl(Uri.parse(
+                            'mailto:${PortfolioConfig.email}'), mode: LaunchMode.externalApplication),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 

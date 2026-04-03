@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/scroll_fade_in.dart';
+import '../../../../core/widgets/smooth_page_route.dart';
 import '../../../../core/widgets/shared_widgets.dart';
 import '../../../blog/presentation/screens/blog_detail_screen.dart';
 import 'volunteer_detail_screen.dart';
@@ -52,29 +54,36 @@ class _AboutScreenState extends State<AboutScreen>
               sliver: SliverList.list(
                 children: [
                   // ── 01 / Header ──
-                  _SectionLabel(index: '01', label: 'THE PERSON BEHIND THE PIXELS'),
-                  const SizedBox(height: 14),
-                  Text(
-                    "My personal digital space.",
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontSize: AppSpacing.headlineSize(
-                            context,
-                            mobile: 30,
-                            tablet: 34,
-                            laptop: 36,
-                          ),
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -2,
-                          height: 1.0,
+                  ScrollFadeIn(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel(index: '01', label: 'THE PERSON BEHIND THE PIXELS'),
+                        const SizedBox(height: 14),
+                        Text(
+                          "My personal digital space.",
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontSize: AppSpacing.headlineSize(
+                                  context,
+                                  mobile: 30,
+                                  tablet: 34,
+                                  laptop: 36,
+                                ),
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -2,
+                                height: 1.0,
+                              ),
                         ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No corporate jargon. Just a quiet corner of the internet where I dump my thoughts, track my life goals, and share the vibes I\'m currently listening to.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: textSec, height: 1.65),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No corporate jargon. Just a quiet corner of the internet where I dump my thoughts, track my life goals, and share the vibes I\'m currently listening to.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: textSec, height: 1.65),
+                        ),
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: AppSpacing.xxl),
@@ -82,35 +91,59 @@ class _AboutScreenState extends State<AboutScreen>
                   const SizedBox(height: AppSpacing.xxl),
 
                   // ── 02 / Bucket List ──
-                  _SectionLabel(index: '02', label: 'BUCKET LIST'),
-                  const SizedBox(height: 16),
-                  const _BucketListSection(),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 100),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel(index: '02', label: 'BUCKET LIST'),
+                        const SizedBox(height: 16),
+                        const _BucketListSection(),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
 
                   // ── 04 / Volunteer Experience ──
-                  _SectionLabel(index: '03', label: 'COMMUNITY CONTRIBUTIONS'),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Communities I\'ve helped build and grown in.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: textSec, height: 1.5),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 200),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel(index: '03', label: 'COMMUNITY CONTRIBUTIONS'),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Communities I\'ve helped build and grown in.',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: textSec, height: 1.5),
+                        ),
+                        const SizedBox(height: 20),
+                        const _VolunteerExperienceFeed(),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 20),
-                  const _VolunteerExperienceFeed(),
 
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
 
                   // ── 05 / Brain Dumps ──
-                  _SectionLabel(index: '04', label: 'BRAIN DUMPS'),
-                  const SizedBox(height: 16),
-                  const _JournalFeed(),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 300),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionLabel(index: '04', label: 'BRAIN DUMPS'),
+                        const SizedBox(height: 16),
+                        const _JournalFeed(),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: AppSpacing.xxxl),
                 ],
@@ -417,8 +450,8 @@ class _MomentCardState extends State<_MomentCard> {
   void _openDetails(BuildContext context) {
     Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (_) => VolunteerDetailScreen(
+        SmoothPageRoute(
+            page: VolunteerDetailScreen(
                   title: widget.title,
                   role: widget.role,
                   paragraphs: widget.paragraphs,
@@ -735,8 +768,8 @@ class _JournalItemState extends State<_JournalItem> {
                 } else {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => BlogDetailScreen(
+                      SmoothPageRoute(
+                          page: BlogDetailScreen(
                               slug: widget.title
                                   .toLowerCase()
                                   .replaceAll(' ', '-'))));

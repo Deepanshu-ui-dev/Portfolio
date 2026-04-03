@@ -157,14 +157,14 @@ class _AppShellState extends ConsumerState<_AppShell>
                     child: AnimatedOpacity(
                       key: _screenKeys[i],
                       opacity: _idx == i ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 250),
-                      curve: Curves.easeOutCubic,
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOutQuart,
                       child: AnimatedSlide(
                         offset: _idx == i
                             ? Offset.zero
-                            : const Offset(0, 0.015),
-                        duration: const Duration(milliseconds: 250),
-                        curve: Curves.easeOutCubic,
+                            : const Offset(0, 0.02),
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutQuart,
                         child: _screens[i]!,
                       ),
                     ),

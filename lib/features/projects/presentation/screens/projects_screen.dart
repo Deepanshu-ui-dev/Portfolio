@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/scroll_fade_in.dart';
 import '../../../../core/widgets/shared_widgets.dart';
 
 // ─────────────────────────────────────────────────────────────
@@ -68,25 +69,23 @@ class _ProjectsScreenState extends State<ProjectsScreen>
               sliver: SliverList.list(
                 children: [
                   // ── HERO ─────────────────────────────────────────
-                  _ProjectsHero(count: filtered.length)
-                      .animate()
-                      .fade(duration: 400.ms)
-                      .slideY(
-                          begin: 0.04,
-                          end: 0,
-                          duration: 400.ms,
-                          curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    child: _ProjectsHero(count: filtered.length),
+                  ),
 
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
 
                   // ── FILTER ───────────────────────────────────────
-                  _FilterSection(
-                    tags: _filterTags,
-                    active: _activeFilter,
-                    onSelect: (t) => setState(
-                        () => _activeFilter = _activeFilter == t ? null : t),
-                  ).animate().fade(duration: 400.ms, delay: 100.ms),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 100),
+                    child: _FilterSection(
+                      tags: _filterTags,
+                      active: _activeFilter,
+                      onSelect: (t) => setState(
+                          () => _activeFilter = _activeFilter == t ? null : t),
+                    ),
+                  ),
 
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
@@ -106,7 +105,10 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                   const SizedBox(height: AppSpacing.xxl),
 
                   // ── OPEN SOURCE CALLOUT ───────────────────────────
-                  const _OpenSourceSection(),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 200),
+                    child: const _OpenSourceSection(),
+                  ),
 
                   const SizedBox(height: AppSpacing.xl),
                 ],

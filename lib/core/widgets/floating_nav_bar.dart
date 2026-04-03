@@ -33,8 +33,42 @@ class FloatingNavBar extends StatefulWidget {
   State<FloatingNavBar> createState() => _FloatingNavBarState();
 }
 
-class _FloatingNavBarState extends State<FloatingNavBar> {
+class _FloatingNavBarState extends State<FloatingNavBar>
+    with SingleTickerProviderStateMixin {
   int _hoveredIndex = -1;
+  late final AnimationController _entranceCtrl;
+  late final Animation<double> _entranceFade;
+  late final Animation<Offset> _entranceSlide;
+
+  @override
+  void initState() {
+    super.initState();
+    _entranceCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _entranceFade = CurvedAnimation(
+      parent: _entranceCtrl,
+      curve: Curves.easeOut,
+    );
+    _entranceSlide = Tween<Offset>(
+      begin: const Offset(0, 1.5),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _entranceCtrl,
+      curve: Curves.easeOutCubic,
+    ));
+    // Small delay so the page content starts painting first
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) _entranceCtrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceCtrl.dispose();
+    super.dispose();
+  }
 
   static const _items = [
     _NavItem(
@@ -76,10 +110,14 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
     final idleColor  = isDark ? const Color(0xFF4a4a4a)  : const Color(0xFFB0B0B0);
     const hoverColor = Color(0xFF777777);
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Center(
+    return FadeTransition(
+      opacity: _entranceFade,
+      child: SlideTransition(
+        position: _entranceSlide,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            child: Center(
           child: Container(
             padding: const EdgeInsets.all(4),
             child: ClipRRect(
@@ -201,6 +239,8 @@ class _FloatingNavBarState extends State<FloatingNavBar> {
             ),
           ),
         ),
+      ),
+      ),
       ),
     );
   }

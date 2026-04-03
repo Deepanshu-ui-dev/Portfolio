@@ -4,6 +4,9 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../../../core/widgets/scroll_fade_in.dart';
+import '../../../../core/widgets/smooth_page_route.dart';
+
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
@@ -63,59 +66,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _HomeHeatmapSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 60.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 60.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 60),
+                    child: const _HomeHeatmapSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _ExperienceSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 120.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 120.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 120),
+                    child: const _ExperienceSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _EducationSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 180.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 180.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 180),
+                    child: const _EducationSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _ProjectsSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 240.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 240.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 240),
+                    child: const _ProjectsSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _AchievementsSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 300.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 300.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 300),
+                    child: const _AchievementsSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _LeadershipSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 360.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 360.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 360),
+                    child: const _LeadershipSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
-                  const _PhotographySection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 420.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 420.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 420),
+                    child: const _PhotographySection(),
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xl),
-                  const _HobbiesSection()
-                      .animate()
-                      .fadeIn(duration: 300.ms, delay: 480.ms, curve: Curves.easeOut)
-                      .slideY(begin: 0.03, end: 0, duration: 300.ms, delay: 480.ms, curve: Curves.easeOut),
+                  ScrollFadeIn(
+                    delay: const Duration(milliseconds: 480),
+                    child: const _HobbiesSection(),
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                 ],
               ),
@@ -1071,7 +1074,7 @@ class _PhotographySection extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const GalleryScreen()),
+                  SmoothPageRoute(page: const GalleryScreen()),
                 );
               },
               isDark: isDark,
@@ -1161,7 +1164,7 @@ class _PhotoCardState extends State<_PhotoCard>
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const GalleryScreen()),
+            SmoothPageRoute(page: const GalleryScreen()),
           );
         },
         child: MonofolioCornersBox(
