@@ -275,9 +275,9 @@ class _FilterChipState extends State<_FilterChip> {
   @override
   Widget build(BuildContext context) {
     final border =
-        widget.isDark ? AppColors.borderDark : AppColors.borderLight;
+        widget.isDark ? const Color.fromARGB(255, 105, 105, 105) : AppColors.borderLight;
     final accent =
-        widget.isDark ? AppColors.accentDark : AppColors.accentLight;
+        widget.isDark ? const Color.fromRGBO(16, 185, 129, 1) : AppColors.accentLight;
     final textSec =
         widget.isDark ? AppColors.textSecDark : AppColors.textSecLight;
 
@@ -293,7 +293,7 @@ class _FilterChipState extends State<_FilterChip> {
           decoration: BoxDecoration(
             color: widget.isActive
                 ? accent.withValues(alpha: 0.09)
-                : Colors.transparent,
+                : const Color.fromARGB(0, 155, 155, 155),
             border: Border.all(
               color: widget.isActive
                   ? accent

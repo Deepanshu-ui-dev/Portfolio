@@ -8,7 +8,7 @@ class PortfolioConfig {
   static const String phone = '+91 9582405021';
 
   static const String githubUrl = 'https://github.com/Deepanshu-ui-dev';
-  static const String resumeUrl = 'https://drive.google.com/file/d/1m_iLq3_Z2h1pRbKN9SRJ6AUs69pZX6-k/view?usp=drivesdk';
+  static const String resumeUrl = 'https://drive.google.com/file/d/13DlMr7MfBh8kz5IzYKE3XHK9S-YF9bix/view?usp=sharing';
   static const String githubUsername = 'Deepanshu-ui-dev';
   static const String linkedinUrl = 'https://www.linkedin.com/in/deepanshu-kaushik-174059297/';
   static const String twitterUrl = 'https://x.com/Deepanshu25u';
@@ -30,7 +30,7 @@ class PortfolioConfig {
       tags: ['Flutter', 'Open Source'],
       badge: 'Public',
       githubUrl: 'https://github.com/Deepanshu-ui-dev/Codexa-App',
-      installUrl: 'https://github.com/Deepanshu-ui-dev/Codexa-App/releases/download/Codexa/Codexa1.0.3.apk',
+      installUrl: 'https://github.com/Deepanshu-ui-dev/Codexa-App/releases/latest/',
     ),
     ProjectItem(
       name: 'Document-Search-Engine',
