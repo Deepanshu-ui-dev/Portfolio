@@ -102,12 +102,12 @@ class _FloatingNavBarState extends State<FloatingNavBar>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final pillBg     = isDark ? const Color(0xFF111111) : Colors.white;
-    final pillBorder = isDark ? const Color(0xFF252525)  : const Color(0xFFE0E0DC);
-    final activeBg   = isDark ? const Color(0xFF1c1c1c)  : const Color(0xFFF2F2EF);
-    final activeBdr  = isDark ? const Color(0xFF2e2e2e)  : const Color(0xFFD4D4D0);
+    final pillBg     = isDark ? const Color(0xFF111111) : AppColors.surfaceLight;
+    final pillBorder = isDark ? const Color(0xFF252525)  : AppColors.borderLight;
+    final activeBg   = isDark ? const Color(0xFF1c1c1c)  : AppColors.surfaceElevLight;
+    final activeBdr  = isDark ? const Color(0xFF2e2e2e)  : AppColors.border2Light;
     final accent     = isDark ? AppColors.accentDark     : AppColors.accentLight;
-    final idleColor  = isDark ? const Color(0xFF4a4a4a)  : const Color(0xFFB0B0B0);
+    final idleColor  = isDark ? const Color(0xFF4a4a4a)  : AppColors.textTerLight;
     const hoverColor = Color(0xFF777777);
 
     return FadeTransition(

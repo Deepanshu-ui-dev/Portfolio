@@ -14,6 +14,7 @@ import '../../../github/data/github_repository.dart';
 import '../../../photography/presentation/screens/gallery_screen.dart';
 import '../widgets/contribution_graph.dart';
 import '../widgets/hero_section.dart';
+import '../widgets/opportunities_banner.dart';
 
 // ─────────────────────────────────────────────
 // HOME SCREEN
@@ -62,6 +63,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   horizontal: padding, vertical: AppSpacing.xl),
               sliver: SliverList.list(
                 children: [
+                  const OpportunitiesBanner(),
+                  const SizedBox(height: AppSpacing.xxl),
                   const HeroSection(),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
@@ -273,11 +276,7 @@ class _PulseSkeleton extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(2),
       ),
-    ).animate(onPlay: (controller) => controller.repeat()).shimmer(
-          duration: 1200.ms,
-          color: Colors.white24,
-          angle: 1.0,
-        );
+    );
   }
 }
 
@@ -300,7 +299,7 @@ class _ResponsiveHeatmap extends StatelessWidget {
             _HeatmapMeta(
               totalContributions: data.totalContributions,
               isDark: isDark,
-              compact: constraints.maxWidth < 420,
+              compact: constraints.maxWidth < 460,
             ),
           ],
         ),
@@ -367,7 +366,7 @@ class _HeatmapMeta extends StatelessWidget {
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [countLabel, legend],
+      children: [Flexible(child: countLabel), legend],
     );
   }
 }
@@ -410,7 +409,7 @@ class _ExperienceSection extends StatelessWidget {
           ],
           tags: const ['Figma', 'Framer', 'Design Systems', 'Prototyping'],
         ),
-        SizedBox(height: 8), 
+        const SizedBox(height: 8), 
         CollapsibleCard(
           leading: iconBox(LucideIcons.box),
           title: 'Freelance UI/UX Designer',
@@ -1223,10 +1222,10 @@ class _PhotoCardState extends State<_PhotoCard>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.collections_outlined,
                         size: 22,
-                        color: Colors.white54,
+                        color: widget.isDark ? Colors.white54 : AppColors.textSecLight,
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -1235,7 +1234,9 @@ class _PhotoCardState extends State<_PhotoCard>
                           fontFamily: 'monospace',
                           fontSize: 9,
                           letterSpacing: 0.12,
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: widget.isDark 
+                              ? Colors.white.withValues(alpha: 0.6)
+                              : AppColors.textPrimaryLight.withValues(alpha: 0.7),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -1345,7 +1346,13 @@ class _SkeletonAssetImageState extends State<_SkeletonAssetImage> {
         }
         return Container(color: widget.skeletonColor)
             .animate(onPlay: (controller) => controller.repeat())
-            .shimmer(duration: 1200.ms, color: Colors.white24, angle: 1.0);
+            .shimmer(
+              duration: 1200.ms,
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? Colors.white12 
+                  : Colors.black.withValues(alpha: 0.08),
+              angle: 1.0,
+            );
       },
       errorBuilder: (_, __, ___) => widget.errorWidget,
     );

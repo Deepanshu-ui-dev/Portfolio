@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/animated_role_text.dart';
+import '../../../../core/widgets/shared_widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MonofolioProfile extends StatelessWidget {
@@ -54,16 +55,13 @@ class MonofolioProfile extends StatelessWidget {
 
         // Profile Heading Row
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: AppColors.surfaceBorder.withOpacity(0.5), width: 1), // Ideally dashed
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: const EdgeInsets.only(top: 16),
+          child: Column(
             children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -123,7 +121,9 @@ class MonofolioProfile extends StatelessWidget {
                     ),
                   ],
                 ],
-              )
+              ),
+              const SizedBox(height: 16),
+              const DashedDivider(),
             ],
           ),
         ),

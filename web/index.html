@@ -1,62 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- META: CORE CONFIGURATION                                         -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <base href="$FLUTTER_BASE_HREF">
-
     <meta charset="UTF-8">
     <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-    <!-- Primary SEO Meta Tags -->
-    <title>Deepanshu Kaushik | Flutter & UI/UX Developer Portfolio</title>
-    <meta
-      name="description"
-      content="Deepanshu Kaushik — Flutter & UI/UX Developer. Explore production-ready mobile & web apps, pixel-perfect UI designs, and creative coding projects."
-    >
-    <meta name="keywords" content="Deepanshu Kaushik, Flutter Developer, UI/UX Designer, Mobile App Developer, Web Developer, Portfolio, Dart, Android, iOS, Cross-platform">
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- SEO: PRIMARY META TAGS                                           -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <title>Deepanshu Kaushik | Flutter & UI/UX Developer | Portfolio</title>
+    <meta name="description" content="Flutter & UI/UX Developer creating production-ready cross-platform mobile & web applications with pixel-perfect UI designs. Explore my portfolio.">
+    <meta name="keywords" content="Flutter Developer, UI/UX Designer, Mobile App Development, Cross-platform Apps, Dart, Android, iOS, Web Development, Portfolio, Deepanshu Kaushik">
     <meta name="author" content="Deepanshu Kaushik">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://deepanshux.tech/">
-    <meta name="theme-color" content="#0D0D0D">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="bingbot" content="index, follow">
 
-    <!-- Performance hints -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- SEO: CANONICAL & ALTERNATE LINKS                                 -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <link rel="canonical" href="https://deepanshux.tech">
+    <link rel="alternate" hreflang="en-US" href="https://deepanshux.tech">
+    <link rel="alternate" hreflang="x-default" href="https://deepanshux.tech">
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- PERFORMANCE: PRELOAD & DNS PREFETCH                              -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://github.com">
+    <link rel="dns-prefetch" href="https://www.linkedin.com">
+    <link rel="dns-prefetch" href="https://x.com">
+    <link rel="preload" href="flutter_bootstrap.js" as="script">
 
-    <!-- Google Site Verification (replace content with your verification token) -->
-    <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_TOKEN"> -->
 
-    <!-- Open Graph / Facebook -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- SEO: OPEN GRAPH (FACEBOOK & LINKEDIN)                            -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <meta property="og:locale" content="en_US">
+    <meta property="og:type" content="website">
     <meta property="og:title" content="Deepanshu Kaushik | Flutter & UI/UX Developer">
-    <meta property="og:description" content="Explore the interactive portfolio of Deepanshu Kaushik. Discover production-ready Flutter apps, pixel-perfect UI designs, and creative coding projects.">
+    <meta property="og:description" content="Production-ready Flutter apps & pixel-perfect UI designs. Explore my portfolio of mobile, web, and creative projects.">
+    <meta property="og:url" content="https://deepanshux.tech">
+    <meta property="og:site_name" content="Deepanshu Kaushik Portfolio">
     <meta property="og:image" content="https://deepanshux.tech/preview.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://deepanshux.tech">
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Deepanshu Kaushik Portfolio">
+    <meta property="og:image:type" content="image/png">
 
-    <!-- Twitter Card -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- SEO: TWITTER CARD                                                -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@Deepanshu25u">
+    <meta name="twitter:creator" content="@Deepanshu25u">
     <meta name="twitter:title" content="Deepanshu Kaushik | Flutter & UI/UX Developer">
-    <meta name="twitter:description" content="Explore the interactive portfolio of Deepanshu Kaushik. Discover production-ready Flutter apps, pixel-perfect UI designs, and creative coding projects.">
+    <meta name="twitter:description" content="Production-ready Flutter apps & pixel-perfect UI designs. Explore my portfolio.">
     <meta name="twitter:image" content="https://deepanshux.tech/preview.png">
 
-    <!-- Structured Data (JSON-LD) -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- SEO: STRUCTURED DATA (JSON-LD)                                   -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -64,45 +74,108 @@
       "name": "Deepanshu Kaushik",
       "url": "https://deepanshux.tech",
       "jobTitle": "Flutter & UI/UX Developer",
-      "description": "Flutter & UI/UX Developer specializing in production-ready cross-platform mobile and web applications.",
       "image": "https://deepanshux.tech/preview.png",
+      "description": "Flutter & UI/UX Developer specializing in production-ready cross-platform applications",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Delhi",
+        "addressCountry": "IN"
+      },
       "sameAs": [
         "https://github.com/Deepanshu-ui-dev",
         "https://www.linkedin.com/in/deepanshu-kaushik-174059297/",
         "https://x.com/Deepanshu25u"
       ],
-      "knowsAbout": ["Flutter", "Dart", "UI/UX Design", "Mobile Development", "Web Development"]
+      "knowsAbout": [
+        "Flutter",
+        "Dart",
+        "UI/UX Design",
+        "Mobile Application Development",
+        "Web Development",
+        "Cross-platform Development",
+        "Firebase",
+        "Riverpod"
+      ]
     }
     </script>
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Deepanshu Kaushik Portfolio",
       "url": "https://deepanshux.tech",
-      "description": "Interactive portfolio of Deepanshu Kaushik — Flutter & UI/UX Developer.",
+      "description": "Interactive portfolio of Deepanshu Kaushik — Flutter & UI/UX Developer",
       "author": {
         "@type": "Person",
         "name": "Deepanshu Kaushik"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://deepanshux.tech?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
       }
     }
     </script>
 
-    <!-- iOS meta tags & icons -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://deepanshux.tech"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "About",
+          "item": "https://deepanshux.tech#about"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Projects",
+          "item": "https://deepanshux.tech#projects"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Skills",
+          "item": "https://deepanshux.tech#skills"
+        }
+      ]
+    }
+    </script>
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- THEMING & APP CONFIG                                             -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <meta name="theme-color" content="#09090B">
+    <meta name="msapplication-TileColor" content="#09090B">
+
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- PWA & MOBILE CONFIG                                              -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Deepanshu Kaushik">
+    <meta name="apple-mobile-web-app-title" content="Deepanshu">
     <link rel="apple-touch-icon" href="icons/Icon-192.png">
+    <link rel="icon" type="image/png" href="icons/Icon-192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="icons/Icon-512.png" sizes="512x512">
 
-    <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/jpeg"
-      href="assets/assets/images/profile.jpeg"
-    />
-
+    <!-- ════════════════════════════════════════════════════════════════ -->
+    <!-- PWA MANIFEST & FAVICON                                           -->
+    <!-- ════════════════════════════════════════════════════════════════ -->
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/jpeg" href="assets/assets/images/profile.jpeg">
   </head>
   <body>
     <!-- SEO fallback for crawlers that don't execute JavaScript -->

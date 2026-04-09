@@ -258,7 +258,7 @@ class GitHubRepository {
       days.add(ContributionDay(
         date:  date,
         count: count,
-        level: (count / 3).clamp(0, 4).toInt(),
+        level: (count / 2).clamp(0, 5).toInt(),
       ));
     }
     return days;

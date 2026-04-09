@@ -1,14 +1,31 @@
 {
-    "name": "Deepanshu Kaushik | Portfolio",
-    "short_name": "Deepanshu K.",
+    "name": "Deepanshu Kaushik | Flutter & UI/UX Developer Portfolio",
+    "short_name": "Deepanshu",
     "id": "/",
-    "categories": ["portfolio", "developer", "design"],
-    "start_url": ".",
+    "scope": "/",
+    "lang": "en-US",
+    "dir": "ltr",
+    "categories": ["productivity", "developer", "design"],
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#0D0D0D",
-    "theme_color": "#0D0D0D",
-    "description": "Flutter & UI/UX Developer Portfolio — Production-ready mobile & web apps, pixel-perfect designs, and creative coding projects by Deepanshu Kaushik.",
     "orientation": "portrait-primary",
+    "theme_color": "#09090B",
+    "background_color": "#09090B",
+    "description": "Flutter & UI/UX Developer creating production-ready cross-platform mobile & web applications with pixel-perfect UI designs.",
+    "screenshots": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
     "prefer_related_applications": false,
     "icons": [
         {

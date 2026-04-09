@@ -79,22 +79,14 @@ class _ContributionGraphState extends State<ContributionGraph> {
   // ─── Colour ──────────────────────────────────────────────
 
   Color _colorForLevel(int level, bool isDark) {
-    if (isDark) {
-      switch (level) {
-        case 0: return AppColors.contrib0Dark;
-        case 1: return AppColors.contrib1Dark;
-        case 2: return AppColors.contrib2Dark;
-        case 3: return AppColors.contrib3Dark;
-        default: return AppColors.contrib4Dark;
-      }
-    } else {
-      switch (level) {
-        case 0: return AppColors.contrib0Light;
-        case 1: return AppColors.contrib1Light;
-        case 2: return AppColors.contrib2Light;
-        case 3: return AppColors.contrib3Light;
-        default: return AppColors.contrib4Light;
-      }
+    switch (level) {
+      case 0: return AppColors.contrib0;
+      case 1: return AppColors.contrib1;
+      case 2: return AppColors.contrib2;
+      case 3: return AppColors.contrib3;
+      case 4: return AppColors.contrib4;
+      case 5: return AppColors.contrib5;
+      default: return AppColors.contrib5;
     }
   }
 
@@ -180,7 +172,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
             ),
           ),
 
-          SizedBox(height: labelGap),
+          const SizedBox(height: labelGap),
 
           // ── Grid with optional day labels ─────────────────
           Row(
@@ -353,6 +345,9 @@ class _HeatmapCell extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
+            border: !isDark && day.level == 0
+                ? Border.all(color: AppColors.borderLight.withValues(alpha: 0.5), width: 0.5)
+                : null,
             color: isHovered
                 ? (isDark
                     ? Colors.white.withValues(alpha: 0.85)

@@ -1,9 +1,27 @@
+/// Deepanshu Kaushik's Interactive Portfolio Application
+///
+/// A high-performance Flutter portfolio showcasing:
+/// - Smooth theme switching with circular reveal transition
+/// - Responsive design across mobile, tablet, and web platforms
+/// - Optimized animations and transitions
+/// - SEO-friendly web presence
+///
+/// Entry point configuration:
+/// - Initializes theme color cache for instant color access
+/// - Sets up Riverpod provider scope for state management
+/// - Configures MaterialApp with theme and navigation
+library portfolio;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
+import 'core/theme/theme_extensions.dart';
 import 'core/widgets/floating_nav_bar.dart';
 import 'core/widgets/shared_widgets.dart';
+import 'core/widgets/lamp_theme_switcher.dart';
+import 'core/widgets/circular_reveal_transition.dart';
 
 // ── Screens ──────────────────────────────────────────────────
 import 'features/home/presentation/screens/home_screen.dart';
@@ -12,40 +30,50 @@ import 'features/projects/presentation/screens/projects_screen.dart';
 import 'features/skills/presentation/screens/skills_screen.dart';
 import 'features/contact/presentation/screens/contact_screen.dart';
 
+/// Application entry point
+/// 
+/// Initializes:
+/// - Theme color cache for optimal performance
+/// - Riverpod provider scope
+/// - Root MaterialApp widget
 void main() {
+  // Pre-compute and cache all theme colors for instant access during theme switching
+  ThemeTransitionUtils.initializeColorCache();
   runApp(const ProviderScope(child: PortfolioApp()));
 }
 
 // ─────────────────────────────────────────────────────────────
-// APP ROOT
+// APP ROOT — Material App Configuration
 // ─────────────────────────────────────────────────────────────
 
+/// Root Material application widget
+///
+/// Responsibilities:
+/// - Provides theme (light/dark mode support)
+/// - Initializes navigation
+/// - Watches theme state changes via Riverpod
+/// 
+/// SEO Note: Title and description are indexable by search engines
 class PortfolioApp extends ConsumerWidget {
+  /// Create a new PortfolioApp instance
   const PortfolioApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeNotifier = ref.watch(themeProvider);
-    final isDark = themeNotifier.isDark;
-    AppColors.isDarkMode = isDark;
+    final themeMode = ref.watch(themeModeProvider);
+    // Sync app colors globally whenever theme changes
+    ref.watch(themeSyncProvider);
 
     return MaterialApp(
-      title: 'Deepanshu Kaushik | Portfolio',
+      title: 'Deepanshu Kaushik | Flutter & UI/UX Developer Portfolio',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark(),
+      theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
       home: const _AppShell(),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────
-// THEME PROVIDER
-// ─────────────────────────────────────────────────────────────
-
-final themeProvider =
-    ChangeNotifierProvider<ThemeNotifier>((_) => ThemeNotifier());
 
 // ─────────────────────────────────────────────────────────────
 // APP SHELL
@@ -82,7 +110,6 @@ class _AppShellState extends ConsumerState<_AppShell>
   //   0 Home | 1 About | 2 Projects | 3 Skills | 4 Contact
   late final List<Widget?> _screens = List<Widget?>.filled(5, null)
     ..[0] = const HomeScreen();
-
 
   Widget _buildScreen(int index) {
     switch (index) {
@@ -134,65 +161,96 @@ class _AppShellState extends ConsumerState<_AppShell>
   }
 
   // Keys to access screen contexts for scroll-to-top
-  final List<GlobalKey> _screenKeys =
-      List.generate(5, (_) => GlobalKey());
+  final List<GlobalKey> _screenKeys = List.generate(5, (_) => GlobalKey());
 
   @override
   Widget build(BuildContext context) {
-    final themeNotifier = ref.watch(themeProvider);
-    final isDark = themeNotifier.isDark;
+    final brightness = ref.watch(effectiveThemeProvider);
+    final isDark = brightness == Brightness.dark;
 
-    return Scaffold(
-      extendBody: true,
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            // ── Screens with crossfade transition ──
-            for (int i = 0; i < _screens.length; i++)
-              if (_screens[i] != null)
-                Offstage(
-                  offstage: _idx != i,
-                  child: TickerMode(
-                    enabled: _idx == i,
-                    child: AnimatedOpacity(
-                      key: _screenKeys[i],
-                      opacity: _idx == i ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 350),
-                      curve: Curves.easeOutQuart,
-                      child: AnimatedSlide(
-                        offset: _idx == i
-                            ? Offset.zero
-                            : const Offset(0, 0.02),
-                        duration: const Duration(milliseconds: 350),
-                        curve: Curves.easeOutQuart,
-                        child: _screens[i]!,
-                      ),
+    return GridBackground(
+      child: Scaffold(
+        extendBody: true,
+        body: RepaintBoundary(
+          child: Stack(
+            children: [
+              CircularRevealTransition(
+                child: SizedBox.expand(
+                  child: GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if (details.primaryVelocity == null) return;
+                      if (details.primaryVelocity! < -500) {
+                        if (_idx < _screens.length - 1) _openTab(_idx + 1);
+                      } else if (details.primaryVelocity! > 500) {
+                        if (_idx > 0) _openTab(_idx - 1);
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        for (int i = 0; i < _screens.length; i++)
+                          if (_screens[i] != null)
+                            Offstage(
+                              offstage: _idx != i,
+                              child: TickerMode(
+                                enabled: _idx == i,
+                                child: RepaintBoundary(
+                                  child: AnimatedScale(
+                                    scale: _idx == i ? 1.0 : 0.98,
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.easeOutCubic,
+                                    child: AnimatedOpacity(
+                                      key: _screenKeys[i],
+                                      opacity: _idx == i ? 1.0 : 0.0,
+                                      duration: const Duration(milliseconds: 350),
+                                      curve: Curves.easeOutCubic,
+                                      child: AnimatedSlide(
+                                        offset: _idx == i
+                                            ? Offset.zero
+                                            : const Offset(0, 0.02),
+                                        duration: const Duration(milliseconds: 350),
+                                        curve: Curves.easeOutCubic,
+                                        child: _screens[i]!,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: RepaintBoundary(
+                            child: PortfolioFooter(
+                              isDark: isDark,
+                              onToggleTheme: () =>
+                                  ref.read(themeModeProvider.notifier).toggle(),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 60,
+                          left: 0,
+                          right: 0,
+                          child: RepaintBoundary(
+                            child: FloatingNavBar(
+                              currentIndex: _idx,
+                              onTap: _openTab,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-
-            // ── Footer ──────────────────────────────────────────
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: PortfolioFooter(
-                isDark: isDark,
-                onToggleTheme: () => ref.read(themeProvider).toggle(),
               ),
-            ),
-
-            // ── Floating nav bar ────────────────────────────────
-            Positioned(
-              bottom: 60,
-              left: 0,
-              right: 0,
-              child: FloatingNavBar(
-                currentIndex: _idx,
-                onTap: _openTab,
+              const Positioned(
+                top: 0,
+                right: 20,
+                child: LampThemeSwitcher(),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

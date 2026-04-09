@@ -5,8 +5,138 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:redacted/redacted.dart';
 import '../theme/app_theme.dart';
 export 'skeleton_loaders.dart';
+export 'magnet.dart';
+export 'grid_background.dart';
 
-// ─────────────────────────────────────────────
+/// ── Dashed Divider ──────────────────────────────────────────
+class DashedDivider extends StatelessWidget {
+  final double height;
+  final double thickness;
+  final double dashWidth;
+  final double dashGap;
+  final Color? color;
+
+  const DashedDivider({
+    super.key,
+    this.height = 1,
+    this.thickness = 1,
+    this.dashWidth = 4,
+    this.dashGap = 4,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveColor =
+        color ?? Theme.of(context).dividerTheme.color ?? AppColors.border;
+
+    return Container(
+      height: height,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _DashedLinePainter(
+          color: effectiveColor,
+          thickness: thickness,
+          dashWidth: dashWidth,
+          dashGap: dashGap,
+        ),
+      ),
+    );
+  }
+}
+
+class DashedVerticalDivider extends StatelessWidget {
+  final double width;
+  final double thickness;
+  final double dashWidth;
+  final double dashGap;
+  final Color? color;
+
+  const DashedVerticalDivider({
+    super.key,
+    this.width = 1,
+    this.thickness = 1,
+    this.dashWidth = 4,
+    this.dashGap = 4,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveColor =
+        color ?? Theme.of(context).dividerTheme.color ?? AppColors.border;
+
+    return Container(
+      width: width,
+      height: double.infinity,
+      child: CustomPaint(
+        painter: _DashedLinePainter(
+          color: effectiveColor,
+          thickness: thickness,
+          dashWidth: dashWidth,
+          dashGap: dashGap,
+          isHorizontal: false,
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+  final double thickness;
+  final double dashWidth;
+  final double dashGap;
+  final bool isHorizontal;
+
+  _DashedLinePainter({
+    required this.color,
+    this.thickness = 1,
+    this.dashWidth = 4,
+    this.dashGap = 4,
+    this.isHorizontal = true,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = thickness
+      ..style = PaintingStyle.stroke;
+
+    if (isHorizontal) {
+      double startX = 0;
+      while (startX < size.width) {
+        canvas.drawLine(
+          Offset(startX, size.height / 2),
+          Offset(startX + dashWidth, size.height / 2),
+          paint,
+        );
+        startX += dashWidth + dashGap;
+      }
+    } else {
+      double startY = 0;
+      while (startY < size.height) {
+        canvas.drawLine(
+          Offset(size.width / 2, startY),
+          Offset(size.width / 2, startY + dashWidth),
+          paint,
+        );
+        startY += dashWidth + dashGap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
+      oldDelegate.color != color ||
+      oldDelegate.thickness != thickness ||
+      oldDelegate.dashWidth != dashWidth ||
+      oldDelegate.dashGap != dashGap ||
+      oldDelegate.isHorizontal != isHorizontal;
+}
+
+/// ── Simple Section Divider ──────────────────────────────────
 // DASHED BORDER CONTAINER
 // ─────────────────────────────────────────────
 
@@ -77,81 +207,6 @@ class _DashedBorderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _DashedBorderPainter old) => old.color != color;
-}
-
-// ─────────────────────────────────────────────
-// DASHED DIVIDERS
-// ─────────────────────────────────────────────
-
-class DashedDivider extends StatelessWidget {
-  final double height;
-  final Color? color;
-  const DashedDivider({super.key, this.height = 1, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = color ?? (isDark ? AppColors.borderDark : AppColors.borderLight);
-    return SizedBox(
-      height: height,
-      width: double.infinity,
-      child: CustomPaint(painter: _DashedLinePainter(color: c, isHorizontal: true)),
-    );
-  }
-}
-
-class DashedVerticalDivider extends StatelessWidget {
-  final double width;
-  final Color? color;
-  const DashedVerticalDivider({super.key, this.width = 1, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = color ?? (isDark ? AppColors.borderDark : AppColors.borderLight);
-    return SizedBox(
-      height: double.infinity,
-      width: width,
-      child: CustomPaint(painter: _DashedLinePainter(color: c, isHorizontal: false)),
-    );
-  }
-}
-
-class _DashedLinePainter extends CustomPainter {
-  final Color color;
-  final bool isHorizontal;
-  const _DashedLinePainter({required this.color, required this.isHorizontal});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    const dash = 4.0;
-    const gap = 4.0;
-    double d = 0;
-    bool drawing = true;
-    final len = isHorizontal ? size.width : size.height;
-
-    while (d < len) {
-      final end = min(d + (drawing ? dash : gap), len);
-      if (drawing) {
-        if (isHorizontal) {
-          canvas.drawLine(Offset(d, 0), Offset(end, 0), paint);
-        } else {
-          canvas.drawLine(Offset(0, d), Offset(0, end), paint);
-        }
-      }
-      d = end;
-      drawing = !drawing;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedLinePainter old) =>
-      old.color != color || old.isHorizontal != isHorizontal;
 }
 
 // ─────────────────────────────────────────────

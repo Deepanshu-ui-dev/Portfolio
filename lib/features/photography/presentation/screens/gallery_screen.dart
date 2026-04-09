@@ -31,133 +31,135 @@ class GalleryScreen extends StatelessWidget {
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-          slivers: [
-            // Header Section
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xl),
-              sliver: SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Text(
-                                '[ 05 ]',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
-                                    ?.copyWith(color: accent, letterSpacing: 1.5),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'SHORTS & GALLERY',
+    return GridBackground(
+      child: Scaffold(
+        body: SafeArea(
+          bottom: false,
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              // Header Section
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: padding, vertical: AppSpacing.xl),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Text(
+                                  '[ 05 ]',
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelSmall
-                                      ?.copyWith(color: textSec, letterSpacing: 2),
+                                      ?.copyWith(color: accent, letterSpacing: 1.5),
                                 ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    'SHORTS & GALLERY',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(color: textSec, letterSpacing: 2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Back Button
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Icon(
+                                LucideIcons.x,
+                                color: textSec,
+                                size: 24,
                               ),
-                            ],
-                          ),
-                        ),
-                        // Back Button
-                        MouseRegion(
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Icon(
-                              LucideIcons.x,
-                              color: textSec,
-                              size: 24,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      "Bits of life.",
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontSize: AppSpacing.headlineSize(
-                              context,
-                              mobile: 30,
-                              tablet: 38,
-                              laptop: 44,
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        "Bits of life.",
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontSize: AppSpacing.headlineSize(
+                                context,
+                                mobile: 30,
+                                tablet: 38,
+                                laptop: 44,
+                              ),
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -2,
+                              height: 1.0,
                             ),
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -2,
-                            height: 1.0,
-                          ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Moments captured through the lens, random shots, and videos.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: textSec, height: 1.65),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    const DashedDivider(),
-                  ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Moments captured through the lens, random shots, and videos.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: textSec, height: 1.65),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      const DashedDivider(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            
-            // Grid Section
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
-              sliver: SliverLayoutBuilder(
-                builder: (context, constraints) {
-                  final isMobile = constraints.crossAxisExtent < AppSpacing.mobileMax;
-                  final isTablet =
-                      constraints.crossAxisExtent >= AppSpacing.mobileMax &&
-                          constraints.crossAxisExtent < AppSpacing.tabletMax;
-
-                  return SliverGrid(
-                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: isMobile
-                          ? 220
-                          : isTablet
-                              ? 250
-                              : 300,
-                      mainAxisSpacing: isMobile ? 12 : 16,
-                      crossAxisSpacing: isMobile ? 12 : 16,
-                      childAspectRatio: isMobile ? 0.74 : 0.8,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return _GalleryImageCard(imagePath: _images[index])
-                            .animate()
-                            .fade(
-                              duration: 400.ms,
-                              delay: Duration(milliseconds: 50 * index),
-                            )
-                            .slideY(
-                              begin: 0.05,
-                              end: 0,
-                              duration: 400.ms,
-                              delay: Duration(milliseconds: 50 * index),
-                              curve: Curves.easeOutCubic,
-                            );
-                      },
-                      childCount: _images.length,
-                    ),
-                  );
-                },
+              
+              // Grid Section
+              SliverPadding(
+                padding: EdgeInsets.fromLTRB(padding, 0, padding, AppSpacing.xl + 40),
+                sliver: SliverLayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.crossAxisExtent < AppSpacing.mobileMax;
+                    final isTablet =
+                        constraints.crossAxisExtent >= AppSpacing.mobileMax &&
+                            constraints.crossAxisExtent < AppSpacing.tabletMax;
+  
+                    return SliverGrid(
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: isMobile
+                            ? 220
+                            : isTablet
+                                ? 250
+                                : 300,
+                        mainAxisSpacing: isMobile ? 12 : 16,
+                        crossAxisSpacing: isMobile ? 12 : 16,
+                        childAspectRatio: isMobile ? 0.74 : 0.8,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return _GalleryImageCard(imagePath: _images[index])
+                              .animate()
+                              .fade(
+                                duration: 400.ms,
+                                delay: Duration(milliseconds: 50 * index),
+                              )
+                              .slideY(
+                                begin: 0.05,
+                                end: 0,
+                                duration: 400.ms,
+                                delay: Duration(milliseconds: 50 * index),
+                                curve: Curves.easeOutCubic,
+                              );
+                        },
+                        childCount: _images.length,
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

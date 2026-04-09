@@ -86,34 +86,37 @@ class _IdentityBlock extends StatelessWidget {
         const SizedBox(height: 12),
 
         LayoutBuilder(builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 500;
+          final isMobile = constraints.maxWidth < 420;
           final sectionGap = isMobile ? AppSpacing.lg : AppSpacing.xxl;
-          final avatar = MonofolioCornersBox(
-            padding: const EdgeInsets.all(4),
-            child: Container(
-              width: isMobile ? double.infinity : 160,
-              height: isMobile ? null : 200,
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
-                border: Border.all(color: border),
-              ),
-              child: RepaintBoundary(
-                child: ColorFiltered(
-                  colorFilter: const ColorFilter.matrix(<double>[
-                    0.33, 0.33, 0.33, 0, 0,
-                    0.33, 0.33, 0.33, 0, 0,
-                    0.33, 0.33, 0.33, 0, 0,
-                    0,    0,    0,    1, 0,
-                  ]),
-                  child: _LazySkeletonAssetImage(
-                    assetPath: 'assets/images/profile.png',
-                    fit: isMobile ? BoxFit.contain : BoxFit.cover,
-                    width: isMobile ? double.infinity : null,
-                    cacheWidth: 400,
-                    skeletonColor: isDark
-                        ? AppColors.surfaceElevDark
-                        : AppColors.surfaceElevLight,
-                    errorIconColor: textSec.withValues(alpha: 0.5),
+          final avatar = Magnet(
+            displacement: 0.1,
+            child: MonofolioCornersBox(
+              padding: const EdgeInsets.all(4),
+              child: Container(
+                width: isMobile ? double.infinity : 160,
+                height: isMobile ? null : 200,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
+                  border: Border.all(color: border),
+                ),
+                child: RepaintBoundary(
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.matrix(<double>[
+                      0.33, 0.33, 0.33, 0, 0,
+                      0.33, 0.33, 0.33, 0, 0,
+                      0.33, 0.33, 0.33, 0, 0,
+                      0,    0,    0,    1, 0,
+                    ]),
+                    child: _LazySkeletonAssetImage(
+                      assetPath: 'assets/images/profile.png',
+                      fit: isMobile ? BoxFit.contain : BoxFit.cover,
+                      width: isMobile ? double.infinity : null,
+                      cacheWidth: 400,
+                      skeletonColor: isDark
+                          ? AppColors.surfaceElevDark
+                          : AppColors.surfaceElevLight,
+                      errorIconColor: textSec.withValues(alpha: 0.5),
+                    ),
                   ),
                 ),
               ),
@@ -148,7 +151,10 @@ class _IdentityBlock extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              avatar,
+              SizedBox(
+                width: (constraints.maxWidth * 0.35).clamp(120.0, 160.0),
+                child: avatar,
+              ),
               SizedBox(width: sectionGap),
               Expanded(child: details),
             ],
@@ -213,6 +219,7 @@ class _DetailRow extends StatelessWidget {
                         ),
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ),
               ],
@@ -331,14 +338,14 @@ class _AboutBlock extends StatelessWidget {
                 const SizedBox(height: 8),
                 const _ResumePulsingButton(),
               ] else
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SectionHeader('I love what I do.'),
+                    const Flexible(child: SectionHeader('I love what I do.')),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 18, top: 4),
-                      child: _ResumePulsingButton(),
+                      padding: const EdgeInsets.only(bottom: 18, top: 4),
+                      child: const _ResumePulsingButton(),
                     ),
                   ],
                 ),
