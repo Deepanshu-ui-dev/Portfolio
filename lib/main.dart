@@ -196,18 +196,18 @@ class _AppShellState extends ConsumerState<_AppShell>
                                 child: RepaintBoundary(
                                   child: AnimatedScale(
                                     scale: _idx == i ? 1.0 : 0.98,
-                                    duration: const Duration(milliseconds: 350),
+                                    duration: const Duration(milliseconds: 300),
                                     curve: Curves.easeOutCubic,
                                     child: AnimatedOpacity(
                                       key: _screenKeys[i],
                                       opacity: _idx == i ? 1.0 : 0.0,
-                                      duration: const Duration(milliseconds: 350),
+                                      duration: const Duration(milliseconds: 300),
                                       curve: Curves.easeOutCubic,
                                       child: AnimatedSlide(
                                         offset: _idx == i
                                             ? Offset.zero
                                             : const Offset(0, 0.02),
-                                        duration: const Duration(milliseconds: 350),
+                                        duration: const Duration(milliseconds: 300),
                                         curve: Curves.easeOutCubic,
                                         child: _screens[i]!,
                                       ),

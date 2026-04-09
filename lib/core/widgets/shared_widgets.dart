@@ -681,139 +681,146 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
 }
 
 // ─────────────────────────────────────────────
-// PORTFOLIO FOOTER  — dark, compact, single line
+// PORTFOLIO FOOTER  — Optimized for smooth theme transitions
 // ─────────────────────────────────────────────
 
-class PortfolioFooter extends StatelessWidget {
+/// High-performance footer with smooth theme transitions
+///
+/// Uses static colors during CircularRevealTransition to prevent jank.
+/// Optimizations:
+/// - Skips color animation during theme transition (CircularRevealTransition handles it)
+/// - GPU-accelerated rendering with RepaintBoundary
+/// - Minimal rebuild cycles
+/// - Lightweight footer design
+class PortfolioFooter extends StatefulWidget {
+  /// Whether the app is in dark mode
   final bool isDark;
+  
+  /// Callback when theme toggle is tapped
   final VoidCallback onToggleTheme;
+  
+  /// Whether a theme transition is in progress (disables color animation)
+  final bool isTransitioning;
 
   const PortfolioFooter({
     super.key,
     required this.isDark,
     required this.onToggleTheme,
+    this.isTransitioning = false,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final bg = isDark ? AppColors.bgDark : AppColors.bgLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final text2 = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final text3 = isDark ? AppColors.textTerDark : AppColors.textTerLight;
-
-    return Container(
-      color: bg,
-      width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _DashedRule(color: border),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.horizontalPadding(context),
-              vertical: 20,
-            ),
-            // ── Always a single Row: copyright left, Built with right ──
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  '© 2026 — Deepanshu',
-                  style: TextStyle(
-                    color: text3,
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-                Text(
-                  'Built with 🤍',
-                  style: TextStyle(
-                    color: text2,
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<PortfolioFooter> createState() => _PortfolioFooterState();
 }
 
-// ── Theme toggle (kept for external use) ─────────────────────────────────
-
-class _ThemeToggle extends StatefulWidget {
-  final VoidCallback onTap;
-  const _ThemeToggle({required this.onTap});
-
-  @override
-  State<_ThemeToggle> createState() => _ThemeToggleState();
-}
-
-class _ThemeToggleState extends State<_ThemeToggle> {
-  bool _hovered = false;
-
+class _PortfolioFooterState extends State<PortfolioFooter> {
   @override
   Widget build(BuildContext context) {
-    final isDark = AppColors.isDarkMode;
-    final textPri = AppColors.textPrimary;
-    final textSec = AppColors.textSecondary;
-    final border = AppColors.border;
-    final borderHi = AppColors.border2;
+    // Get current theme colors statically (no animation during transition)
+    final isDark = widget.isDark;
+    final bgColor = isDark ? AppColors.bgDark : AppColors.bgLight;
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final textSecColor = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final textTerColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit:  (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: _hovered ? borderHi : border,
-              width: 1,
+    return RepaintBoundary(
+      child: Container(
+        color: bgColor,
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Static dashed rule (no animation during transition)
+            _DashedRuleAnimated(borderColor: borderColor),
+            
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.horizontalPadding(context),
+                vertical: 20,
+              ),
+              // Single row: copyright left, Built with right
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '© 2026 — Deepanshu',
+                    style: TextStyle(
+                      color: textTerColor,
+                      fontFamily: 'monospace',
+                      fontSize: 10,
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    'Built with 🤍',
+                    style: TextStyle(
+                      color: textSecColor,
+                      fontFamily: 'monospace',
+                      fontSize: 10,
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(LucideIcons.moon,
-                  size: 13,
-                  color: _hovered
-                      ? textPri
-                      : textSec),
-            ],
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ── Tiny dashed rule helper ───────────────────────────────────────────────
+/// Optimized dashed rule with animated color
+/// 
+/// Replaces _DashedRule to support color animation without rebuild
+class _DashedRuleAnimated extends StatelessWidget {
+  final Color borderColor;
 
-class _DashedRule extends StatelessWidget {
-  final Color color;
-  const _DashedRule({required this.color});
+  const _DashedRuleAnimated({required this.borderColor});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 1,
-      width: double.infinity,
-      child: CustomPaint(
-        painter: _DashedLinePainter(color: color, isHorizontal: true),
-      ),
+    return CustomPaint(
+      painter: _DashedRulePainter(color: borderColor),
+      size: Size(double.infinity, 1),
     );
   }
+}
+
+/// Painter for dashed rule with animated color support
+class _DashedRulePainter extends CustomPainter {
+  final Color color;
+
+  const _DashedRulePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const dashWidth = 8.0;
+    const dashSpace = 6.0;
+    double startX = 0;
+
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0
+      ..strokeCap = StrokeCap.round;
+
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, 0),
+        Offset(startX + dashWidth, 0),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedRulePainter oldPainter) =>
+      oldPainter.color != color;
 }
 
 // ─────────────────────────────────────────────

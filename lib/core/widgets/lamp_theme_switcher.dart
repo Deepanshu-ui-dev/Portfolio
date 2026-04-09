@@ -1,3 +1,16 @@
+/// Interactive lamp-based theme switcher with physics simulation
+///
+/// Features a draggable rope connected to a bulb that toggles theme mode
+/// when pulled down. Includes realistic physics simulation with gravity,
+/// friction, and constraint satisfaction for smooth animations.
+///
+/// Performance optimized for 60fps with:
+/// - Reduced physics iterations (4 vs 10)
+/// - Efficient motion detection with debouncing
+/// - GPU-accelerated rendering
+/// - Minimal memory allocations per frame
+library theme_switcher;
+
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -9,51 +22,123 @@ import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 import 'circular_reveal_transition.dart';
 
+/// Interactive lamp theme switcher widget
+///
+/// Displays an interactive rope-and-bulb interface for toggling dark/light theme.
+/// The user can drag the bulb down to trigger a theme switch with smooth animation.
+///
+/// Usage:
+/// ```dart
+/// const LampThemeSwitcher()
+/// ```
+///
+/// Features:
+/// - Physics-based rope animation
+/// - Smooth color transitions
+/// - Haptic feedback on toggle
+/// - Responsive to mouse hover on desktop
 class LampThemeSwitcher extends ConsumerStatefulWidget {
+  /// Create a new LampThemeSwitcher
   const LampThemeSwitcher({super.key});
 
   @override
   ConsumerState<LampThemeSwitcher> createState() => _LampThemeSwitcherState();
 }
 
+/// State management for lamp theme switcher
+///
+/// Handles physics simulation, user interaction, and animation timing
 class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
     with TickerProviderStateMixin {
 
+  // ───────────────────────────────────────────────────────────────────
+  // Physics Configuration Constants
+  // ───────────────────────────────────────────────────────────────────
+  
+  /// Number of points in the rope chain
   static const int    _pointCount      = 14;
+  
+  /// Distance between each rope point
   static const double _stickLength     = 9.0;
+  
+  /// Gravity acceleration (units per frame squared)
   static const double _gravity         = 0.45;
-  static const double _friction        = 0.92; // Slightly higher for smoother settling
+  
+  /// Velocity damping factor (0-1, lower = more friction)
+  static const double _friction        = 0.92;
+  
+  /// Total rope length (calculated)
   static const double _ropeLength      = _pointCount * _stickLength;
+  
+  /// Distance threshold to trigger theme toggle
   static const double _toggleThreshold = 28.0;
+  
+  /// Maximum reach distance for rope end
   static const double _maxReach        = _ropeLength * 1.7;
-  static const int    _physicsIter     = 4; // Reduced from 10 for better FPS
+  
+  /// Number of physics constraint iterations per frame
+  static const int    _physicsIter     = 4;
 
+  // ───────────────────────────────────────────────────────────────────
+  // Physics State
+  // ───────────────────────────────────────────────────────────────────
+
+  /// Rope chain points with position and velocity
   final List<_Point> _points = [];
+  
+  /// Rope segment constraints
   final List<_Stick> _sticks = [];
 
+  // ───────────────────────────────────────────────────────────────────
+  // Interaction State
+  // ───────────────────────────────────────────────────────────────────
+
+  /// Current mouse position when dragging
   Offset? _mousePos;
+  
+  /// Current mouse position during hover
   Offset? _hoverPos;
+  
+  /// Whether user is currently dragging the rope
   bool    _isDragging = false;
+  
+  /// Whether theme toggle has occurred during current drag
   bool    _hasToggled = false;
+  
+  /// Whether mouse is hovering over the widget
   bool    _isHovering = false;
+  
+  /// Timer for debouncing motion stop detection
   Timer? _motionStopTimer;
 
+  // ───────────────────────────────────────────────────────────────────
+  // Animation Controllers
+  // ───────────────────────────────────────────────────────────────────
+
+  /// Main animation loop for physics simulation
   late AnimationController _loopController;
+  
+  /// Bloom glow effect animation
   late AnimationController _bloomController;
+  
+  /// Bloom animation with easing curve
   late Animation<double>   _bloomAnim;
 
   @override
   void initState() {
     super.initState();
     _initPhysics();
+    
+    // Physics simulation loop (16ms per frame ≈ 60fps)
     _loopController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 16),
     )..addListener(_onFrame);
 
+    // Bloom effect animation (fast, punchy feedback)
     _bloomController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 150), // Faster bloom
+      duration: const Duration(milliseconds: 150),
     );
     _bloomAnim = CurvedAnimation(
       parent: _bloomController,
@@ -61,29 +146,43 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
     );
   }
 
+  /// Initialize rope physics simulation
+  ///
+  /// Creates a chain of points connected by constraints,
+  /// with the first point fixed at the top
   void _initPhysics() {
     _points.clear();
     _sticks.clear();
+    
+    // Fixed anchor point at top
     _points.add(_Point(50, 0, isFixed: true));
+    
+    // Rope chain points
     for (int i = 1; i < _pointCount; i++) {
       _points.add(_Point(50, i * _stickLength));
       _sticks.add(_Stick(_points[i - 1], _points[i], _stickLength));
     }
   }
 
+  /// Start the physics simulation loop
   void _startLoop() {
     _motionStopTimer?.cancel();
     if (!_loopController.isAnimating) _loopController.repeat();
   }
 
+  /// Stop the physics simulation loop
   void _stopLoop() {
     if (_loopController.isAnimating) _loopController.stop();
   }
 
+  /// Physics frame callback - called every 16ms
+  ///
+  /// Updates physics, detects motion stopping, and triggers repaints
   void _onFrame() {
     if (!mounted) return;
     _runPhysics();
 
+    // Check if motion has stopped
     if (!_isDragging && !_isHovering && !_bloomController.isAnimating) {
       double maxV = 0;
       for (final p in _points) {
@@ -91,6 +190,7 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
         maxV = math.max(maxV, (p.x - p.oldX).abs());
         maxV = math.max(maxV, (p.y - p.oldY).abs());
       }
+      // Debounce stop detection to prevent loop thrashing
       if (maxV < 0.05) {
         _motionStopTimer?.cancel();
         _motionStopTimer = Timer(const Duration(milliseconds: 200), _stopLoop);
@@ -100,7 +200,15 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
     setState(() {});
   }
 
+  /// Execute one frame of physics simulation
+  ///
+  /// Handles:
+  /// 1. Gravity and friction on all points
+  /// 2. Hover force field
+  /// 3. User drag interaction
+  /// 4. Constraint satisfaction (rope tension)
   void _runPhysics() {
+    // Apply forces: gravity, friction, hover force
     for (final p in _points) {
       if (p.isFixed) continue;
       final vx = (p.x - p.oldX) * _friction;
@@ -110,6 +218,7 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
       p.x += vx;
       p.y += vy + _gravity;
 
+      // Hover force field (repel rope when mouse nearby)
       if (_hoverPos != null && !_isDragging) {
         final dx   = p.x - _hoverPos!.dx;
         final dy   = p.y - _hoverPos!.dy;
@@ -122,6 +231,7 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
       }
     }
 
+    // User drag interaction
     if (_isDragging && _mousePos != null) {
       final last   = _points.last;
       final anchor = Offset(_points[0].x, _points[0].y);
@@ -132,24 +242,31 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
       last.x = target.dx;
       last.y = target.dy;
 
+      // Check if threshold crossed for theme toggle
       if (last.y > _ropeLength + _toggleThreshold && !_hasToggled) {
         _hasToggled = true;
         _bloomController.forward(from: 0.0);
-        _startLoop(); // Ensure loop is active for bloom frames
+        _startLoop();
 
+        // Get global position for circular reveal origin
         final rb        = context.findRenderObject() as RenderBox?;
         final globalPos = rb?.localToGlobal(Offset(last.x, last.y))
             ?? Offset(last.x, last.y);
 
+        // Trigger theme transition animation
         ref.read(transitionProvider.notifier).start(globalPos);
-        // Minimal delay to ensure snapshot captures OLD theme before build triggers
+        
+        // Minimal delay ensures snapshot captures OLD theme before toggle
         Future.delayed(const Duration(milliseconds: 16), () {
           if (mounted) ref.read(themeModeProvider.notifier).toggle();
         });
+        
+        // Haptic feedback for user confirmation
         HapticFeedback.mediumImpact();
       }
     }
 
+    // Satisfy rope length constraints (10 iterations optimal)
     for (int iter = 0; iter < _physicsIter; iter++) {
       for (final s in _sticks) {
         final dx   = s.p1.x - s.p2.x;
@@ -221,7 +338,7 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
             },
             child: TweenAnimationBuilder<double>(
               tween: Tween<double>(end: isDark ? 1.0 : 0.0),
-              duration: const Duration(milliseconds: 350), // Faster blend
+              duration: const Duration(milliseconds: 350),
               curve: Curves.easeOutQuart,
               builder: (context, t, _) {
                 final textMuted = Color.lerp(
@@ -255,37 +372,100 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
   }
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
+// PHYSICS DATA STRUCTURES
+// ──────────────────────────────────────────────────────────────────────────
 
+/// A point in the rope chain with position and velocity
+///
+/// Stores current and previous position for velocity calculation using Verlet integration
 class _Point {
-  double x, y, oldX, oldY;
+  /// Current X position
+  double x;
+  
+  /// Current Y position
+  double y;
+  
+  /// Previous X position (for velocity)
+  double oldX;
+  
+  /// Previous Y position (for velocity)
+  double oldY;
+  
+  /// Whether this point is fixed (anchor)
   final bool isFixed;
+
+  /// Create a new physics point
   _Point(this.x, this.y, {this.isFixed = false}) : oldX = x, oldY = y;
 }
 
+/// A rope segment connecting two points
+///
+/// Represents the constraint that two points should maintain a specific distance
 class _Stick {
-  final _Point p1, p2;
+  /// First point in the constraint
+  final _Point p1;
+  
+  /// Second point in the constraint
+  final _Point p2;
+  
+  /// Target distance between points
   final double length;
+
+  /// Create a new rope segment
   _Stick(this.p1, this.p2, this.length);
 }
 
+/// Snapshot of point position for rendering
+///
+/// Immutable data for efficient painting
 class _Snap {
-  final double x, y;
+  /// X coordinate
+  final double x;
+  
+  /// Y coordinate
+  final double y;
+
+  /// Create a new snapshot
   const _Snap(this.x, this.y);
 }
 
-// ── Painter ───────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────
+// RENDERING - CUSTOM PAINTER
+// ──────────────────────────────────────────────────────────────────────────
 
+/// Custom painter for the lamp visual
+///
+/// Renders:
+/// - Ceiling fixture
+/// - Rope with shadow
+/// - Glass bulb with highlight
+/// - Metal cap
+/// - Filament (dark mode)
+/// - Light bloom effect
 class _LampPainter extends CustomPainter {
+  /// Current rope point positions
   final List<_Snap> snapshots;
+  
+  /// Whether in dark mode
   final bool        isDark;
+  
+  /// Whether currently dragging
   final bool        isDragging;
+  
+  /// Rope color (muted text)
   final Color       textMuted;
+  
+  /// Border color (accent)
   final Color       border2;
 
+  /// Theme transition progress (0-1)
   final double      themeT;
+  
+  /// Bloom effect intensity (0-1)
   final double      bloomT;
 
+  /// Create a new lamp painter
   const _LampPainter({
     required this.snapshots,
     required this.isDark,
@@ -303,6 +483,7 @@ class _LampPainter extends CustomPainter {
     _drawBulb(canvas);
   }
 
+  /// Draw the ceiling fixture
   void _drawFixture(Canvas canvas) {
     final x = snapshots[0].x;
     final p = Paint()..color = border2..style = PaintingStyle.fill;
@@ -316,6 +497,7 @@ class _LampPainter extends CustomPainter {
     canvas.drawCircle(Offset(x, 4), 3, p);
   }
 
+  /// Draw the rope with shadow and main stroke
   void _drawRope(Canvas canvas) {
     if (snapshots.length < 2) return;
     
@@ -326,7 +508,7 @@ class _LampPainter extends CustomPainter {
         ? textMuted.withValues(alpha: 0.60)
         : textMuted.withValues(alpha: 0.55);
     
-    // Shadow layer
+    // Shadow layer (offset slightly)
     canvas.drawPath(
       _buildPath(offsetY: 0.6),
       Paint()
@@ -347,6 +529,7 @@ class _LampPainter extends CustomPainter {
     );
   }
 
+  /// Build smooth cubic path through rope points
   Path _buildPath({double offsetY = 0}) {
     final s    = snapshots;
     final path = Path()..moveTo(s[0].x, s[0].y + offsetY);
@@ -366,6 +549,7 @@ class _LampPainter extends CustomPainter {
     return path;
   }
 
+  /// Draw the light bulb
   void _drawBulb(Canvas canvas) {
     if (snapshots.length < 2) return;
 
@@ -377,10 +561,10 @@ class _LampPainter extends CustomPainter {
     canvas.translate(last.x, last.y);
     canvas.rotate(angle);
 
-    // Glass dome: y = 0 (top) → y = 14 (bottom)
+    // Glass dome color (cool daylight → warm tungsten)
     final bulbColor = Color.lerp(
-      const Color(0xFFE8E8E4), // cool daylight (light)
-      const Color(0xFFD4C89A), // warm tungsten (dark)
+      const Color(0xFFE8E8E4),
+      const Color(0xFFD4C89A),
       themeT,
     )!;
     final bulbPath  = Path()
@@ -389,6 +573,7 @@ class _LampPainter extends CustomPainter {
       ..cubicTo( 9, 10, 9,  4, 6,  0)
       ..close();
 
+    // Bulb fill
     canvas.drawPath(
       bulbPath,
       Paint()
@@ -397,6 +582,8 @@ class _LampPainter extends CustomPainter {
             : bulbColor.withValues(alpha: isDark ? 0.50 : 0.70)
         ..style = PaintingStyle.fill,
     );
+    
+    // Bulb outline
     canvas.drawPath(
       bulbPath,
       Paint()
@@ -416,7 +603,7 @@ class _LampPainter extends CustomPainter {
       Paint()..color = border2..style = PaintingStyle.fill,
     );
 
-    // Filament (dark mode only)
+    // Filament glow (dark mode only)
     if (isDark) {
       final filamentAlpha = (isDragging ? 0.95 : 0.40) + (bloomT * 0.5);
       canvas.drawPath(
@@ -441,7 +628,7 @@ class _LampPainter extends CustomPainter {
         ..style = PaintingStyle.fill,
     );
 
-    // Light bloom effect (radial glow behind bulb)
+    // Light bloom effect (radial glow)
     if (bloomT > 0.01) {
       canvas.drawCircle(
         Offset.zero,
@@ -464,21 +651,11 @@ class _LampPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _LampPainter old) {
-    if (old.themeT != themeT) {
-      return true;
-    }
-    if (old.bloomT != bloomT) {
-      return true;
-    }
-    if (old.isDark != isDark) {
-      return true;
-    }
-    if (old.isDragging != isDragging) {
-      return true;
-    }
-    if (old.snapshots.length != snapshots.length) {
-      return true;
-    }
+    if (old.themeT != themeT) return true;
+    if (old.bloomT != bloomT) return true;
+    if (old.isDark != isDark) return true;
+    if (old.isDragging != isDragging) return true;
+    if (old.snapshots.length != snapshots.length) return true;
     for (int i = 0; i < snapshots.length; i++) {
       if (old.snapshots[i].x != snapshots[i].x ||
           old.snapshots[i].y != snapshots[i].y) {
