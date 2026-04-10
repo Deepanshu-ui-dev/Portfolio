@@ -357,6 +357,7 @@ class _LinkRowState extends State<_LinkRow> {
             color: _hovered ? surfaceEl : Colors.transparent,
             border: Border.all(
                 color: _hovered ? border2 : border, width: 1),
+          ),
           child: Row(children: [
             SizedBox(
               width: 28,
