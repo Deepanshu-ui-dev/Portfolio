@@ -78,7 +78,6 @@ class _IdentityBlock extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Top label
         Text(
           'FIG.01 // IDENTITY',
           style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 1.5),
@@ -88,8 +87,9 @@ class _IdentityBlock extends StatelessWidget {
         LayoutBuilder(builder: (context, constraints) {
           final isMobile = constraints.maxWidth < 420;
           final sectionGap = isMobile ? AppSpacing.lg : AppSpacing.xxl;
+          final isMobileDevice = AppSpacing.isMobile(context);
           final avatar = Magnet(
-            displacement: 0.1,
+            displacement: isMobileDevice ? 0.0 : 0.1,
             child: MonofolioCornersBox(
               padding: const EdgeInsets.all(4),
               child: Container(
@@ -311,9 +311,7 @@ class _PulseSkeletonBoxState extends State<_PulseSkeletonBox>
   }
 }
 
-// ─────────────────────────────────────────────
-// ABOUT BLOCK
-// ─────────────────────────────────────────────
+// ─── About Block ──────────────────────────────────────
 
 class _AboutBlock extends StatelessWidget {
   const _AboutBlock();

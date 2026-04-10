@@ -313,10 +313,7 @@ class _ContactScreenState extends State<ContactScreen>
   }
 }
 
-// ─────────────────────────────────────────────
-// LINK ROW  — full-width row with index, platform, handle, arrow
-// ─────────────────────────────────────────────
-
+// ─── Link Row ──────────────────────────────────────────
 class _LinkRow extends StatefulWidget {
   final String index, platform, handle, url;
   final IconData icon;
@@ -345,6 +342,7 @@ class _LinkRowState extends State<_LinkRow> {
     final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
     final textPri  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final accent   = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final isCompact = MediaQuery.sizeOf(context).width < 450;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -359,9 +357,7 @@ class _LinkRowState extends State<_LinkRow> {
             color: _hovered ? surfaceEl : Colors.transparent,
             border: Border.all(
                 color: _hovered ? border2 : border, width: 1),
-          ),
           child: Row(children: [
-            // Index
             SizedBox(
               width: 28,
               child: Text(widget.index,
@@ -370,26 +366,22 @@ class _LinkRowState extends State<_LinkRow> {
                         fontSize: 9,
                       )),
             ),
-            // Icon
             Icon(widget.icon, size: 14, color: textSec),
             const SizedBox(width: 10),
-            // Platform label
             SizedBox(
-              width: 90,
+              width: isCompact ? 70 : 90,
               child: Text(widget.platform,
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: textSec,
                         letterSpacing: 1.5,
                       )),
             ),
-            // Divider dash
             Text('——',
                 style: Theme.of(context)
                     .textTheme
                     .labelSmall
                     ?.copyWith(color: textSec.withValues(alpha: 0.3))),
             const SizedBox(width: 10),
-            // Handle
             Expanded(
               child: Text(
                 widget.handle,
@@ -401,7 +393,6 @@ class _LinkRowState extends State<_LinkRow> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Arrow
             AnimatedSlide(
               offset: _hovered ? const Offset(0.15, -0.15) : Offset.zero,
               duration: const Duration(milliseconds: 160),
@@ -416,10 +407,7 @@ class _LinkRowState extends State<_LinkRow> {
   }
 }
 
-// ─────────────────────────────────────────────
-// TERMINAL PING  — interactive quick-message composer
-// ─────────────────────────────────────────────
-
+// ─── Terminal Ping ─────────────────────────────────────
 class _TerminalPing extends StatefulWidget {
   const _TerminalPing();
 
@@ -493,7 +481,6 @@ class _TerminalPingState extends State<_TerminalPing> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          // Terminal title bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
@@ -624,10 +611,7 @@ class _TerminalPingState extends State<_TerminalPing> {
   }
 }
 
-// ─────────────────────────────────────────────
-// STATUS CARD
-// ─────────────────────────────────────────────
-
+// ─── Status Card ──────────────────────────────────────
 class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -707,10 +691,7 @@ class _StatusRow extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// LOCATION CARD
-// ─────────────────────────────────────────────
-
+// ─── Location Card ────────────────────────────────────
 class _LocationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -720,7 +701,6 @@ class _LocationCard extends StatelessWidget {
     final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
     final textPri  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
-    // India Standard Time  UTC+5:30
     final now = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
     final hour   = now.hour;
     final minute = now.minute.toString().padLeft(2, '0');

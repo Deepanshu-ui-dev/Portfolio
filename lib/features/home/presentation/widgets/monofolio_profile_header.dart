@@ -13,14 +13,13 @@ class MonofolioProfile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // "New Checkout my Article" Button
         Center(
           child: Container(
             margin: const EdgeInsets.only(bottom: 32),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.surfaceBorder, width: 1),
-              color: AppColors.surfaceBorder.withOpacity(0.2), // Faint dashed look emulation
+              color: AppColors.surfaceBorder.withOpacity(0.2),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -53,80 +52,99 @@ class MonofolioProfile extends StatelessWidget {
           ),
         ),
 
-        // Profile Heading Row
+        // ─── Profile Heading ──────────────────────────────────
         Container(
           padding: const EdgeInsets.only(top: 16),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hi, I\'m 👋🏼',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+          child: LayoutBuilder(builder: (context, constraints) {
+            final isMobile = constraints.maxWidth < 600;
+            
+            final details = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hi, I\'m 👋🏼',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Text(
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
                         PortfolioConfig.name,
                         style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontSize: 28,
+                          fontSize: isMobile ? 24 : 28,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 2, // Emulate the wide tracking seen in the screenshot's name
+                          letterSpacing: 2,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: 8),
-                      Icon(Icons.verified, color: AppColors.textPrimary, size: 24),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(Icons.verified, color: AppColors.textPrimary, size: isMobile ? 20 : 24),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const AnimatedRoleText(),
+              ],
+            );
+
+            final socials = Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (PortfolioConfig.githubUrl.isNotEmpty) ...[
+                  IconButton(
+                    icon: const Icon(Icons.code),
+                    onPressed: () => launchUrl(Uri.parse(PortfolioConfig.githubUrl)),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                if (PortfolioConfig.linkedinUrl.isNotEmpty) ...[
+                  IconButton(
+                    icon: const Icon(Icons.link),
+                    onPressed: () => launchUrl(Uri.parse(PortfolioConfig.linkedinUrl)),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+                if (PortfolioConfig.twitterUrl.isNotEmpty) ...[
+                  IconButton(
+                    icon: const Icon(Icons.alternate_email),
+                    onPressed: () => launchUrl(Uri.parse(PortfolioConfig.twitterUrl)),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ],
+            );
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (isMobile) ...[
+                  details,
+                  const SizedBox(height: 20),
+                  socials,
+                ] else
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(child: details),
+                      socials,
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  const AnimatedRoleText(),
-                ],
-              ),
-              
-              // Social Icons
-              Row(
-                children: [
-                  if (PortfolioConfig.githubUrl.isNotEmpty) ...[
-                    IconButton(
-                      icon: const Icon(Icons.code), // Emulate github via standard material temporarily if fontawesome isn't used
-                      onPressed: () => launchUrl(Uri.parse(PortfolioConfig.githubUrl)),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  if (PortfolioConfig.linkedinUrl.isNotEmpty) ...[
-                    IconButton(
-                      icon: const Icon(Icons.link), // Emulate linkedin
-                      onPressed: () => launchUrl(Uri.parse(PortfolioConfig.linkedinUrl)),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  if (PortfolioConfig.twitterUrl.isNotEmpty) ...[
-                    IconButton(
-                      icon: const Icon(Icons.alternate_email), // Emulate twitter/x
-                      onPressed: () => launchUrl(Uri.parse(PortfolioConfig.twitterUrl)),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 16),
-              const DashedDivider(),
-            ],
-          ),
+                const SizedBox(height: 16),
+                const DashedDivider(),
+              ],
+            );
+          }),
         ),
+
       ],
     );
   }

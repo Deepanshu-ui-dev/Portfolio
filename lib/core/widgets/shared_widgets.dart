@@ -137,9 +137,7 @@ class _DashedLinePainter extends CustomPainter {
 }
 
 /// ── Simple Section Divider ──────────────────────────────────
-// DASHED BORDER CONTAINER
-// ─────────────────────────────────────────────
-
+// ─── Dashed Border Container ──────────────────────────
 class DashedBorderContainer extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -209,10 +207,7 @@ class _DashedBorderPainter extends CustomPainter {
   bool shouldRepaint(covariant _DashedBorderPainter old) => old.color != color;
 }
 
-// ─────────────────────────────────────────────
-// MONOFOLIO CORNER  (L-shaped bracket)
-// ─────────────────────────────────────────────
-
+// ─── Corners & Boxes ──────────────────────────────────
 class MonofolioCorner extends StatelessWidget {
   final bool isTop;
   final bool isLeft;
@@ -370,10 +365,7 @@ class _SectionHeaderState extends State<SectionHeader> {
   }
 }
 
-// ─────────────────────────────────────────────
-// COLLAPSIBLE CARD
-// ─────────────────────────────────────────────
-
+// ─── Collapsible Card ─────────────────────────────────
 class CollapsibleCard extends StatefulWidget {
   final Widget leading;
   final String title;
@@ -509,7 +501,11 @@ class _CollapsibleCardState extends State<CollapsibleCard>
               sizeFactor: _heightAnim,
               child: (widget.bullets.isNotEmpty || widget.tags.isNotEmpty)
                    ? Padding(
-                      padding: const EdgeInsets.only(left: 64, right: 16, bottom: 16),
+                      padding: EdgeInsets.only(
+                        left: AppSpacing.isMobile(context) ? 20 : 64,
+                        right: 16,
+                        bottom: 16,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -565,10 +561,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
   }
 }
 
-// ─────────────────────────────────────────────
-// TYPEWRITER LINE  — cycles through phrases
-// ─────────────────────────────────────────────
-
+// ─── Typewriter Line ──────────────────────────────────
 class _TypewriterLine extends StatefulWidget {
   final List<String> phrases;
 
@@ -643,7 +636,6 @@ class _TypewriterLineState extends State<_TypewriterLine> {
   }
 }
 
-// Blinking block cursor
 class _Cursor extends StatefulWidget {
   final TextStyle? style;
   const _Cursor({this.style});
@@ -680,18 +672,7 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
   }
 }
 
-// ─────────────────────────────────────────────
-// PORTFOLIO FOOTER  — Optimized for smooth theme transitions
-// ─────────────────────────────────────────────
-
-/// High-performance footer with smooth theme transitions
-///
-/// Uses static colors during CircularRevealTransition to prevent jank.
-/// Optimizations:
-/// - Skips color animation during theme transition (CircularRevealTransition handles it)
-/// - GPU-accelerated rendering with RepaintBoundary
-/// - Minimal rebuild cycles
-/// - Lightweight footer design
+// ─── Portfolio Footer ─────────────────────────────────
 class PortfolioFooter extends StatefulWidget {
   /// Whether the app is in dark mode
   final bool isDark;
@@ -731,7 +712,6 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Static dashed rule (no animation during transition)
             _DashedRuleAnimated(borderColor: borderColor),
             
             Padding(
@@ -739,7 +719,7 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
                 horizontal: AppSpacing.horizontalPadding(context),
                 vertical: 20,
               ),
-              // Single row: copyright left, Built with right
+              // Copyright row
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
