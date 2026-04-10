@@ -63,64 +63,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   horizontal: padding, vertical: AppSpacing.xl),
               sliver: SliverList.list(
                 children: [
-                  const OpportunitiesBanner(),
+                  const RepaintBoundary(child: OpportunitiesBanner()),
                   const SizedBox(height: AppSpacing.xxl),
-                  const HeroSection(),
+                  const RepaintBoundary(child: HeroSection()),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 60),
-                    child: const _HomeHeatmapSection(),
+                    child: const RepaintBoundary(child: _HomeHeatmapSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 120),
-                    child: const _ExperienceSection(),
+                    child: const RepaintBoundary(child: _ExperienceSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 180),
-                    child: const _EducationSection(),
+                    child: const RepaintBoundary(child: _EducationSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 240),
-                    child: const _ProjectsSection(),
+                    child: const RepaintBoundary(child: _ProjectsSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 300),
-                    child: const _AchievementsSection(),
+                    child: const RepaintBoundary(child: _AchievementsSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 360),
-                    child: const _LeadershipSection(),
+                    child: const RepaintBoundary(child: _LeadershipSection()),
                   ),
                   const SizedBox(height: AppSpacing.xxl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xxl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 420),
-                    child: const _PhotographySection(),
+                    child: const RepaintBoundary(child: _PhotographySection()),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   const DashedDivider(),
                   const SizedBox(height: AppSpacing.xl),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 480),
-                    child: const _HobbiesSection(),
+                    child: const RepaintBoundary(child: _HobbiesSection()),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                 ],
@@ -156,12 +156,10 @@ class _HomeHeatmapSection extends ConsumerWidget {
               child: Center(
                 child: Text(
                   '// error: failed to fetch activity',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontFamily: 'JetBrainsMono',
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? AppColors.textSecDark
-                            : AppColors.textSecLight,
-                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                        fontSize: 10,
                       ),
                 ),
               ),

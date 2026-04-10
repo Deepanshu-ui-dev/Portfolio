@@ -169,7 +169,8 @@ class AppSpacing {
     if (w >= 900)     return 48;
     if (w >= mobileMax) return 32;
     if (w >= 390)     return 20;
-    return 14;
+    if (w >= 350)     return 16;
+    return 12;
   }
 
   // ── Responsive headline font size ────────────────────
@@ -259,7 +260,9 @@ class AppTheme {
       textTheme: TextTheme(
         // Hero / page name
         displayLarge: TextStyle(
-          fontFamily: mono, fontSize: 34, fontWeight: FontWeight.w800,
+          fontFamily: mono, 
+          fontSize: isDark ? 34 : 32, // Slightly smaller in light theme or just general reduction
+          fontWeight: FontWeight.w800,
           color: textPrimary, letterSpacing: -1.5, height: 1.05,
         ),
         // Sub-hero / tagline

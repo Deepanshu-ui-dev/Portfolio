@@ -116,7 +116,7 @@ class _SkillsScreenState extends State<SkillsScreen>
                 children: [
                   // ── HERO ──────────────────────────────────────────
                   const ScrollFadeIn(
-                    child: _SkillsHero(),
+                    child: RepaintBoundary(child: _SkillsHero()),
                   ),
 
                   const SizedBox(height: AppSpacing.xxl),
@@ -127,7 +127,7 @@ class _SkillsScreenState extends State<SkillsScreen>
                   for (int i = 0; i < _sections.length; i++) ...[
                     ScrollFadeIn(
                       delay: Duration(milliseconds: 100 + i * 80),
-                      child: _SkillSection(data: _sections[i]),
+                      child: RepaintBoundary(child: _SkillSection(data: _sections[i])),
                     ),
                     if (i < _sections.length - 1) ...[
                       const SizedBox(height: AppSpacing.xxl),
@@ -143,7 +143,7 @@ class _SkillsScreenState extends State<SkillsScreen>
                   // ── CALLOUT ROW ───────────────────────────────────
                   ScrollFadeIn(
                     delay: Duration(milliseconds: 100 + _sections.length * 80),
-                    child: const _PhilosophyCallout(),
+                    child: const RepaintBoundary(child: _PhilosophyCallout()),
                   ),
 
                   const SizedBox(height: AppSpacing.xl),

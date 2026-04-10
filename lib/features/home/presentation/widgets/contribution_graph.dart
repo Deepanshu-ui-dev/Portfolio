@@ -30,9 +30,27 @@ class ContributionGraph extends StatefulWidget {
 
 class _ContributionGraphState extends State<ContributionGraph> {
   ContributionDay? _hoveredDay;
+  late List<List<ContributionDay?>> _weeks;
+  late Map<int, String> _monthLabels;
 
   static const int _rows = 7;
   static const double _cellGap = 2.5;
+
+  @override
+  void initState() {
+    super.initState();
+    _weeks = _buildWeeks();
+    _monthLabels = _buildMonthLabels(_weeks);
+  }
+
+  @override
+  void didUpdateWidget(ContributionGraph oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.contributions != oldWidget.contributions) {
+      _weeks = _buildWeeks();
+      _monthLabels = _buildMonthLabels(_weeks);
+    }
+  }
 
   // ─── Group contributions into weeks ──────────────────────
 
@@ -103,8 +121,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final allWeeks = _buildWeeks();
-    if (allWeeks.isEmpty) return const SizedBox(height: 80);
+    if (_weeks.isEmpty) return const SizedBox(height: 80);
 
     final labelColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
 
@@ -118,12 +135,12 @@ class _ContributionGraphState extends State<ContributionGraph> {
 
       // Calculate how many weeks we can fit at a minimum cell size of 7px
       final maxWeeks = ((gridWidth + _cellGap) / (7.0 + _cellGap)).floor();
-      final weeksToShow = maxWeeks.clamp(20, allWeeks.length);
+      final weeksToShow = maxWeeks.clamp(20, _weeks.length).toInt();
 
       // Use the most recent weeks
-      final weeks = allWeeks.length > weeksToShow
-          ? allWeeks.sublist(allWeeks.length - weeksToShow)
-          : allWeeks;
+      final weeks = _weeks.length > weeksToShow
+          ? _weeks.sublist(_weeks.length - weeksToShow)
+          : _weeks;
 
       final weekCount = weeks.length;
 
@@ -136,6 +153,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
       final rowStep = cellSize + _cellGap;
       final gridHeight = _rows * rowStep - _cellGap;
 
+      // Month labels need to be re-filtered based on 'weeks' sublist
       final monthLabels = _buildMonthLabels(weeks);
 
       // Month label row

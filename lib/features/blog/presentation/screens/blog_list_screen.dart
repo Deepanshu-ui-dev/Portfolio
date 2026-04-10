@@ -83,7 +83,7 @@ class BlogScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.xxxl),
 
               // Footer
-              const _FooterWidget(),
+              const RepaintBoundary(child: _FooterWidget()),
               const SizedBox(height: AppSpacing.xl),
             ],
           ),

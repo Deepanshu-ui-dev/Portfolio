@@ -19,7 +19,7 @@ class MonofolioProfile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.surfaceBorder, width: 1),
-              color: AppColors.surfaceBorder.withOpacity(0.2),
+              color: AppColors.surfaceBorder.withValues(alpha: 0.2),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -56,7 +56,7 @@ class MonofolioProfile extends StatelessWidget {
         Container(
           padding: const EdgeInsets.only(top: 16),
           child: LayoutBuilder(builder: (context, constraints) {
-            final isMobile = constraints.maxWidth < 600;
+            final isMobile = AppSpacing.isMobile(context);
             
             final details = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,6 +65,7 @@ class MonofolioProfile extends StatelessWidget {
                   'Hi, I\'m 👋🏼',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
+                    fontSize: isMobile ? 11 : 12,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -74,15 +75,15 @@ class MonofolioProfile extends StatelessWidget {
                       child: Text(
                         PortfolioConfig.name,
                         style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          fontSize: isMobile ? 24 : 28,
+                          fontSize: isMobile ? 22 : 28,
                           fontWeight: FontWeight.w600,
-                          letterSpacing: 2,
+                          letterSpacing: isMobile ? 1.5 : 2,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Icon(Icons.verified, color: AppColors.textPrimary, size: isMobile ? 20 : 24),
+                    Icon(Icons.verified, color: AppColors.textPrimary, size: isMobile ? 18 : 24),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -95,28 +96,31 @@ class MonofolioProfile extends StatelessWidget {
               children: [
                 if (PortfolioConfig.githubUrl.isNotEmpty) ...[
                   IconButton(
-                    icon: const Icon(Icons.code),
+                    icon: const Icon(Icons.code, size: 20),
                     onPressed: () => launchUrl(Uri.parse(PortfolioConfig.githubUrl)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
+                    color: AppColors.textPrimary,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                 ],
                 if (PortfolioConfig.linkedinUrl.isNotEmpty) ...[
                   IconButton(
-                    icon: const Icon(Icons.link),
+                    icon: const Icon(Icons.link, size: 20),
                     onPressed: () => launchUrl(Uri.parse(PortfolioConfig.linkedinUrl)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
+                    color: AppColors.textPrimary,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                 ],
                 if (PortfolioConfig.twitterUrl.isNotEmpty) ...[
                   IconButton(
-                    icon: const Icon(Icons.alternate_email),
+                    icon: const Icon(Icons.alternate_email, size: 20),
                     onPressed: () => launchUrl(Uri.parse(PortfolioConfig.twitterUrl)),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
+                    color: AppColors.textPrimary,
                   ),
                 ],
               ],
@@ -127,7 +131,7 @@ class MonofolioProfile extends StatelessWidget {
               children: [
                 if (isMobile) ...[
                   details,
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   socials,
                 ] else
                   Row(
@@ -139,7 +143,7 @@ class MonofolioProfile extends StatelessWidget {
                     ],
                   ),
                 const SizedBox(height: 16),
-                const DashedDivider(),
+                const RepaintBoundary(child: DashedDivider()),
               ],
             );
           }),

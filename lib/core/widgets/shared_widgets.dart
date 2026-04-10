@@ -30,15 +30,17 @@ class DashedDivider extends StatelessWidget {
     final effectiveColor =
         color ?? Theme.of(context).dividerTheme.color ?? AppColors.border;
 
-    return Container(
+    return SizedBox(
       height: height,
       width: double.infinity,
-      child: CustomPaint(
-        painter: _DashedLinePainter(
-          color: effectiveColor,
-          thickness: thickness,
-          dashWidth: dashWidth,
-          dashGap: dashGap,
+      child: RepaintBoundary(
+        child: CustomPaint(
+          painter: _DashedLinePainter(
+            color: effectiveColor,
+            thickness: thickness,
+            dashWidth: dashWidth,
+            dashGap: dashGap,
+          ),
         ),
       ),
     );

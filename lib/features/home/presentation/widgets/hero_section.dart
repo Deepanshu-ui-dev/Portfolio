@@ -52,9 +52,9 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: const [
-            _IdentityBlock(),
+            RepaintBoundary(child: _IdentityBlock()),
             SizedBox(height: AppSpacing.xl),
-            _AboutBlock(),
+            RepaintBoundary(child: _AboutBlock()),
           ],
         ),
       ),
@@ -88,13 +88,14 @@ class _IdentityBlock extends StatelessWidget {
           final isMobile = constraints.maxWidth < 420;
           final sectionGap = isMobile ? AppSpacing.lg : AppSpacing.xxl;
           final isMobileDevice = AppSpacing.isMobile(context);
+          
           final avatar = Magnet(
             displacement: isMobileDevice ? 0.0 : 0.1,
             child: MonofolioCornersBox(
               padding: const EdgeInsets.all(4),
               child: Container(
                 width: isMobile ? double.infinity : 160,
-                height: isMobile ? null : 200,
+                height: isMobile ? 320 : 200, // Slightly taller on mobile for impact
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
                   border: Border.all(color: border),
@@ -109,9 +110,9 @@ class _IdentityBlock extends StatelessWidget {
                     ]),
                     child: _LazySkeletonAssetImage(
                       assetPath: 'assets/images/profile.png',
-                      fit: isMobile ? BoxFit.contain : BoxFit.cover,
+                      fit: isMobile ? BoxFit.cover : BoxFit.cover,
                       width: isMobile ? double.infinity : null,
-                      cacheWidth: 400,
+                      cacheWidth: 800, // Higher res for profile
                       skeletonColor: isDark
                           ? AppColors.surfaceElevDark
                           : AppColors.surfaceElevLight,
@@ -125,16 +126,16 @@ class _IdentityBlock extends StatelessWidget {
 
           Widget details = Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const DashedDivider(),
+            children: const [
+              DashedDivider(),
               _DetailRow(index: '00', label: 'NAME', value: PortfolioConfig.name),
-              const DashedDivider(),
+              DashedDivider(),
               _DetailRow(index: '01', label: 'BASED', value: PortfolioConfig.location),
-              const DashedDivider(),
+              DashedDivider(),
               _DetailRow(index: '02', label: 'ROLE', value: 'UI/UX & Flutter Dev'),
-              const DashedDivider(),
+              DashedDivider(),
               _DetailRow(index: '03', label: 'STATUS', value: 'Open to Work', isStatus: true),
-              const DashedDivider(),
+              DashedDivider(),
             ],
           );
 
@@ -142,7 +143,7 @@ class _IdentityBlock extends StatelessWidget {
             return Column(
               children: [
                 avatar,
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xl),
                 details,
               ],
             );
