@@ -145,7 +145,7 @@ class _AboutScreenState extends State<AboutScreen>
                     ),
                   ),
 
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 120),
                 ],
               ),
             ),

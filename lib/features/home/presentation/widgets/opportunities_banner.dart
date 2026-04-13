@@ -123,29 +123,33 @@ class _OpportunitiesBannerState extends State<OpportunitiesBanner>
                     const SizedBox(width: 10),
 
                     // Text column
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _formatDate(_now),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: accentColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.04,
-                              ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          _formatTime(_now),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: detailColor,
-                                fontSize: 10,
-                                letterSpacing: 1.0,
-                              ),
-                        ),
-                      ],
+                    Flexible(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _formatDate(_now),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: accentColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.04,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _formatTime(_now),
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                  color: detailColor,
+                                  fontSize: 10,
+                                  letterSpacing: 1.0,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

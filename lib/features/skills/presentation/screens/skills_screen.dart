@@ -146,7 +146,7 @@ class _SkillsScreenState extends State<SkillsScreen>
                     child: const RepaintBoundary(child: _PhilosophyCallout()),
                   ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
@@ -303,10 +303,7 @@ class _SkillSection extends StatelessWidget {
                 ?.copyWith(color: textSec, letterSpacing: 2),
           ),
         ]),
-        const SizedBox(height: 6),
-
-        // ── Section heading — SectionHeader widget ──
-        SectionHeader(data.title),
+        const SizedBox(height: 10),
 
         // ── Subtitle ──
         Padding(

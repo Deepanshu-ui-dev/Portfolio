@@ -452,6 +452,9 @@ class _SocialLinkState extends State<_SocialLink> {
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       color: _hovered ? active : idle,
                       letterSpacing: 1.2,
+                      decoration: _hovered ? TextDecoration.underline : null,
+                      decorationColor: active.withValues(alpha: 0.4),
+                      decorationStyle: TextDecorationStyle.dashed,
                     ),
               ),
             ],

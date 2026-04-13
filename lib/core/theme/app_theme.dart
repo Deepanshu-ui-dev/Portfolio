@@ -6,18 +6,18 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // ── Dark theme ─────────────────────────────────────────
-  static const Color bgDark          = Color(0xFF09090B); // Zinc-950
-  static const Color surfaceDark     = Color(0xFF111113); // Lifted — less muddy than 18181B
-  static const Color surfaceElevDark = Color(0xFF1C1C1F); // Clear step above surface
-  static const Color surfacePopDark  = Color(0xFF232326); // Extra level for popovers/dropdowns
+  static const Color bgDark          = Color(0xFF0A0A0C); // Zinc-950 — slightly warmer
+  static const Color surfaceDark     = Color(0xFF121214); // Lifted — clearer separation from bg
+  static const Color surfaceElevDark = Color(0xFF1A1A1E); // Clean step above surface
+  static const Color surfacePopDark  = Color(0xFF222226); // Popovers/dropdowns
   static const Color borderDark      = Color(0xFF27272A); // Zinc-800
   static const Color border2Dark     = Color(0xFF3F3F46); // Zinc-700 — emphasis borders
   static const Color borderFocusDark = Color(0xFF71717A); // Zinc-500 — focus rings
-  static const Color textPrimaryDark = Color(0xFFFAFAFA); // Zinc-50
-  static const Color textSecDark     = Color(0xFFA1A1AA); // Zinc-400
-  static const Color textTerDark     = Color(0xFF71717A); // Zinc-500
-  static const Color textMutedDark   = Color(0xFF52525B); // Zinc-600
-  static const Color textDisabledDark= Color(0xFF3F3F46); // Zinc-700
+  static const Color textPrimaryDark = Color(0xFFF5F5F5); // Zinc-100 — softer than pure white
+  static const Color textSecDark     = Color(0xFF9E9EA8); // Zinc-400 — slightly cooler
+  static const Color textTerDark     = Color(0xFF6E6E78); // Zinc-500
+  static const Color textMutedDark   = Color(0xFF505058); // Zinc-600
+  static const Color textDisabledDark= Color(0xFF3C3C44); // Zinc-700
   static const Color accentDark      = Color(0xFF10B981); // Emerald-500
   static const Color accentSubtleDark= Color(0xFF064E3B); // Emerald-900 — tinted bg
   static const Color accentMutedDark = Color(0xFF065F46); // Emerald-800 — hover tint
@@ -29,18 +29,18 @@ class AppColors {
   // ── Light theme ────────────────────────────────────────
   // Warm bone-white family. Every surface step is clearly distinct.
   // Text steps all pass WCAG AA on their respective backgrounds.
-  static const Color bgLight          = Color(0xFFFAFAF8); // Bone white
-  static const Color surfaceLight     = Color(0xFFF4F4F1); // Cream
-  static const Color surfaceElevLight = Color(0xFFEAEAE7); // Linen
+  static const Color bgLight          = Color(0xFFFBFBF9); // Warm bone white
+  static const Color surfaceLight     = Color(0xFFF5F5F2); // Cream — cleaner separation
+  static const Color surfaceElevLight = Color(0xFFECECE9); // Linen
   static const Color surfacePopLight  = Color(0xFFFFFFFF); // Pure white — popovers pop
-  static const Color borderLight      = Color(0xFFD8D8D4); // Stone-300 — visible, not harsh
+  static const Color borderLight      = Color(0xFFDADAD6); // Stone-300 — visible, not harsh
   static const Color border2Light     = Color(0xFFC4C4BF); // Stone-400 — emphasis
   static const Color borderFocusLight = Color(0xFF3F3F46); // Zinc-700 — focus rings
-  static const Color textPrimaryLight = Color(0xFF0A0A0B); // Near-black
-  static const Color textSecLight     = Color(0xFF3F3F46); // Zinc-700 — 7.2:1 on bone ✓ AA
-  static const Color textTerLight     = Color(0xFF71717A); // Zinc-500 — 4.6:1 ✓ AA
-  static const Color textMutedLight   = Color(0xFFA1A1AA); // Zinc-400 — decorative only
-  static const Color textDisabledLight= Color(0xFFC4C4BF); // Stone-400
+  static const Color textPrimaryLight = Color(0xFF0C0C0E); // Near-black — warmer
+  static const Color textSecLight     = Color(0xFF44444C); // Zinc-700 — better contrast ✓ AA
+  static const Color textTerLight     = Color(0xFF6E6E78); // Zinc-500 — 4.8:1 ✓ AA
+  static const Color textMutedLight   = Color(0xFF9E9EA8); // Zinc-400 — decorative only
+  static const Color textDisabledLight= Color(0xFFC0C0BC); // Stone-400
   static const Color accentLight      = Color(0xFF047857); // Emerald-700 — 5.1:1 ✓ AA
   static const Color accentSubtleLight= Color(0xFFD1FAE5); // Emerald-100 — tinted bg
   static const Color accentMutedLight = Color(0xFFA7F3D0); // Emerald-200 — hover tint
@@ -146,7 +146,7 @@ class AppSpacing {
   static const double xl             = 28;
   static const double xxl            = 40;
   static const double xxxl           = 56;
-  static const double section        = 80;
+  static const double section        = 72;
   static const double maxContentWidth= 1080;
 
   // ── Breakpoint helpers ───────────────────────────────
@@ -168,9 +168,9 @@ class AppSpacing {
     if (w >= tabletMax) return 64;
     if (w >= 900)     return 48;
     if (w >= mobileMax) return 32;
-    if (w >= 390)     return 20;
-    if (w >= 350)     return 16;
-    return 12;
+    if (w >= 390)     return 24;
+    if (w >= 350)     return 20;
+    return 16;
   }
 
   // ── Responsive headline font size ────────────────────
@@ -261,9 +261,9 @@ class AppTheme {
         // Hero / page name
         displayLarge: TextStyle(
           fontFamily: mono, 
-          fontSize: isDark ? 34 : 32, // Slightly smaller in light theme or just general reduction
+          fontSize: 36,
           fontWeight: FontWeight.w800,
-          color: textPrimary, letterSpacing: -1.5, height: 1.05,
+          color: textPrimary, letterSpacing: -1.5, height: 1.08,
         ),
         // Sub-hero / tagline
         displayMedium: TextStyle(
@@ -290,16 +290,16 @@ class AppTheme {
         ),
         // Body
         bodyLarge: TextStyle(
-          fontFamily: mono, fontSize: 13, fontWeight: FontWeight.w400,
-          color: textPrimary, height: 1.85,
+          fontFamily: mono, fontSize: 14, fontWeight: FontWeight.w400,
+          color: textPrimary, height: 1.9,
         ),
         bodyMedium: TextStyle(
-          fontFamily: mono, fontSize: 12, fontWeight: FontWeight.w400,
-          color: textSec, height: 1.85,
+          fontFamily: mono, fontSize: 13, fontWeight: FontWeight.w400,
+          color: textSec, height: 1.9,
         ),
         bodySmall: TextStyle(
-          fontFamily: mono, fontSize: 11, fontWeight: FontWeight.w400,
-          color: textSec, height: 1.7,
+          fontFamily: mono, fontSize: 11.5, fontWeight: FontWeight.w400,
+          color: textSec, height: 1.75,
         ),
         // Labels / tags / captions
         labelLarge: TextStyle(

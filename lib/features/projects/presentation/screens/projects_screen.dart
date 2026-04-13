@@ -96,13 +96,9 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                   else
                     _ProjectGrid(projects: filtered),
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxxl),
                   const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxl),
-
-                  const SizedBox(height: AppSpacing.xxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxxl),
 
                   // ── OPEN SOURCE CALLOUT ───────────────────────────
                   ScrollFadeIn(
@@ -110,7 +106,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                     child: const _OpenSourceSection(),
                   ),
 
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
