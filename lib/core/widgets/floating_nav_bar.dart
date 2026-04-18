@@ -3,20 +3,18 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 // ─────────────────────────────────────────────────────────────
-// FLOATING NAV BAR
+// FLOATING NAV BAR — chanhdai.com-inspired
+//
+// Design language:
+//   • Pure Zinc surface + borders (no tinting, no color bg)
+//   • 8px corner radius — flat and editorial, not pill-shaped
+//   • All 5 items show their label (9px mono, ALL CAPS, spaced)
+//   • Active: Emerald accent icon + label, tiny accent underline
+//   • Hover: subtle zinc fill, icon brightens
+//   • Spring-physics entrance from bottom
 //
 // Tab order (must match _AppShell._screens exactly):
-//   0 → Home       home_outlined       / home_rounded
-//   1 → About      person_outline      / person_rounded
-//   2 → Projects   work_outline        / work_rounded
-//   3 → Skills     auto_awesome_outlined/ auto_awesome
-//   4 → Contact    mail_outline        / mail_rounded
-//
-// Behaviour:
-//   • Active: accent-colored icon + 3 px accent dot below
-//   • Hover:  subtle activeBg fill, no border
-//   • Icon switches via AnimatedSwitcher (scale pop)
-//   • Tooltip: monospace, matches pill surface/border
+//   0 Home | 1 About | 2 Projects | 3 Skills | 4 Contact
 // ─────────────────────────────────────────────────────────────
 
 class FloatingNavBar extends StatefulWidget {
@@ -45,20 +43,20 @@ class _FloatingNavBarState extends State<FloatingNavBar>
     super.initState();
     _entranceCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 700),
     );
     _entranceFade = CurvedAnimation(
       parent: _entranceCtrl,
       curve: Curves.easeOut,
     );
     _entranceSlide = Tween<Offset>(
-      begin: const Offset(0, 1.5),
+      begin: const Offset(0, 1.2),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _entranceCtrl,
-      curve: Curves.easeOutCubic,
+      // easeOutQuint — fast deceleration, no overshooting jank
+      curve: const Cubic(0.22, 1.0, 0.36, 1.0),
     ));
-    // Small delay so the page content starts painting first
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _entranceCtrl.forward();
     });
@@ -71,44 +69,27 @@ class _FloatingNavBarState extends State<FloatingNavBar>
   }
 
   static const _items = [
-    _NavItem(
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home_rounded,
-      label: 'Home',
-    ),
-    _NavItem(
-      icon: Icons.person_outline_rounded,
-      activeIcon: Icons.person_rounded,
-      label: 'About',
-    ),
-    _NavItem(
-      icon: Icons.work_outline_rounded,
-      activeIcon: Icons.work_rounded,
-      label: 'Projects',
-    ),
-    _NavItem(
-      icon: Icons.auto_awesome_outlined,
-      activeIcon: Icons.auto_awesome,
-      label: 'Skills',
-    ),
-    _NavItem(
-      icon: Icons.mail_outline_rounded,
-      activeIcon: Icons.mail_rounded,
-      label: 'Contact',
-    ),
+    _NavItem(icon: Icons.home_outlined,         activeIcon: Icons.home_rounded,         label: 'HOME'),
+    _NavItem(icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded,       label: 'ABOUT'),
+    _NavItem(icon: Icons.work_outline_rounded,   activeIcon: Icons.work_rounded,         label: 'WORK'),
+    _NavItem(icon: Icons.auto_awesome_outlined,  activeIcon: Icons.auto_awesome,         label: 'SKILLS'),
+    _NavItem(icon: Icons.mail_outline_rounded,   activeIcon: Icons.mail_rounded,         label: 'CONTACT'),
   ];
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final pillBg     = isDark ? const Color(0xFF111111) : AppColors.surfaceLight;
-    final pillBorder = isDark ? const Color(0xFF252525)  : AppColors.borderLight;
-    final activeBg   = isDark ? const Color(0xFF1c1c1c)  : AppColors.surfaceElevLight;
-    final activeBdr  = isDark ? const Color(0xFF2e2e2e)  : AppColors.border2Light;
-    final accent     = isDark ? AppColors.accentDark     : AppColors.accentLight;
-    final idleColor  = isDark ? const Color(0xFF4a4a4a)  : AppColors.textTerLight;
-    const hoverColor = Color(0xFF777777);
+    // ── Color tokens (chanhdai.com Zinc scale, mapped to our theme) ──────
+    // Dark: zinc-950 bg, zinc-800 border, zinc-700 hover fill, zinc-400 idle
+    // Light: white bg, zinc-200 border, zinc-100 hover fill, zinc-500 idle
+    final navBg      = isDark ? const Color(0xFF0D0D0F) : const Color(0xFFFFFFFF);
+    final navBorder  = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
+    final hoverFill  = isDark ? const Color(0xFF1C1C1F) : const Color(0xFFF4F4F5);
+    final activeFill = isDark ? const Color(0xFF161618) : const Color(0xFFF0F0F0);
+    final accent     = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final idleIcon   = isDark ? const Color(0xFF71717A) : const Color(0xFFA1A1AA);// zinc-500
+    final hoverIcon  = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF3F3F46);// zinc-300/700
 
     return FadeTransition(
       opacity: _entranceFade,
@@ -118,129 +99,104 @@ class _FloatingNavBarState extends State<FloatingNavBar>
           child: Padding(
             padding: const EdgeInsets.only(bottom: 20),
             child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(4),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: pillBg.withValues(alpha: 0.92),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: pillBorder, width: 0.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.50 : 0.12),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(_items.length, (i) {
-                final isActive  = widget.currentIndex == i;
-                final isHovered = _hoveredIndex == i && !isActive;
-                final item      = _items[i];
-
-                return MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  onEnter: (_) => setState(() => _hoveredIndex = i),
-                  onExit:  (_) => setState(() => _hoveredIndex = -1),
-                  child: GestureDetector(
-                    onTap: () => widget.onTap(i),
-                    child: Tooltip(
-                      message: item.label,
-                      preferBelow: false,
-                      verticalOffset: 30,
-                      waitDuration: const Duration(milliseconds: 500),
-                      textStyle: TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 10,
-                        letterSpacing: 1,
-                        color: isDark
-                            ? const Color(0xFFAAAAAA)
-                            : const Color(0xFF555555),
-                      ),
-                      decoration: BoxDecoration(
-                        color: pillBg,
-                        borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: pillBorder, width: 0.5),
-                      ),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 120),
-                        curve: Curves.easeOut,
-                        margin: const EdgeInsets.symmetric(horizontal: 1),
-                        width: 44,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isActive
-                              ? activeBg
-                              : isHovered
-                                  ? activeBg.withValues(alpha: 0.55)
-                                  : Colors.transparent,
-                          borderRadius: BorderRadius.circular(7),
-                          border: isActive
-                              ? Border.all(color: activeBdr, width: 0.5)
-                              : null,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: navBg.withValues(alpha: isDark ? 0.90 : 0.95),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: navBorder, width: 0.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.40 : 0.08),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
                         ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Icon — scales between outline ↔ filled variant
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 150),
-                              switchInCurve: Curves.easeOutBack,
-                              switchOutCurve: Curves.easeIn,
-                              transitionBuilder: (child, anim) =>
-                                  ScaleTransition(scale: anim, child: child),
-                              child: Icon(
-                                isActive ? item.activeIcon : item.icon,
-                                // Key forces AnimatedSwitcher to rebuild on change
-                                key: ValueKey('nav_icon_${i}_$isActive'),
-                                size: 17,
-                                color: isActive
-                                    ? accent
-                                    : isHovered
-                                        ? hoverColor
-                                        : idleColor,
-                              ),
-                            ),
+                      ],
+                    ),
+                    // Inner horizontal padding only — items decide vertical
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(_items.length, (i) {
+                        final isActive  = widget.currentIndex == i;
+                        final isHovered = _hoveredIndex == i && !isActive;
+                        final item = _items[i];
 
-                            // Accent dot — scales in when tab becomes active
-                            Positioned(
-                              bottom: 5,
-                              child: AnimatedScale(
-                                duration: const Duration(milliseconds: 180),
-                                curve: Curves.easeOutBack,
-                                scale: isActive ? 1.0 : 0.0,
-                                child: Container(
-                                  width: 3.0,
-                                  height: 3.0,
-                                  decoration: BoxDecoration(
-                                    color: accent,
-                                    shape: BoxShape.circle,
-                                  ),
+                        final iconColor = isActive
+                            ? accent
+                            : isHovered
+                                ? hoverIcon
+                                : idleIcon;
+
+                        return MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          onEnter: (_) => setState(() => _hoveredIndex = i),
+                          onExit:  (_) => setState(() => _hoveredIndex = -1),
+                          child: GestureDetector(
+                            onTap: () => widget.onTap(i),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 140),
+                              curve: Curves.easeOut,
+                              margin: const EdgeInsets.symmetric(horizontal: 1),
+                              width: 58,
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? activeFill
+                                    : isHovered
+                                        ? hoverFill
+                                        : Colors.transparent,
+                                borderRadius: BorderRadius.circular(7),
+                                border: isActive
+                                    ? Border.all(color: navBorder, width: 0.5)
+                                    : null,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 160),
+                                      switchInCurve: Curves.easeOutBack,
+                                      switchOutCurve: Curves.easeIn,
+                                      transitionBuilder: (child, anim) =>
+                                          ScaleTransition(scale: anim, child: child),
+                                      child: Icon(
+                                        isActive ? item.activeIcon : item.icon,
+                                        key: ValueKey('icon_${i}_$isActive'),
+                                        size: 18,
+                                        color: iconColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      curve: Curves.easeOutCubic,
+                                      width: isActive ? 14 : 0,
+                                      height: 1.5,
+                                      decoration: BoxDecoration(
+                                        color: accent,
+                                        borderRadius: BorderRadius.circular(1),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
+                        );
+                      }),
                     ),
                   ),
-                );
-              }),
-            ),
-          ),
+                ),
               ),
             ),
           ),
         ),
-      ),
-      ),
       ),
     );
   }

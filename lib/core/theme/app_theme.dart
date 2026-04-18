@@ -6,21 +6,23 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // ── Dark theme ─────────────────────────────────────────
-  static const Color bgDark          = Color(0xFF0A0A0C); // Zinc-950 — slightly warmer
-  static const Color surfaceDark     = Color(0xFF121214); // Lifted — clearer separation from bg
+  static const Color bgDark          = Color(0xFF0A0A0C); // Zinc-950
+  static const Color surfaceDark     = Color(0xFF111113); // Warmer lift
   static const Color surfaceElevDark = Color(0xFF1A1A1E); // Clean step above surface
   static const Color surfacePopDark  = Color(0xFF222226); // Popovers/dropdowns
   static const Color borderDark      = Color(0xFF27272A); // Zinc-800
   static const Color border2Dark     = Color(0xFF3F3F46); // Zinc-700 — emphasis borders
   static const Color borderFocusDark = Color(0xFF71717A); // Zinc-500 — focus rings
-  static const Color textPrimaryDark = Color(0xFFF5F5F5); // Zinc-100 — softer than pure white
-  static const Color textSecDark     = Color(0xFF9E9EA8); // Zinc-400 — slightly cooler
+  static const Color textPrimaryDark = Color(0xFFF5F5F5); // Zinc-100
+  static const Color textSecDark     = Color(0xFF9E9EA8); // Zinc-400
   static const Color textTerDark     = Color(0xFF6E6E78); // Zinc-500
   static const Color textMutedDark   = Color(0xFF505058); // Zinc-600
   static const Color textDisabledDark= Color(0xFF3C3C44); // Zinc-700
-  static const Color accentDark      = Color(0xFF10B981); // Emerald-500
-  static const Color accentSubtleDark= Color(0xFF064E3B); // Emerald-900 — tinted bg
-  static const Color accentMutedDark = Color(0xFF065F46); // Emerald-800 — hover tint
+  static const Color accentDark      = Color(0xFF0FE5A8); // Cyan-Emerald — designer accent
+  static const Color accentHoverDark = Color(0xFF38F0C0); // Brighter hover
+  static const Color accentSubtleDark= Color(0xFF053D2E); // Deep tinted bg
+  static const Color accentMutedDark = Color(0xFF065F46); // Hover tint
+  static const Color accentTextDark  = Color(0xFFD1FAE5); // Highlighted body text
   static const Color errorDark       = Color(0xFFF87171); // Red-400
   static const Color errorSubtleDark = Color(0xFF450A0A); // Red-950
   static const Color warningDark     = Color(0xFFFBBF24); // Amber-400
@@ -41,9 +43,11 @@ class AppColors {
   static const Color textTerLight     = Color(0xFF6E6E78); // Zinc-500 — 4.8:1 ✓ AA
   static const Color textMutedLight   = Color(0xFF9E9EA8); // Zinc-400 — decorative only
   static const Color textDisabledLight= Color(0xFFC0C0BC); // Stone-400
-  static const Color accentLight      = Color(0xFF047857); // Emerald-700 — 5.1:1 ✓ AA
+  static const Color accentLight      = Color(0xFF036B4C); // Deeper emerald — AAA contrast
+  static const Color accentHoverLight = Color(0xFF024D37); // Darker hover
   static const Color accentSubtleLight= Color(0xFFD1FAE5); // Emerald-100 — tinted bg
   static const Color accentMutedLight = Color(0xFFA7F3D0); // Emerald-200 — hover tint
+  static const Color accentTextLight  = Color(0xFF014D38); // Highlighted body text
   static const Color errorLight       = Color(0xFFDC2626); // Red-600
   static const Color errorSubtleLight = Color(0xFFFEF2F2); // Red-50
   static const Color warningLight     = Color(0xFFD97706); // Amber-600
@@ -55,8 +59,8 @@ class AppColors {
   static const Color contrib1Dark = Color(0xFF064E3B); // Emerald-900
   static const Color contrib2Dark = Color(0xFF065F46); // Emerald-800
   static const Color contrib3Dark = Color(0xFF059669); // Emerald-600
-  static const Color contrib4Dark = Color(0xFF10B981); // Emerald-500
-  static const Color contrib5Dark = Color(0xFF34D399); // Emerald-400 — peak
+  static const Color contrib4Dark = Color(0xFF0FE5A8); // Cyan-Emerald
+  static const Color contrib5Dark = Color(0xFF38F0C0); // Peak — matches accent
 
   // ── Contribution heatmap — Light ───────────────────────
   // Inverted: empty = light gray, peak = very dark green.
@@ -92,8 +96,10 @@ class AppColors {
 
   // ── Dynamic accessors — accent ────────────────────────
   static Color get accent         => isDarkMode ? accentDark         : accentLight;
+  static Color get accentHover    => isDarkMode ? accentHoverDark    : accentHoverLight;
   static Color get accentSubtle   => isDarkMode ? accentSubtleDark   : accentSubtleLight;
   static Color get accentMuted    => isDarkMode ? accentMutedDark    : accentMutedLight;
+  static Color get accentText     => isDarkMode ? accentTextDark     : accentTextLight;
 
   // ── Dynamic accessors — semantic ──────────────────────
   static Color get error          => isDarkMode ? errorDark          : errorLight;
@@ -197,12 +203,14 @@ class AppRadius {
   static const double md     = 6;
   static const double lg     = 8;
   static const double xl     = 12;
+  static const double xxl    = 20;
   static const double pill   = 999;
 
   static const BorderRadius zero    = BorderRadius.zero;
   static const BorderRadius card    = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius dialog  = BorderRadius.all(Radius.circular(md));
   static const BorderRadius chip    = BorderRadius.all(Radius.circular(pill));
+  static const BorderRadius nav     = BorderRadius.all(Radius.circular(xxl));
 }
 
 // ─────────────────────────────────────────────
@@ -263,7 +271,7 @@ class AppTheme {
           fontFamily: mono, 
           fontSize: 36,
           fontWeight: FontWeight.w800,
-          color: textPrimary, letterSpacing: -1.5, height: 1.08,
+          color: textPrimary, letterSpacing: -1.8, height: 1.06,
         ),
         // Sub-hero / tagline
         displayMedium: TextStyle(
@@ -278,7 +286,7 @@ class AppTheme {
         // Card / entry titles
         headlineLarge: TextStyle(
           fontFamily: mono, fontSize: 14, fontWeight: FontWeight.w600,
-          color: textPrimary, letterSpacing: -0.2, height: 1.4,
+          color: textPrimary, letterSpacing: -0.6, height: 1.4,
         ),
         headlineMedium: TextStyle(
           fontFamily: mono, fontSize: 12, fontWeight: FontWeight.w600,
@@ -291,15 +299,15 @@ class AppTheme {
         // Body
         bodyLarge: TextStyle(
           fontFamily: mono, fontSize: 14, fontWeight: FontWeight.w400,
-          color: textPrimary, height: 1.9,
+          color: textPrimary, height: 1.8,
         ),
         bodyMedium: TextStyle(
           fontFamily: mono, fontSize: 13, fontWeight: FontWeight.w400,
-          color: textSec, height: 1.9,
+          color: textSec, height: 1.8,
         ),
         bodySmall: TextStyle(
           fontFamily: mono, fontSize: 11.5, fontWeight: FontWeight.w400,
-          color: textSec, height: 1.75,
+          color: textSec, height: 1.7,
         ),
         // Labels / tags / captions
         labelLarge: TextStyle(
@@ -312,7 +320,7 @@ class AppTheme {
         ),
         labelSmall: TextStyle(
           fontFamily: mono, fontSize: 9, fontWeight: FontWeight.w400,
-          color: textMuted, letterSpacing: 0.5,
+          color: textMuted, letterSpacing: 1.0,
         ),
       ),
 

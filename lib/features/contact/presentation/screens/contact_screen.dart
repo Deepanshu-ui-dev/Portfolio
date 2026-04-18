@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/scroll_fade_in.dart';
@@ -296,6 +297,7 @@ class _ContactScreenState extends State<ContactScreen>
                       _SendBtn(
                         onTap: () => launchUrl(Uri.parse(
                             'mailto:${PortfolioConfig.email}'), mode: LaunchMode.externalApplication),
+                        isSent: false,
                       ),
                     ],
                   ),
@@ -424,6 +426,14 @@ class _TerminalPingState extends State<_TerminalPing> {
 
   static const _topics = ['freelance', 'full-time', 'collab', 'other'];
 
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
   void _send() async {
     if (_ctrl.text.trim().isEmpty) return;
     final subject = Uri.encodeComponent('[${_selectedTopic.toUpperCase()}] Quick Ping');
@@ -465,7 +475,6 @@ class _TerminalPingState extends State<_TerminalPing> {
   Widget build(BuildContext context) {
     final isDark  = Theme.of(context).brightness == Brightness.dark;
     final border  = isDark ? AppColors.borderDark  : AppColors.borderLight;
-    final border2 = isDark ? AppColors.border2Dark : AppColors.border2Light;
     final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final surfaceEl = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
@@ -473,10 +482,23 @@ class _TerminalPingState extends State<_TerminalPing> {
     final accent  = isDark ? AppColors.accentDark  : AppColors.accentLight;
     final bg      = isDark ? AppColors.bgDark      : AppColors.bgLight;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: surface,
-        border: Border.all(color: border, width: 1),
+        border: Border.all(
+          color: _focus.hasFocus ? accent : border, 
+          width: _focus.hasFocus ? 1.5 : 1,
+        ),
+        boxShadow: _focus.hasFocus
+            ? [
+                BoxShadow(
+                  color: accent.withValues(alpha: isDark ? 0.2 : 0.1),
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                )
+              ]
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,8 +507,8 @@ class _TerminalPingState extends State<_TerminalPing> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
             decoration: BoxDecoration(
-              color: surfaceEl,
-              border: Border(bottom: BorderSide(color: border, width: 1)),
+              color: _focus.hasFocus ? accent.withValues(alpha: 0.05) : surfaceEl,
+              border: Border(bottom: BorderSide(color: _focus.hasFocus ? accent.withValues(alpha: 0.5) : border, width: 1)),
             ),
             child: Row(children: [
               _Dot(color: const Color(0xFFFF5F57)),
@@ -497,7 +519,11 @@ class _TerminalPingState extends State<_TerminalPing> {
               const SizedBox(width: 12),
               Text('ping — imdeepanshu4work@gmail.com',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: textSec, fontSize: 9, letterSpacing: 0.8)),
+                        color: _focus.hasFocus ? accent : textSec, 
+                        fontSize: 9, 
+                        letterSpacing: 0.8,
+                        fontWeight: _focus.hasFocus ? FontWeight.w600 : FontWeight.w400,
+                      )),
             ]),
           ),
 
@@ -528,7 +554,7 @@ class _TerminalPingState extends State<_TerminalPing> {
                         decoration: BoxDecoration(
                           color: selected ? textPri : Colors.transparent,
                           border: Border.all(
-                              color: selected ? textPri : border2,
+                              color: selected ? textPri : (isDark ? AppColors.border2Dark : AppColors.border2Light),
                               width: 1),
                         ),
                         child: Text(
@@ -557,14 +583,17 @@ class _TerminalPingState extends State<_TerminalPing> {
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium
-                            ?.copyWith(color: accent)),
+                            ?.copyWith(color: accent, fontWeight: FontWeight.w700)),
                     Expanded(
                       child: TextField(
                         controller: _ctrl,
                         focusNode: _focus,
-                        maxLines: 3,
+                        maxLines: 5,
                         minLines: 1,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'JetBrainsMono',
+                          fontSize: 13,
+                        ),
                         decoration: InputDecoration(
                           hintText: 'type your message here...',
                           hintStyle: Theme.of(context)
@@ -572,7 +601,8 @@ class _TerminalPingState extends State<_TerminalPing> {
                               .bodyMedium
                               ?.copyWith(
                                   color:
-                                      textSec.withValues(alpha: 0.4)),
+                                      textSec.withValues(alpha: 0.4),
+                                  fontFamily: 'JetBrainsMono'),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
@@ -600,7 +630,7 @@ class _TerminalPingState extends State<_TerminalPing> {
                             fontSize: 9,
                           ),
                     ),
-                    _SendBtn(onTap: _send),
+                    _SendBtn(onTap: _send, isSent: _sent),
                   ],
                 ),
               ],
@@ -785,7 +815,8 @@ class _LocationCard extends StatelessWidget {
 
 class _SendBtn extends StatefulWidget {
   final VoidCallback onTap;
-  const _SendBtn({required this.onTap});
+  final bool isSent;
+  const _SendBtn({required this.onTap, this.isSent = false});
 
   @override
   State<_SendBtn> createState() => _SendBtnState();
@@ -797,38 +828,48 @@ class _SendBtnState extends State<_SendBtn> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final fg = isDark ? AppColors.bgDark : AppColors.bgLight;
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final fg     = isDark ? AppColors.bgDark : AppColors.bgLight;
 
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
-      onExit:  (_) => setState(() => _hovered = false),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
           decoration: BoxDecoration(
-            color: _hovered ? bg.withValues(alpha: 0.85) : bg,
+            color: _hovered ? accent : Colors.transparent,
+            border: Border.all(color: accent, width: 1),
           ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text('SEND',
-                style: TextStyle(
-                  fontFamily: 'IBMPlexMono',
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                  color: fg,
-                )),
-            const SizedBox(width: 6),
-            Icon(Icons.arrow_forward_rounded, size: 13, color: fg),
-          ]),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'SEND PING',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: _hovered ? fg : accent,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                LucideIcons.send,
+                size: 12,
+                color: _hovered ? fg : accent,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 
 // ─────────────────────────────────────────────
 // PULSING DOT

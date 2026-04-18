@@ -317,7 +317,8 @@ class _StripePainter extends CustomPainter {
 
 class SectionHeader extends StatefulWidget {
   final String title;
-  const SectionHeader(this.title, {super.key});
+  final String? index; // e.g. '01' → renders [ 01 ] eyebrow style
+  const SectionHeader(this.title, {super.key, this.index});
 
   @override
   State<SectionHeader> createState() => _SectionHeaderState();
@@ -329,9 +330,32 @@ class _SectionHeaderState extends State<SectionHeader> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final dotColor = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+
+    // ── Numbered eyebrow style [ 01 ] TITLE ─────────────────────────────
+    if (widget.index != null) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20, top: 8),
+        child: Row(children: [
+          Text(
+            '[ ${widget.index} ]',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: accent, letterSpacing: 1.5),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            widget.title.toUpperCase(),
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: textSec, letterSpacing: 2),
+          ),
+        ]),
+      );
+    }
+
+    // ── Bar style (original, for sections that don't have an index) ──────
+    const kCurve = Cubic(0.33, 1.0, 0.68, 1.0);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -340,24 +364,31 @@ class _SectionHeaderState extends State<SectionHeader> {
         padding: const EdgeInsets.only(bottom: 20, top: 8),
         child: Row(
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              width: _hovered ? 14 : 6,
-              height: 6,
-              color: _hovered ? accent : dotColor,
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 6.0, end: _hovered ? 22.0 : 6.0),
+              duration: const Duration(milliseconds: 220),
+              curve: kCurve,
+              builder: (_, w, __) => Container(
+                width: w,
+                height: 6,
+                color: accent,
+              ),
             ),
             const SizedBox(width: 10),
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 160),
-              padding: EdgeInsets.only(left: _hovered ? 6 : 0),
-              child: Text(
-                widget.title.toUpperCase(),
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: textColor,
-                      letterSpacing: 2.0,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
+            AnimatedSlide(
+              offset: _hovered ? const Offset(0.012, 0) : Offset.zero,
+              duration: const Duration(milliseconds: 220),
+              curve: kCurve,
+              child: AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 220),
+                curve: kCurve,
+                style: (Theme.of(context).textTheme.labelLarge ?? const TextStyle()).copyWith(
+                  color: _hovered ? accent : textColor,
+                  letterSpacing: 2.0,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                ),
+                child: Text(widget.title.toUpperCase()),
               ),
             ),
           ],
@@ -399,16 +430,19 @@ class _CollapsibleCardState extends State<CollapsibleCard>
   late Animation<double> _heightAnim;
   bool _hovered = false;
 
+  // easeOutQuint approximation — smooth, premium expand feel
+  static const _kExpandCurve = Cubic(0.23, 1.0, 0.32, 1.0);
+
   @override
   void initState() {
     super.initState();
     _expanded = widget.initiallyExpanded;
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 260),
       value: _expanded ? 1.0 : 0.0,
     );
-    _heightAnim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOutCubic);
+    _heightAnim = CurvedAnimation(parent: _ctrl, curve: _kExpandCurve);
   }
 
   @override
@@ -432,17 +466,37 @@ class _CollapsibleCardState extends State<CollapsibleCard>
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final tagBg = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
         margin: const EdgeInsets.only(bottom: 2),
         transform: Matrix4.translationValues(0, _hovered ? -1.5 : 0.0, 0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
-          border: Border.all(color: border, width: 1),
+          border: Border(
+            // Left accent stripe — expands to 2px on hover or when expanded
+            left: BorderSide(
+              color: (_hovered || _expanded) ? accent : border,
+              width: (_hovered || _expanded) ? 2 : 1,
+            ),
+            top: BorderSide(color: border, width: 1),
+            bottom: BorderSide(color: border, width: 1),
+            right: BorderSide(color: border, width: 1),
+          ),
+          boxShadow: _hovered 
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           children: [
@@ -454,7 +508,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               child: AnimatedScale(
-                scale: _isPressed ? 0.98 : 1.0,
+                scale: _isPressed ? 0.985 : 1.0,
                 duration: const Duration(milliseconds: 120),
                 curve: Curves.easeOutCubic,
                 child: Padding(
@@ -491,8 +545,9 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                       const SizedBox(width: 10),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0,
-                        duration: const Duration(milliseconds: 220),
-                        child: Icon(LucideIcons.chevronDown, size: 14, color: textSec),
+                        duration: const Duration(milliseconds: 260),
+                        curve: _kExpandCurve,
+                        child: Icon(LucideIcons.chevronDown, size: 14, color: _expanded ? accent : textSec),
                       ),
                     ],
                   ),
@@ -518,13 +573,20 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                                   children: [
                                     Padding(
                                       padding: const EdgeInsets.only(top: 5, right: 12),
-                                      child: Container(width: 4, height: 4, color: textSec),
+                                      child: Container(
+                                        width: 4, 
+                                        height: 4, 
+                                        decoration: BoxDecoration(
+                                          color: (_hovered || _expanded) ? accent : textSec,
+                                          borderRadius: BorderRadius.circular(1),
+                                        ),
+                                      ),
                                     ),
                                     Expanded(
                                       child: Text(b,
                                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                 color: textSec,
-                                                height: 1.75,
+                                                height: 1.65,
                                               )),
                                     ),
                                   ],
@@ -676,13 +738,8 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
 
 // ─── Portfolio Footer ─────────────────────────────────
 class PortfolioFooter extends StatefulWidget {
-  /// Whether the app is in dark mode
   final bool isDark;
-  
-  /// Callback when theme toggle is tapped
   final VoidCallback onToggleTheme;
-  
-  /// Whether a theme transition is in progress (disables color animation)
   final bool isTransitioning;
 
   const PortfolioFooter({
@@ -697,14 +754,17 @@ class PortfolioFooter extends StatefulWidget {
 }
 
 class _PortfolioFooterState extends State<PortfolioFooter> {
+  bool _creditHovered = false;
+
   @override
   Widget build(BuildContext context) {
-    // Get current theme colors statically (no animation during transition)
     final isDark = widget.isDark;
-    final bgColor = isDark ? AppColors.bgDark : AppColors.bgLight;
-    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textSecColor = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textTerColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
+    final bgColor     = isDark ? AppColors.bgDark        : AppColors.bgLight;
+    final borderColor = isDark ? AppColors.borderDark     : AppColors.borderLight;
+    final textTerColor= isDark ? AppColors.textTerDark    : AppColors.textTerLight;
+    final accentColor = isDark ? AppColors.accentDark     : AppColors.accentLight;
+    final creditColor = _creditHovered ? accentColor
+        : (isDark ? AppColors.textSecDark : AppColors.textSecLight);
 
     return RepaintBoundary(
       child: Container(
@@ -714,14 +774,14 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _DashedRuleAnimated(borderColor: borderColor),
-            
+            // Gradient-fade top divider — elegant fade from transparent center out
+            _FadeRuleDivider(borderColor: borderColor),
+
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: AppSpacing.horizontalPadding(context),
                 vertical: 20,
               ),
-              // Copyright row
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -736,14 +796,21 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
-                    'Built with 🤍',
-                    style: TextStyle(
-                      color: textSecColor,
-                      fontFamily: 'monospace',
-                      fontSize: 10,
-                      letterSpacing: 0.4,
-                      fontWeight: FontWeight.w500,
+                  // Hover-accent credit text
+                  MouseRegion(
+                    onEnter: (_) => setState(() => _creditHovered = true),
+                    onExit:  (_) => setState(() => _creditHovered = false),
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                      style: TextStyle(
+                        color: creditColor,
+                        fontFamily: 'monospace',
+                        fontSize: 10,
+                        letterSpacing: 0.4,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      child: const Text('Built with 🤍'),
                     ),
                   ),
                 ],
@@ -756,53 +823,51 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
   }
 }
 
-/// Optimized dashed rule with animated color
-/// 
-/// Replaces _DashedRule to support color animation without rebuild
-class _DashedRuleAnimated extends StatelessWidget {
+/// Gradient-fade horizontal divider.
+/// Rather than a plain dashed line, the border color fades in from the
+/// edges and peaks at the center — a subtle editorial touch, no glows.
+class _FadeRuleDivider extends StatelessWidget {
   final Color borderColor;
-
-  const _DashedRuleAnimated({required this.borderColor});
+  const _FadeRuleDivider({required this.borderColor});
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: _DashedRulePainter(color: borderColor),
-      size: Size(double.infinity, 1),
+      painter: _FadeRulePainter(color: borderColor),
+      size: const Size(double.infinity, 1),
     );
   }
 }
 
-/// Painter for dashed rule with animated color support
-class _DashedRulePainter extends CustomPainter {
+class _FadeRulePainter extends CustomPainter {
   final Color color;
-
-  const _DashedRulePainter({required this.color});
+  const _FadeRulePainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
-    const dashWidth = 8.0;
-    const dashSpace = 6.0;
-    double startX = 0;
-
+    // Solid 1px line that fades out at both edges (transparent → opaque → transparent)
     final paint = Paint()
-      ..color = color
+      ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0
-      ..strokeCap = StrokeCap.round;
+      ..shader = LinearGradient(
+        colors: [
+          color.withValues(alpha: 0.0),
+          color.withValues(alpha: 0.8),
+          color.withValues(alpha: 0.8),
+          color.withValues(alpha: 0.0),
+        ],
+        stops: const [0.0, 0.18, 0.82, 1.0],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
-    while (startX < size.width) {
-      canvas.drawLine(
-        Offset(startX, 0),
-        Offset(startX + dashWidth, 0),
-        paint,
-      );
-      startX += dashWidth + dashSpace;
-    }
+    canvas.drawLine(
+      Offset(0, size.height / 2),
+      Offset(size.width, size.height / 2),
+      paint,
+    );
   }
 
   @override
-  bool shouldRepaint(_DashedRulePainter oldPainter) =>
-      oldPainter.color != color;
+  bool shouldRepaint(_FadeRulePainter old) => old.color != color;
 }
 
 // ─────────────────────────────────────────────

@@ -65,7 +65,7 @@ class PortfolioApp extends ConsumerWidget {
     ref.watch(themeSyncProvider);
 
     return MaterialApp(
-      title: 'Deepanshu Kaushik | Flutter & UI/UX Developer Portfolio',
+      title: 'Deepanshu Kaushik — Flutter Developer & UI/UX Designer | Portfolio 2026',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),

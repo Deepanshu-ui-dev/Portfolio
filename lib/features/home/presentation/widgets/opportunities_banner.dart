@@ -60,7 +60,6 @@ class _OpportunitiesBannerState extends State<OpportunitiesBanner>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final borderColor = AppColors.border;
     final dimColor = AppColors.textTer;
     final detailColor = AppColors.textSecondary;

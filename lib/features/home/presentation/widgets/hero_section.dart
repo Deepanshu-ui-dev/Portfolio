@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../config/portfolio_config.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/shared_widgets.dart';
+import '../../../../core/widgets/scroll_fade_in.dart';
 
 // ─────────────────────────────────────────────
 // HERO SECTION
@@ -80,7 +81,7 @@ class _IdentityBlock extends StatelessWidget {
       children: [
         Text(
           'FIG.01 // IDENTITY',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 1.5),
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 2.5, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
 
@@ -126,15 +127,31 @@ class _IdentityBlock extends StatelessWidget {
 
           Widget details = Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: const [
+            children: [
               DashedDivider(),
-              _DetailRow(index: '00', label: 'NAME', value: PortfolioConfig.name),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 0),
+                duration: const Duration(milliseconds: 480),
+                child: const _DetailRow(index: '00', label: 'NAME', value: PortfolioConfig.name),
+              ),
               DashedDivider(),
-              _DetailRow(index: '01', label: 'BASED', value: PortfolioConfig.location),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 60),
+                duration: const Duration(milliseconds: 480),
+                child: const _DetailRow(index: '01', label: 'BASED', value: PortfolioConfig.location),
+              ),
               DashedDivider(),
-              _DetailRow(index: '02', label: 'ROLE', value: 'UI/UX & Flutter Dev'),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 120),
+                duration: const Duration(milliseconds: 480),
+                child: const _DetailRow(index: '02', label: 'ROLE', value: 'UI/UX \u0026 Flutter Dev', isImportant: true),
+              ),
               DashedDivider(),
-              _DetailRow(index: '03', label: 'STATUS', value: 'Open to Work', isStatus: true),
+              ScrollFadeIn(
+                delay: const Duration(milliseconds: 180),
+                duration: const Duration(milliseconds: 480),
+                child: const _DetailRow(index: '03', label: 'STATUS', value: 'Open to Work', isStatus: true),
+              ),
               DashedDivider(),
             ],
           );
@@ -171,12 +188,14 @@ class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
   final bool isStatus;
+  final bool isImportant;
 
   const _DetailRow({
     required this.index,
     required this.label,
     required this.value,
     this.isStatus = false,
+    this.isImportant = false,
   });
 
   @override
@@ -197,7 +216,7 @@ class _DetailRow extends StatelessWidget {
           ),
           SizedBox(
             width: isCompact ? 64 : 80,
-            child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 1.5)),
+            child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 2.0)),
           ),
           Expanded(
             child: Row(
@@ -205,9 +224,9 @@ class _DetailRow extends StatelessWidget {
               children: [
                 if (isStatus) ...[
                   Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+                    width: 7,
+                    height: 7,
+                    color: accent,
                   ),
                   const SizedBox(width: 8),
                 ],
@@ -216,7 +235,7 @@ class _DetailRow extends StatelessWidget {
                     value,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: textPri,
-                          fontWeight: isStatus ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: (isStatus || isImportant || label == 'NAME') ? FontWeight.w700 : FontWeight.w400,
                         ),
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,
@@ -338,14 +357,11 @@ class _AboutBlock extends StatelessWidget {
                 const _ResumePulsingButton(),
               ] else
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Flexible(child: SectionHeader('I love what I do.')),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 18, top: 4),
-                      child: const _ResumePulsingButton(),
-                    ),
+                    const Expanded(child: SectionHeader('I love what I do.')),
+                    const SizedBox(width: 16),
+                    const _ResumePulsingButton(),
                   ],
                 ),
           const SizedBox(height: 8),
@@ -364,27 +380,33 @@ class _AboutBlock extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 1.5),
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            children: [
-              _SocialLink(
-                svgAsset: 'assets/icons/github.svg',
-                label: 'GitHub',
-                url: PortfolioConfig.githubUrl,
-              ),
-              _SocialLink(
-                svgAsset: 'assets/icons/linkedin.svg',
-                label: 'LinkedIn',
-                url: PortfolioConfig.linkedinUrl,
-              ),
-              _SocialLink(
-                svgAsset: 'assets/icons/x.svg',
-                label: 'X / Twitter',
-                url: PortfolioConfig.twitterUrl,
-              ),
-            ],
-          ),
+          LayoutBuilder(builder: (context, constraints) {
+            final isShort = constraints.maxWidth < 400;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _SocialLink(
+                  svgAsset: 'assets/icons/github.svg',
+                  label: 'GitHub',
+                  url: PortfolioConfig.githubUrl,
+                  isFullWidth: isShort,
+                ),
+                _SocialLink(
+                  svgAsset: 'assets/icons/linkedin.svg',
+                  label: 'LinkedIn',
+                  url: PortfolioConfig.linkedinUrl,
+                  isFullWidth: isShort,
+                ),
+                _SocialLink(
+                  svgAsset: 'assets/icons/x.svg',
+                  label: 'X / Twitter',
+                  url: PortfolioConfig.twitterUrl,
+                  isFullWidth: isShort,
+                ),
+              ],
+            );
+          }),
             ],
           );
         },
@@ -401,11 +423,13 @@ class _SocialLink extends StatefulWidget {
   final String svgAsset;
   final String label;
   final String url;
+  final bool isFullWidth;
 
   const _SocialLink({
     required this.svgAsset,
     required this.label,
     required this.url,
+    this.isFullWidth = false,
   });
 
   @override
@@ -419,23 +443,34 @@ class _SocialLinkState extends State<_SocialLink> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final active = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final idle = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final idle   = isDark ? AppColors.textSecDark     : AppColors.textSecLight;
+    final border = isDark ? AppColors.borderDark      : AppColors.borderLight;
+    final hoverBg= isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+
+    // easeOutCubic — snappy hover response
+    const kCurve = Cubic(0.33, 1.0, 0.68, 1.0);
+    const kDur   = Duration(milliseconds: 160);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onExit:  (_) => setState(() => _hovered = false),
       child: GestureDetector(
         onTap: () => launchUrl(Uri.parse(widget.url)),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
+          duration: kDur,
+          curve: kCurve,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
-            border: Border.all(color: _hovered ? active : border),
+            color: _hovered ? hoverBg : Colors.transparent,
+            border: Border.all(
+              color: _hovered ? active : border,
+              width: _hovered ? 1 : 1,
+            ),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: widget.isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 widget.svgAsset,
@@ -447,15 +482,25 @@ class _SocialLinkState extends State<_SocialLink> {
                 ),
               ),
               const SizedBox(width: 10),
-              Text(
-                widget.label,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: _hovered ? active : idle,
-                      letterSpacing: 1.2,
-                      decoration: _hovered ? TextDecoration.underline : null,
-                      decorationColor: active.withValues(alpha: 0.4),
-                      decorationStyle: TextDecorationStyle.dashed,
-                    ),
+              AnimatedDefaultTextStyle(
+                duration: kDur,
+                curve: kCurve,
+                style: (Theme.of(context).textTheme.labelMedium ?? const TextStyle()).copyWith(
+                  color: _hovered ? active : idle,
+                  letterSpacing: 1.2,
+                ),
+                child: Text(widget.label),
+              ),
+              const SizedBox(width: 6),
+              // Stable-width arrow to prevent layout shifts
+              AnimatedOpacity(
+                opacity: _hovered ? 1.0 : 0.0,
+                duration: kDur,
+                child: Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 12,
+                  color: idle,
+                ),
               ),
             ],
           ),

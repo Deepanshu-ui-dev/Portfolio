@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
 /// A wrapper that plays a fade + slide-up animation the first time
-/// its child becomes visible in the viewport.
+/// its child is built in the widget tree.
 ///
-/// Uses a lightweight approach: on first layout, it checks if the
-/// widget is within the scroll viewport, and if not yet animated,
-/// triggers the entrance animation with an optional [delay].
+/// Uses a lightweight approach: after the first frame it triggers
+/// the entrance animation with an optional [delay], making it easy
+/// to stagger siblings by incrementing delay.
+///
+/// Curve: `Cubic(0.16, 1.0, 0.3, 1.0)` — an easeOutExpo approximation
+/// that feels snappy and premium without being jarring.
 class ScrollFadeIn extends StatefulWidget {
   final Widget child;
 
@@ -23,13 +25,16 @@ class ScrollFadeIn extends StatefulWidget {
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.duration = const Duration(milliseconds: 500),
+    this.duration = const Duration(milliseconds: 420),
     this.slideBegin = 0.04,
   });
 
   @override
   State<ScrollFadeIn> createState() => _ScrollFadeInState();
 }
+
+// easeOutExpo approximation — snappy deceleration, premium feel.
+const _kExpoOut = Cubic(0.16, 1.0, 0.3, 1.0);
 
 class _ScrollFadeInState extends State<ScrollFadeIn>
     with SingleTickerProviderStateMixin {
@@ -46,9 +51,8 @@ class _ScrollFadeInState extends State<ScrollFadeIn>
     _offset = Tween<Offset>(
       begin: Offset(0, widget.slideBegin),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _ctrl, curve: _kExpoOut));
 
-    // Schedule visibility check after the first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkAndAnimate());
   }
 

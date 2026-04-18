@@ -136,9 +136,9 @@ class _SkillsScreenState extends State<SkillsScreen>
                     ],
                   ],
 
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 64),
                   const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 64),
 
                   // ── CALLOUT ROW ───────────────────────────────────
                   ScrollFadeIn(
@@ -602,7 +602,7 @@ class _PhilosophyCallout extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Philosophy'),
+        const SectionHeader('Philosophy', index: '06'),
         ..._items.map((item) => _PhiloRow(item: item)),
       ],
     );
@@ -629,44 +629,47 @@ class _PhiloRowState extends State<_PhiloRow> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final surfaceEl =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 14),
+        duration: const Duration(milliseconds: 180),
         margin: const EdgeInsets.only(bottom: 2),
+        transform: Matrix4.identity()..translate(_hovered ? 10.0 : 0.0, 0.0),
         decoration: BoxDecoration(
-          color: _hovered ? surfaceEl : Colors.transparent,
-          border: Border.all(
-              color: _hovered ? border : Colors.transparent, width: 1),
+          border: Border(
+            left: BorderSide(
+              color: _hovered ? accent : Colors.transparent,
+              width: 2,
+            ),
+          ),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.item.number,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: accent),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                widget.item.text,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(height: 1.7),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 13, 14, 13),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 180),
+                style: (Theme.of(context).textTheme.labelMedium ?? const TextStyle())
+                    .copyWith(color: _hovered ? accent : accent),
+                child: Text(widget.item.number),
               ),
-            ),
-          ],
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  widget.item.text,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(height: 1.7, color: _hovered ? (isDark ? Colors.white : Colors.black) : textSec),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

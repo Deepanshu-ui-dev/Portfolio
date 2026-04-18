@@ -73,10 +73,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                     child: _ProjectsHero(count: filtered.length),
                   ),
 
-                  const SizedBox(height: AppSpacing.xxl),
-                  const DashedDivider(),
-
-                  // ── FILTER ───────────────────────────────────────
+                   // Filter section with simple spacing
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 100),
                     child: _FilterSection(
@@ -87,8 +84,7 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                     ),
                   ),
 
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 48),
 
                   // ── GRID / EMPTY ──────────────────────────────────
                   if (filtered.isEmpty)
@@ -96,10 +92,8 @@ class _ProjectsScreenState extends State<ProjectsScreen>
                   else
                     _ProjectGrid(projects: filtered),
 
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
-
+                  const SizedBox(height: 64),
+                  
                   // ── OPEN SOURCE CALLOUT ───────────────────────────
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 200),
@@ -288,23 +282,19 @@ class _FilterChipState extends State<_FilterChip> {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
           decoration: BoxDecoration(
             color: widget.isActive
-                ? accent.withValues(alpha: 0.09)
-                : const Color.fromARGB(0, 155, 155, 155),
-            border: Border.all(
-              color: widget.isActive
-                  ? accent
-                  : _hov
-                      ? textSec
-                      : border,
-            ),
+                ? accent
+                : _hov
+                    ? textSec
+                    : border.withValues(alpha: 0.5),
           ),
           child: Text(
             widget.label.toUpperCase(),
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
                   fontSize: 9,
                   letterSpacing: 1.5,
+                  fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
                   color: widget.isActive
-                      ? accent
+                      ? (widget.isDark ? AppColors.bgDark : Colors.white)
                       : _hov
                           ? textSec
                           : border,
@@ -430,11 +420,23 @@ class _ProjectCardState extends State<_ProjectCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        transform: Matrix4.translationValues(0, _hovered ? -3.0 : 0.0, 0),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()
+          ..translate(0.0, _hovered ? -4.0 : 0.0)
+          ..scale(_hovered ? 1.015 : 1.0, _hovered ? 1.015 : 1.0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: _hovered ? border2 : border, width: 1),
+          boxShadow: _hovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,19 +572,16 @@ class _BrowserMock extends StatelessWidget {
           decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: border, width: 1))),
           child: Row(children: [
-            ...List.generate(
-              3,
-              (i) => Padding(
-                padding: const EdgeInsets.only(right: 5),
-                child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration:
-                      BoxDecoration(shape: BoxShape.circle, color: border),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
+            // macOS traffic-light dots
+            Container(width: 7, height: 7,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFF5F57))),
+            const SizedBox(width: 5),
+            Container(width: 7, height: 7,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFBD2E))),
+            const SizedBox(width: 5),
+            Container(width: 7, height: 7,
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF28C840))),
+            const SizedBox(width: 10),
             Expanded(child: Container(height: 10, color: blockA)),
           ]),
         ),
@@ -676,7 +675,7 @@ class _LinkBtnState extends State<_LinkBtn> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: accent),
-              color: _hovered ? accent.withOpacity(0.15) : Colors.transparent,
+              color: _hovered ? accent.withValues(alpha: 0.12) : Colors.transparent,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -726,7 +725,7 @@ class _OpenSourceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Open Source'),
+        const SectionHeader('Open Source Contributions', index: '03'),
         ..._items.map((item) => _OSRow(item: item)),
       ],
     );
@@ -753,45 +752,45 @@ class _OSRowState extends State<_OSRow> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final surfaceEl =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
     final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        padding:
-            const EdgeInsets.symmetric(vertical: 13, horizontal: 14),
+        duration: const Duration(milliseconds: 180),
         margin: const EdgeInsets.only(bottom: 2),
         decoration: BoxDecoration(
-          color: _hovered ? surfaceEl : Colors.transparent,
-          border: Border.all(
-              color: _hovered ? border : Colors.transparent, width: 1),
+          border: Border(
+            left: BorderSide(
+              color: _hovered ? accent : Colors.transparent,
+              width: 2,
+            ),
+          ),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.item.number,
-              style: Theme.of(context)
-                  .textTheme
-                  .labelMedium
-                  ?.copyWith(color: accent),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                widget.item.text,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(height: 1.7),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(_hovered ? 10 : 0, 13, 14, 13),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 180),
+                style: (Theme.of(context).textTheme.labelMedium ?? const TextStyle())
+                    .copyWith(color: _hovered ? accent : accent),
+                child: Text(widget.item.number),
               ),
-            ),
-          ],
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  widget.item.text,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(height: 1.7),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -10,7 +10,7 @@ class PortfolioConfig {
   static const String githubUrl = 'https://github.com/Deepanshu-ui-dev';
   static const String resumeUrl = 'https://drive.google.com/file/d/13DlMr7MfBh8kz5IzYKE3XHK9S-YF9bix/view?usp=sharing';
   static const String githubUsername = 'Deepanshu-ui-dev';
-  static const String linkedinUrl = 'https://www.linkedin.com/in/deepanshu-kaushik-174059297/';
+  static const String linkedinUrl = 'https://www.linkedin.com/in/imdeepanshukaushik/';
   static const String twitterUrl = 'https://x.com/Deepanshu25u';
   static const String websiteUrl = 'https://deepanshui.framer.website/';
 

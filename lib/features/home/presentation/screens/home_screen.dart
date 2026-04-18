@@ -80,44 +80,34 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     delay: const Duration(milliseconds: 120),
                     child: const RepaintBoundary(child: _ExperienceSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 180),
                     child: const RepaintBoundary(child: _EducationSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 240),
                     child: const RepaintBoundary(child: _ProjectsSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 300),
                     child: const RepaintBoundary(child: _AchievementsSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 360),
                     child: const RepaintBoundary(child: _LeadershipSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
-                  const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 420),
                     child: const RepaintBoundary(child: _PhotographySection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 48),
                   const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: 48),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 480),
                     child: const RepaintBoundary(child: _HobbiesSection()),
@@ -139,7 +129,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
 class _HomeHeatmapSection extends ConsumerWidget {
   const _HomeHeatmapSection();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stats =
@@ -148,6 +137,7 @@ class _HomeHeatmapSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const SectionHeader('ACTIVITY HEATMAP', index: '01'),
         stats.when(
           loading: () => const _HeatmapShell(child: _HeatmapSkeleton()),
           error: (e, _) => _HeatmapShell(
@@ -188,7 +178,7 @@ class _HeatmapShell extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: BoxDecoration(
-        color: surfaceElev.withOpacity(0.3),
+        color: surfaceElev.withValues(alpha: 0.3),
         border: Border.all(color: border),
       ),
       child: child,
@@ -196,64 +186,99 @@ class _HeatmapShell extends StatelessWidget {
   }
 }
 
-class _HeatmapSkeleton extends StatelessWidget {
+// ONE shared shimmer controller for ALL skeleton cells — not one per cell.
+class _HeatmapSkeleton extends StatefulWidget {
   const _HeatmapSkeleton();
+
+  @override
+  State<_HeatmapSkeleton> createState() => _HeatmapSkeletonState();
+}
+
+class _HeatmapSkeletonState extends State<_HeatmapSkeleton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _shimmerCtrl;
+  late final Animation<double> _shimmer;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+    _shimmer = CurvedAnimation(parent: _shimmerCtrl, curve: Curves.easeInOut);
+  }
+
+  @override
+  void dispose() {
+    _shimmerCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cell = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final columns = constraints.maxWidth < 420 ? 28 : 42;
-        final cellSize = constraints.maxWidth < 420 ? 6.0 : 8.0;
+    // AnimatedBuilder wraps the ENTIRE skeleton — one rebuild per frame for all cells
+    return AnimatedBuilder(
+      animation: _shimmer,
+      builder: (context, _) {
+        final pulse = _shimmer.value; // 0.0 → 1.0 → 0.0
 
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Wrap(
-                spacing: 2,
-                runSpacing: 2,
-                children: List.generate(columns, (i) {
-                  final alpha = (i % 5 == 0)
-                      ? 0.55
-                      : (i % 3 == 0)
-                          ? 0.42
-                          : 0.3;
-                  return _PulseSkeleton(
-                    width: cellSize,
-                    height: cellSize,
-                    color: cell.withValues(alpha: alpha),
-                  );
-                }),
-              ),
-              const SizedBox(height: 10),
-              Row(
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = constraints.maxWidth < 420 ? 28 : 42;
+            final cellSize = constraints.maxWidth < 420 ? 6.0 : 8.0;
+
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _PulseSkeleton(
-                    width: constraints.maxWidth * 0.45,
-                    height: 8,
-                    color: cell.withValues(alpha: 0.4),
+                  Wrap(
+                    spacing: 2,
+                    runSpacing: 2,
+                    children: List.generate(columns, (i) {
+                      final base = (i % 5 == 0)
+                          ? 0.45
+                          : (i % 3 == 0)
+                              ? 0.35
+                              : 0.25;
+                      return _PulseSkeleton(
+                        width: cellSize,
+                        height: cellSize,
+                        color: cell.withValues(alpha: base + pulse * 0.28),
+                      );
+                    }),
                   ),
-                  const Spacer(),
-                  _PulseSkeleton(
-                    width: constraints.maxWidth * 0.25,
-                    height: 8,
-                    color: cell.withValues(alpha: 0.4),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _PulseSkeleton(
+                        width: constraints.maxWidth * 0.45,
+                        height: 8,
+                        color: cell.withValues(alpha: 0.3 + pulse * 0.25),
+                      ),
+                      const Spacer(),
+                      _PulseSkeleton(
+                        width: constraints.maxWidth * 0.25,
+                        height: 8,
+                        color: cell.withValues(alpha: 0.3 + pulse * 0.25),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 }
 
+// Pure StatelessWidget — no controller, no ticker. Receives computed color from parent.
 class _PulseSkeleton extends StatelessWidget {
   final double width;
   final double height;
@@ -393,12 +418,12 @@ class _ExperienceSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Where I\'ve Worked'),
+        const SectionHeader('Professional Journey', index: '02'),
         CollapsibleCard(
           leading: iconBox(LucideIcons.layers),
-          title: 'Layerance',
-          subtitle: 'UI/UX Intern — Founding Designer',
-          rightLabel: '2026 — Present',
+          title: 'BarterNow',
+          subtitle: 'UI/UX Designer — Founding Designer',
+          rightLabel: 'JAN 2026 — Present',
           initiallyExpanded: true,
           bullets: const [
             'Designed the core product interface and visual identity as the founding designer for an early-stage startup.',
@@ -445,7 +470,7 @@ class _EducationSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Academic Background'),
+        const SectionHeader('Academic Foundation', index: '03'),
         CollapsibleCard(
           leading: Container(
             width: 36,
@@ -485,7 +510,7 @@ class _ProjectsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Featured Work'),
+        const SectionHeader('Featured Work', index: '04'),
         LayoutBuilder(builder: (context, constraints) {
           if (constraints.maxWidth > 520) {
             return IntrinsicHeight(
@@ -539,11 +564,23 @@ class _ProjectCardState extends State<_ProjectCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        transform: Matrix4.translationValues(0, _hovered ? -1.5 : 0, 0),
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()
+          ..translate(0.0, _hovered ? -4.0 : 0.0)
+          ..scale(_hovered ? 1.015 : 1.0, _hovered ? 1.015 : 1.0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: _hovered ? border2 : border, width: 1),
+          boxShadow: _hovered
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  )
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -671,22 +708,19 @@ class _BrowserMock extends StatelessWidget {
             border: Border(bottom: BorderSide(color: border, width: 1)),
           ),
           child: Row(children: [
-            ...List.generate(
-              3,
-              (i) => Padding(
-                padding: const EdgeInsets.only(right: 5),
-                child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration:
-                      BoxDecoration(shape: BoxShape.circle, color: border),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(child: Container(height: 10, color: blockA)),
-          ]),
-        ),
+              // macOS-style traffic-light dots
+              Container(width: 7, height: 7,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFF5F57))),
+              const SizedBox(width: 5),
+              Container(width: 7, height: 7,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFFFFBD2E))),
+              const SizedBox(width: 5),
+              Container(width: 7, height: 7,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF28C840))),
+              const SizedBox(width: 10),
+              Expanded(child: Container(height: 10, color: blockA)),
+            ]),
+          ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -773,7 +807,7 @@ class _LinkBtnState extends State<_LinkBtn> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: accent),
-              color: _hovered ? accent.withOpacity(0.15) : Colors.transparent,
+              color: _hovered ? accent.withValues(alpha: 0.12) : Colors.transparent,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -822,7 +856,7 @@ class _AchievementsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Milestones & Impact'),
+        const SectionHeader('Milestones & Impact', index: '05'),
         ..._items.map(
               (e) => _AchievementRow(
                 number: e['number']!,
@@ -855,42 +889,55 @@ class _AchievementRowState extends State<_AchievementRow> {
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
     final textPri =
         isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        transform: Matrix4.translationValues(_hovered ? 3.0 : 0.0, 0, 0),
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.number,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(color: textSec, fontWeight: FontWeight.w600)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.title,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: textPri, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 4),
-                  Text(widget.subtitle,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(color: textSec, height: 1.5)),
-                ],
-              ),
+        duration: const Duration(milliseconds: 180),
+        margin: const EdgeInsets.only(bottom: 2),
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              // Left accent border appears on hover — no layout shift
+              color: _hovered ? accent : Colors.transparent,
+              width: 2,
             ),
-          ],
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(_hovered ? 10 : 0, 14, 0, 14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 180),
+                style: (Theme.of(context).textTheme.bodyMedium ?? const TextStyle())
+                    .copyWith(color: _hovered ? accent : textSec, fontWeight: FontWeight.w600),
+                child: Text(widget.number),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.title,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge
+                            ?.copyWith(color: textPri, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 4),
+                    Text(widget.subtitle,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(color: textSec, height: 1.5)),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -912,7 +959,7 @@ class _LeadershipSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Community Leadership'),
+        const SectionHeader('Community Leadership', index: '06'),
         CollapsibleCard(
           leading: Container(
             width: 36,
@@ -1014,7 +1061,7 @@ class _PhotographySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Photography'),
+        const SectionHeader('Visual Journey', index: '07'),
 
         // Intro text
         Padding(
@@ -1464,7 +1511,7 @@ class _HobbiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Hobbies'),
+        const SectionHeader('Personal Interests', index: '08'),
         const SizedBox(height: 20),
         ..._hobbies.asMap().entries.map((e) {
           final num = '0${e.key + 1}';
