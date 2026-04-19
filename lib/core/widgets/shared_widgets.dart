@@ -755,11 +755,25 @@ class PortfolioFooter extends StatefulWidget {
 class _PortfolioFooterState extends State<PortfolioFooter> {
   bool _creditHovered = false;
   int _visitCount = 0;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _loadAndIncrementVisitCount();
+    // Refresh count every 60 seconds for "real-time" feel
+    _refreshTimer = Timer.periodic(const Duration(seconds: 60), (_) => _refreshVisitCount());
+  }
+
+  Future<void> _refreshVisitCount() async {
+    try {
+      final response = await http.get(Uri.parse(PortfolioConfig.visitorApiUrl));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final count = data['count'] as int;
+        if (mounted) setState(() => _visitCount = count);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadAndIncrementVisitCount() async {
@@ -772,7 +786,7 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
       
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final count = data['value'] as int;
+        final count = data['count'] as int;
         
         if (mounted) setState(() => _visitCount = count);
         // Update local cache for offline/fallback
@@ -810,6 +824,7 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     super.dispose();
   }
 
