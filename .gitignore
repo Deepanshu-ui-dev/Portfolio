@@ -44,5 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Ignore sensitive portfolio configuration
-lib/config/portfolio_config.dart
+# Ignore sensitive secrets
+lib/config/secrets.dart
