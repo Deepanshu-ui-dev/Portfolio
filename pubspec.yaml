@@ -1,8 +1,8 @@
 name: monofolio
 description: >
-  Production-ready portfolio application built with Flutter, showcasing 
-  high-quality UI/UX design, smooth animations, and optimized performance. 
-  Features interactive theme switching, responsive layouts, and pixel-perfect 
+  Production-ready portfolio application built with Flutter, showcasing
+  high-quality UI/UX design, smooth animations, and optimized performance.
+  Features interactive theme switching, responsive layouts, and pixel-perfect
   design across mobile and web platforms.
 publish_to: "none"
 version: 1.0.0+1
@@ -17,27 +17,28 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # Networking & API
   http: ^1.2.0
   url_launcher: ^6.3.0
-  
+
   # State Management
   flutter_riverpod: ^2.4.9
-  
+
   # UI & Animations
   flutter_animate: ^4.2.0-hotfix.1
   flutter_svg: ^2.0.10+1
   lucide_icons: ^0.257.0
   redacted: ^1.0.12
-  
+  supabase_flutter: ^2.5.0
+
   # Content & Data
   flutter_markdown: ^0.6.19
   shared_preferences: ^2.2.3
-  
+
   # Navigation
   go_router: ^13.2.0
-  
+
   # Audio
   just_audio: ^0.10.5
 
@@ -48,14 +49,14 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  
+
   fonts:
     - family: JetBrainsMono
       fonts:
         - asset: assets/fonts/JetBrainsMono-Regular.ttf
         - asset: assets/fonts/JetBrainsMono-Bold.ttf
           weight: 700
-  
+
   assets:
     - assets/icons/github.svg
     - assets/icons/linkedin.svg

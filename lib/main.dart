@@ -14,9 +14,11 @@ library portfolio;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
+import 'config/portfolio_config.dart';
 import 'core/theme/theme_extensions.dart';
 import 'core/widgets/floating_nav_bar.dart';
 import 'core/widgets/shared_widgets.dart';
@@ -37,7 +39,15 @@ import 'features/contact/presentation/screens/contact_screen.dart';
 /// - Theme color cache for optimal performance
 /// - Riverpod provider scope
 /// - Root MaterialApp widget
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: PortfolioConfig.supabaseUrl,
+    anonKey: PortfolioConfig.supabaseAnonKey,
+  );
+
   // Pre-compute and cache all theme colors for instant access during theme switching
   ThemeTransitionUtils.initializeColorCache();
   runApp(const ProviderScope(child: PortfolioApp()));

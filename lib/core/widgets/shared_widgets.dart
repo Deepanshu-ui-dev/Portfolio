@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:redacted/redacted.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../supabase/supabase_config.dart';
 import '../../config/portfolio_config.dart';
 import '../theme/app_theme.dart';
 export 'skeleton_loaders.dart';
@@ -765,61 +763,22 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
     _refreshTimer = Timer.periodic(const Duration(seconds: 60), (_) => _refreshVisitCount());
   }
 
-  Future<void> _refreshVisitCount() async {
+  Future<void> _loadAndIncrementVisitCount() async {
     try {
-      final response = await http.get(Uri.parse(PortfolioConfig.visitorApiUrl));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final count = data['count'] as int;
-        if (mounted) setState(() => _visitCount = count);
-      }
+      final count = await supabase.rpc('increment_visits');
+      if (mounted) setState(() => _visitCount = count as int);
     } catch (_) {}
   }
 
-  Future<void> _loadAndIncrementVisitCount() async {
+  Future<void> _refreshVisitCount() async {
     try {
-      const key = 'portfolio_visit_count';
-      final prefs = await _getPrefs();
-      
-      // Increment and fetch global count from API
-      final response = await http.get(Uri.parse('${PortfolioConfig.visitorApiUrl}/up'));
-      
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final count = data['count'] as int;
-        
-        if (mounted) setState(() => _visitCount = count);
-        // Update local cache for offline/fallback
-        await prefs?.setInt(key, count);
-      } else {
-        // API failed, fallback to local increment
-        final count = (prefs?.getInt(key) ?? 0) + 1;
-        await prefs?.setInt(key, count);
-        if (mounted) setState(() => _visitCount = count);
-      }
-    } catch (_) {
-      // Network error, fallback to local increment
-      try {
-        final prefs = await _getPrefs();
-        final count = (prefs?.getInt('portfolio_visit_count') ?? 0) + 1;
-        await prefs?.setInt('portfolio_visit_count', count);
-        if (mounted) setState(() => _visitCount = count);
-      } catch (e) {
-        // Fatal shared_prefs error, ignore
-      }
-    }
-  }
-
-  dynamic _prefsInstance;
-  Future<dynamic> _getPrefs() async {
-    try {
-      if (_prefsInstance != null) return _prefsInstance;
-      final prefs = await _SharedPrefsHelper.getInstance();
-      _prefsInstance = prefs;
-      return prefs;
-    } catch (_) {
-      return null;
-    }
+      final data = await supabase
+          .from('visits')
+          .select('count')
+          .eq('id', 1)
+          .single();
+      if (mounted) setState(() => _visitCount = data['count'] as int);
+    } catch (_) {}
   }
 
   @override
@@ -874,31 +833,6 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
   }
 }
 
-/// A simple wrapper that accesses SharedPreferences via dynamic invocation
-/// to avoid a direct import dependency in shared_widgets.dart
-class _SharedPrefsHelper {
-  static SharedPreferences? _instance;
-  static Future<SharedPreferences?> getInstance() async {
-    if (_instance != null) return _instance;
-    try {
-      final prefs = await _SharedPrefsAccess.get();
-      _instance = prefs;
-      return prefs;
-    } catch (_) {
-      return null;
-    }
-  }
-}
-
-class _SharedPrefsAccess {
-  static Future<SharedPreferences?> get() async {
-    try {
-      return await SharedPreferences.getInstance();
-    } catch (_) {
-      return null;
-    }
-  }
-}
 
 // ─── Desktop Footer Content ─────────────────────────────────
 class _DesktopFooterContent extends StatelessWidget {
