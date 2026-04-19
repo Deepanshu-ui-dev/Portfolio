@@ -767,7 +767,10 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
     try {
       final count = await supabase.rpc('increment_visits');
       if (mounted) setState(() => _visitCount = count as int);
-    } catch (_) {}
+    } catch (e) {
+      // If RPC fails, try refreshing count without incrementing
+      _refreshVisitCount();
+    }
   }
 
   Future<void> _refreshVisitCount() async {
@@ -777,7 +780,8 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
           .select('count')
           .eq('id', 1)
           .single();
-      if (mounted) setState(() => _visitCount = data['count'] as int);
+      final count = data['count'] as int;
+      if (mounted) setState(() => _visitCount = count);
     } catch (_) {}
   }
 
@@ -856,6 +860,7 @@ class _DesktopFooterContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // ── Left/Center: Visitor badge ─────────────────────────────
+        // Show badge if count is > 0
         if (visitCount > 0) _VisitorBadge(
           count: visitCount,
           accentColor: accentColor,

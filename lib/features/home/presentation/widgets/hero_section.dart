@@ -231,7 +231,7 @@ class _DetailRow extends StatelessWidget {
                     value,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: textPri,
-                          fontWeight: (isStatus || isImportant || label == 'NAME') ? FontWeight.w700 : FontWeight.w400,
+                          fontWeight: (isStatus || isImportant || label == 'NAME' || label == 'BASED') ? FontWeight.w700 : FontWeight.w400,
                         ),
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,

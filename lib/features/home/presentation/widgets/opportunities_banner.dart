@@ -172,7 +172,7 @@ class _OpportunitiesBannerState extends State<OpportunitiesBanner>
                   Text(
                     'v2026',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: borderColor,
+                          color: dimColor,
                           fontSize: 8,
                           letterSpacing: 0.1,
                         ),
