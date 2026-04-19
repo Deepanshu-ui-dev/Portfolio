@@ -13,6 +13,7 @@ class PortfolioConfig {
   static const String linkedinUrl = 'https://www.linkedin.com/in/imdeepanshukaushik/';
   static const String twitterUrl = 'https://x.com/Deepanshu25u';
   static const String websiteUrl = 'https://deepanshui.framer.website/';
+  static const String visitorApiUrl = 'https://api.counterapi.dev/v1/deepanshux.tech/visits';
 
   static const String bio =
       'I\'m a UI/UX designer and Flutter developer currently pursuing B.Tech in Data Science at ABES Engineering College (2023–2027). '

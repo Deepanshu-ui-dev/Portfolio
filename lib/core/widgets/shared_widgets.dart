@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:http/http.dart' as http;
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:redacted/redacted.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../config/portfolio_config.dart';
 import '../theme/app_theme.dart';
 export 'skeleton_loaders.dart';
 export 'magnet.dart';
 export 'grid_background.dart';
-import 'lamp_theme_switcher.dart';
 
 /// ── Dashed Divider ──────────────────────────────────────────
 class DashedDivider extends StatelessWidget {
@@ -765,10 +766,34 @@ class _PortfolioFooterState extends State<PortfolioFooter> {
     try {
       const key = 'portfolio_visit_count';
       final prefs = await _getPrefs();
-      final count = (prefs?.getInt(key) ?? 0) + 1;
-      await prefs?.setInt(key, count);
-      if (mounted) setState(() => _visitCount = count);
-    } catch (_) {}
+      
+      // Increment and fetch global count from API
+      final response = await http.get(Uri.parse('${PortfolioConfig.visitorApiUrl}/up'));
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final count = data['value'] as int;
+        
+        if (mounted) setState(() => _visitCount = count);
+        // Update local cache for offline/fallback
+        await prefs?.setInt(key, count);
+      } else {
+        // API failed, fallback to local increment
+        final count = (prefs?.getInt(key) ?? 0) + 1;
+        await prefs?.setInt(key, count);
+        if (mounted) setState(() => _visitCount = count);
+      }
+    } catch (_) {
+      // Network error, fallback to local increment
+      try {
+        final prefs = await _getPrefs();
+        final count = (prefs?.getInt('portfolio_visit_count') ?? 0) + 1;
+        await prefs?.setInt('portfolio_visit_count', count);
+        if (mounted) setState(() => _visitCount = count);
+      } catch (e) {
+        // Fatal shared_prefs error, ignore
+      }
+    }
   }
 
   dynamic _prefsInstance;
