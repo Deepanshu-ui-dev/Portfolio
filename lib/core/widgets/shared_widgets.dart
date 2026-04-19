@@ -1008,6 +1008,17 @@ class _VisitorBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final n = count;
+    final s = n.toString();
+    String formattedNumber = '';
+    int c = 0;
+    for (int i = s.length - 1; i >= 0; i--) {
+      c++;
+      formattedNumber = s[i] + formattedNumber;
+      if (c % 3 == 0 && i > 0) formattedNumber = ',' + formattedNumber;
+    }
+    final suffix = _getOrdinalSuffix(n);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1020,23 +1031,48 @@ class _VisitorBadge extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 5),
-        Text(
-          '${_formatCount(count)} VISITS',
-          style: TextStyle(
-            color: textTerColor,
-            fontFamily: 'monospace',
-            fontSize: 8,
-            letterSpacing: 1.2,
-            fontWeight: FontWeight.w500,
+        RichText(
+          text: TextSpan(
+            style: TextStyle(
+              color: textTerColor,
+              fontFamily: 'monospace',
+              fontSize: 8,
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w500,
+            ),
+            children: [
+              const TextSpan(text: "YOU'RE THE "),
+              TextSpan(text: formattedNumber),
+              WidgetSpan(
+                child: Transform.translate(
+                  offset: const Offset(0, -4),
+                  child: Text(
+                    suffix.toUpperCase(),
+                    style: TextStyle(
+                      color: textTerColor,
+                      fontFamily: 'monospace',
+                      fontSize: 5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const TextSpan(text: " VISITOR"),
+            ],
           ),
         ),
       ],
     );
   }
 
-  String _formatCount(int n) {
-    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
-    return n.toString().padLeft(3, '0');
+  String _getOrdinalSuffix(int n) {
+    if (n >= 11 && n <= 13) return 'th';
+    switch (n % 10) {
+      case 1:  return 'st';
+      case 2:  return 'nd';
+      case 3:  return 'rd';
+      default: return 'th';
+    }
   }
 }
 
