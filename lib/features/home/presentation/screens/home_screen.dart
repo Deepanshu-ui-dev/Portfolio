@@ -50,6 +50,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
+    final isMobile = AppSpacing.isMobile(context);
+    // Tighter vertical spacing on mobile — everything was oversized
+    final vPad = isMobile ? AppSpacing.lg : AppSpacing.xl;
+    final sectionGap = isMobile ? AppSpacing.xl : AppSpacing.xxxl;
 
     return FadeTransition(
       opacity: _fadeAnim,
@@ -60,59 +64,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           slivers: [
             SliverPadding(
               padding: EdgeInsets.symmetric(
-                  horizontal: padding, vertical: AppSpacing.xl),
+                  horizontal: padding, vertical: vPad),
               sliver: SliverList.list(
                 children: [
                   const RepaintBoundary(child: OpportunitiesBanner()),
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: sectionGap),
                   const RepaintBoundary(child: HeroSection()),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  SizedBox(height: sectionGap),
                   const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  SizedBox(height: sectionGap),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 60),
                     child: const RepaintBoundary(child: _HomeHeatmapSection()),
                   ),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  SizedBox(height: sectionGap),
                   const DashedDivider(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  SizedBox(height: sectionGap),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 120),
                     child: const RepaintBoundary(child: _ExperienceSection()),
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: isMobile ? 36 : 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 180),
                     child: const RepaintBoundary(child: _EducationSection()),
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: isMobile ? 36 : 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 240),
                     child: const RepaintBoundary(child: _ProjectsSection()),
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: isMobile ? 36 : 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 300),
                     child: const RepaintBoundary(child: _AchievementsSection()),
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: isMobile ? 36 : 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 360),
                     child: const RepaintBoundary(child: _LeadershipSection()),
                   ),
-                  const SizedBox(height: 64),
+                  SizedBox(height: isMobile ? 36 : 64),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 420),
                     child: const RepaintBoundary(child: _PhotographySection()),
                   ),
-                  const SizedBox(height: 48),
+                  SizedBox(height: isMobile ? 32 : 48),
                   const DashedDivider(),
-                  const SizedBox(height: 48),
+                  SizedBox(height: isMobile ? 32 : 48),
                   ScrollFadeIn(
                     delay: const Duration(milliseconds: 480),
                     child: const RepaintBoundary(child: _HobbiesSection()),
                   ),
-                  const SizedBox(height: 120),
+                  SizedBox(height: isMobile ? 90 : 120),
                 ],
               ),
             ),
@@ -512,7 +516,7 @@ class _ProjectsSection extends StatelessWidget {
       children: [
         const SectionHeader('Featured Work', index: '04'),
         LayoutBuilder(builder: (context, constraints) {
-          if (constraints.maxWidth > 520) {
+          if (constraints.maxWidth > AppSpacing.mobileMax) {
             return IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

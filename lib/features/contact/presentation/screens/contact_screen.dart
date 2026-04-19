@@ -36,9 +36,8 @@ class _ContactScreenState extends State<ContactScreen>
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent  = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent  = AppColors.accent;
 
     return FadeTransition(
       opacity: _fade,
@@ -337,13 +336,12 @@ class _LinkRowState extends State<_LinkRow> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final border   = isDark ? AppColors.borderDark   : AppColors.borderLight;
-    final border2  = isDark ? AppColors.border2Dark  : AppColors.border2Light;
-    final surfaceEl = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
-    final textPri  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent   = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final border   = AppColors.border;
+    final border2  = AppColors.border2;
+    final surfaceEl = AppColors.surfaceElev;
+    final textSec  = AppColors.textSecondary;
+    final textPri  = AppColors.textPrimary;
+    final accent   = AppColors.accent;
     final isCompact = MediaQuery.sizeOf(context).width < 450;
 
     return MouseRegion(
@@ -359,6 +357,7 @@ class _LinkRowState extends State<_LinkRow> {
             color: _hovered ? surfaceEl : Colors.transparent,
             border: Border.all(
                 color: _hovered ? border2 : border, width: 1),
+            borderRadius: AppRadius.subtle,
           ),
           child: Row(children: [
             SizedBox(
@@ -473,23 +472,24 @@ class _TerminalPingState extends State<_TerminalPing> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark  = Theme.of(context).brightness == Brightness.dark;
-    final border  = isDark ? AppColors.borderDark  : AppColors.borderLight;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final surfaceEl = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent  = isDark ? AppColors.accentDark  : AppColors.accentLight;
-    final bg      = isDark ? AppColors.bgDark      : AppColors.bgLight;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final border   = isDark ? AppColors.borderDark   : AppColors.borderLight;
+    final surface  = isDark ? AppColors.surfaceDark  : AppColors.surfaceLight;
+    final surfaceEl= isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
+    final textPri  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final accent   = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final bg       = isDark ? AppColors.bgDark       : AppColors.bgLight;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: surface,
         border: Border.all(
-          color: _focus.hasFocus ? accent : border, 
+          color: _focus.hasFocus ? accent : border,
           width: _focus.hasFocus ? 1.5 : 1,
         ),
+        borderRadius: AppRadius.card,
         boxShadow: _focus.hasFocus
             ? [
                 BoxShadow(
@@ -509,6 +509,7 @@ class _TerminalPingState extends State<_TerminalPing> {
             decoration: BoxDecoration(
               color: _focus.hasFocus ? accent.withValues(alpha: 0.05) : surfaceEl,
               border: Border(bottom: BorderSide(color: _focus.hasFocus ? accent.withValues(alpha: 0.5) : border, width: 1)),
+              borderRadius: AppRadius.top(AppRadius.cardValue),
             ),
             child: Row(children: [
               _Dot(color: const Color(0xFFFF5F57)),
@@ -554,8 +555,9 @@ class _TerminalPingState extends State<_TerminalPing> {
                         decoration: BoxDecoration(
                           color: selected ? textPri : Colors.transparent,
                           border: Border.all(
-                              color: selected ? textPri : (isDark ? AppColors.border2Dark : AppColors.border2Light),
+                              color: selected ? textPri : AppColors.border2,
                               width: 1),
+                          borderRadius: AppRadius.subtle,
                         ),
                         child: Text(
                           t,
@@ -646,17 +648,17 @@ class _TerminalPingState extends State<_TerminalPing> {
 class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final border   = isDark ? AppColors.borderDark   : AppColors.borderLight;
-    final surface  = isDark ? AppColors.surfaceDark  : AppColors.surfaceLight;
-    final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
-    final accent   = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final border   = AppColors.border;
+    final surface  = AppColors.surface;
+    final textSec  = AppColors.textSecondary;
+    final accent   = AppColors.accent;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: surface,
         border: Border.all(color: border, width: 1),
+        borderRadius: AppRadius.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,9 +698,8 @@ class _StatusRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark  = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent  = isDark ? AppColors.accentDark  : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent  = AppColors.accent;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -726,11 +727,10 @@ class _StatusRow extends StatelessWidget {
 class _LocationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final border   = isDark ? AppColors.borderDark   : AppColors.borderLight;
-    final surface  = isDark ? AppColors.surfaceDark  : AppColors.surfaceLight;
-    final textSec  = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
-    final textPri  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final border   = AppColors.border;
+    final surface  = AppColors.surface;
+    final textSec  = AppColors.textSecondary;
+    final textPri  = AppColors.textPrimary;
 
     final now = DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30));
     final hour   = now.hour;
@@ -744,6 +744,7 @@ class _LocationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: surface,
         border: Border.all(color: border, width: 1),
+        borderRadius: AppRadius.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -827,9 +828,8 @@ class _SendBtnState extends State<_SendBtn> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final fg     = isDark ? AppColors.bgDark : AppColors.bgLight;
+    final accent = AppColors.accent;
+    final fg     = AppColors.background;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -1009,10 +1009,9 @@ class _FaqItemState extends State<_FaqItem>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final border = AppColors.border;
+    final surface = AppColors.surface;
+    final textSec = AppColors.textSecondary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
@@ -1038,9 +1037,7 @@ class _FaqItemState extends State<_FaqItem>
               Expanded(
                 child: Text(widget.question,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: isDark
-                              ? AppColors.textPrimaryDark
-                              : AppColors.textPrimaryLight,
+                          color: AppColors.textPrimary,
                         )),
               ),
               const SizedBox(width: 8),

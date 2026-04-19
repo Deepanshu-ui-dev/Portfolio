@@ -38,8 +38,7 @@ class _AboutScreenState extends State<AboutScreen>
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final textSec = AppColors.textSecondary;
 
     return FadeTransition(
       opacity: _fade,
@@ -167,9 +166,8 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return Row(children: [
       Text('[ $index ]',
@@ -198,19 +196,17 @@ class _BucketListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceElev =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final surfaceElev = AppColors.surfaceElev;
+    final textSec = AppColors.textSecondary;
+    final textPri = AppColors.textPrimary;
+    final border = AppColors.border;
 
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: surfaceElev.withOpacity(0.3),
+        color: surfaceElev.withValues(alpha: 0.3),
         border: Border.all(color: border),
+        borderRadius: AppRadius.card,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,11 +257,9 @@ class _BucketItemState extends State<_BucketItem> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textPri = AppColors.textPrimary;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -284,10 +278,11 @@ class _BucketItemState extends State<_BucketItem> {
                     color: widget.isDone
                         ? accent
                     : _hovered
-                      ? accent.withOpacity(0.7)
-                      : textSec.withOpacity(0.4)),
+                      ? accent.withValues(alpha: 0.7)
+                      : textSec.withValues(alpha: 0.4)),
+                borderRadius: AppRadius.subtle,
                 color: widget.isDone
-                    ? accent.withOpacity(0.15)
+                    ? accent.withValues(alpha: 0.15)
                     : Colors.transparent,
               ),
               child: widget.isDone
@@ -306,7 +301,7 @@ class _BucketItemState extends State<_BucketItem> {
                       decoration: widget.isDone
                           ? TextDecoration.lineThrough
                           : null,
-                      decorationColor: textSec.withOpacity(0.5),
+                      decorationColor: textSec.withValues(alpha: 0.5),
                     ),
               ),
             ),
@@ -461,15 +456,12 @@ class _MomentCardState extends State<_MomentCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final border2 = isDark ? AppColors.border2Dark : AppColors.border2Light;
-    final surfaceElev =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final border = AppColors.border;
+    final border2 = AppColors.border2;
+    final surfaceElev = AppColors.surfaceElev;
+    final textPri = AppColors.textPrimary;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -488,9 +480,10 @@ class _MomentCardState extends State<_MomentCard> {
             duration: const Duration(milliseconds: 160),
             decoration: BoxDecoration(
               color: _hovered
-                  ? surfaceElev.withOpacity(0.5)
+                  ? surfaceElev.withValues(alpha: 0.5)
                   : Colors.transparent,
               border: Border.all(color: _hovered ? border2 : border),
+              borderRadius: AppRadius.card,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -511,13 +504,11 @@ class _MomentCardState extends State<_MomentCard> {
                           widget.imageAsset,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => ColoredBox(
-                            color: isDark
-                                ? const Color(0xFF1A1A1A)
-                                : const Color(0xFFDDDDDD),
+                            color: AppColors.surfaceElev,
                             child: Center(
                               child: Icon(
                                 LucideIcons.image,
-                                color: textSec.withOpacity(0.3),
+                                color: textSec.withValues(alpha: 0.3),
                                 size: 32,
                               ),
                             ),
@@ -539,8 +530,9 @@ class _MomentCardState extends State<_MomentCard> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          border: Border.all(color: accent.withOpacity(0.4)),
-                          color: accent.withOpacity(0.06),
+                          border: Border.all(color: accent.withValues(alpha: 0.4)),
+                          color: accent.withValues(alpha: 0.06),
+                          borderRadius: AppRadius.subtle,
                         ),
                         child: Text(
                           widget.role.toUpperCase(),
@@ -576,7 +568,7 @@ class _MomentCardState extends State<_MomentCard> {
                             .textTheme
                             .bodySmall
                             ?.copyWith(
-                                color: textSec.withOpacity(0.6),
+                                color: textSec.withValues(alpha: 0.6),
                                 fontSize: 11),
                       ),
                       const SizedBox(height: 10),
@@ -653,17 +645,16 @@ class _StatCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final textPri = AppColors.textPrimary;
+    final textSec = AppColors.textSecondary;
+    final border = AppColors.border;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       margin: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         border: Border.all(color: border),
+        borderRadius: AppRadius.subtle,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -742,15 +733,12 @@ class _JournalItemState extends State<_JournalItem> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final border2 = isDark ? AppColors.border2Dark : AppColors.border2Light;
-    final surfaceElev =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final border = AppColors.border;
+    final border2 = AppColors.border2;
+    final surfaceElev = AppColors.surfaceElev;
+    final textPri = AppColors.textPrimary;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -784,6 +772,7 @@ class _JournalItemState extends State<_JournalItem> {
                 : Colors.transparent,
             border: Border.all(
                 color: _hovered && !widget.isThought ? border2 : border),
+            borderRadius: AppRadius.card,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

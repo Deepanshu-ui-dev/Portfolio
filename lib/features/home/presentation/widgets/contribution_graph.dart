@@ -96,7 +96,7 @@ class _ContributionGraphState extends State<ContributionGraph> {
 
   // ─── Colour ──────────────────────────────────────────────
 
-  Color _colorForLevel(int level, bool isDark) {
+  Color _colorForLevel(int level) {
     switch (level) {
       case 0: return AppColors.contrib0;
       case 1: return AppColors.contrib1;
@@ -120,10 +120,9 @@ class _ContributionGraphState extends State<ContributionGraph> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     if (_weeks.isEmpty) return const SizedBox(height: 80);
 
-    final labelColor = isDark ? AppColors.textTerDark : AppColors.textTerLight;
+    final labelColor = AppColors.textSecondary;
 
     return LayoutBuilder(builder: (context, constraints) {
       final width = constraints.maxWidth;
@@ -233,7 +232,6 @@ class _ContributionGraphState extends State<ContributionGraph> {
                       weeks: weeks,
                       cellSize: cellSize,
                       cellGap: _cellGap,
-                      isDark: isDark,
                       colorForLevel: _colorForLevel,
                       hoveredDay: _hoveredDay,
                       onHover: (day) {
@@ -267,8 +265,7 @@ class _HeatmapGrid extends StatelessWidget {
   final List<List<ContributionDay?>> weeks;
   final double cellSize;
   final double cellGap;
-  final bool isDark;
-  final Color Function(int level, bool isDark) colorForLevel;
+  final Color Function(int level) colorForLevel;
   final ContributionDay? hoveredDay;
   final ValueChanged<ContributionDay?> onHover;
   final VoidCallback onExit;
@@ -278,7 +275,6 @@ class _HeatmapGrid extends StatelessWidget {
     required this.weeks,
     required this.cellSize,
     required this.cellGap,
-    required this.isDark,
     required this.colorForLevel,
     required this.hoveredDay,
     required this.onHover,
@@ -304,8 +300,7 @@ class _HeatmapGrid extends StatelessWidget {
                     ? _HeatmapCell(
                         day: weeks[w][d]!,
                         size: cellSize,
-                        isDark: isDark,
-                        color: colorForLevel(weeks[w][d]!.level, isDark),
+                        color: colorForLevel(weeks[w][d]!.level),
                         isHovered: hoveredDay == weeks[w][d],
                         onHover: onHover,
                         formatDate: formatDate,
@@ -321,7 +316,6 @@ class _HeatmapGrid extends StatelessWidget {
 class _HeatmapCell extends StatelessWidget {
   final ContributionDay day;
   final double size;
-  final bool isDark;
   final Color color;
   final bool isHovered;
   final ValueChanged<ContributionDay?> onHover;
@@ -330,7 +324,6 @@ class _HeatmapCell extends StatelessWidget {
   const _HeatmapCell({
     required this.day,
     required this.size,
-    required this.isDark,
     required this.color,
     required this.isHovered,
     required this.onHover,
@@ -349,12 +342,12 @@ class _HeatmapCell extends StatelessWidget {
         textStyle: TextStyle(
           fontFamily: 'JetBrainsMono',
           fontSize: 10,
-          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          color: AppColors.textPrimary,
         ),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
+          color: AppColors.surfaceElev,
           border: Border.all(
-            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+            color: AppColors.border,
           ),
           borderRadius: BorderRadius.circular(4),
         ),
@@ -363,13 +356,19 @@ class _HeatmapCell extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(2),
-            border: !isDark && day.level == 0
-                ? Border.all(color: AppColors.borderLight.withValues(alpha: 0.5), width: 0.5)
-                : null,
+            border: () {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return !isDark && day.level == 0
+                  ? Border.all(color: AppColors.border.withValues(alpha: 0.5), width: 0.5)
+                  : null;
+            }(),
             color: isHovered
-                ? (isDark
-                    ? Colors.white.withValues(alpha: 0.85)
-                    : Colors.black.withValues(alpha: 0.6))
+                ? () {
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    return isDark
+                        ? Colors.white.withValues(alpha: 0.85)
+                        : Colors.black.withValues(alpha: 0.6);
+                  }()
                 : color,
           ),
         ),

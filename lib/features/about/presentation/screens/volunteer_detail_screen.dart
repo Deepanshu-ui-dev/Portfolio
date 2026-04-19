@@ -21,10 +21,9 @@ class VolunteerDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final textPri = AppColors.textPrimary;
+    final accent = AppColors.accent;
 
     return GridBackground(
       child: Scaffold(
@@ -99,7 +98,7 @@ class VolunteerDetailScreen extends StatelessWidget {
                                   child: Container(
                                     width: double.infinity,
                                     decoration: BoxDecoration(
-                                      border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+                                      border: Border.all(color: AppColors.border),
                                     ),
                                     child: ColorFiltered(
                                       colorFilter: const ColorFilter.matrix(<double>[
@@ -168,9 +167,8 @@ class VolunteerDetailScreen extends StatelessWidget {
   }
 
   Widget _buildSection(BuildContext context, String header, String content) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textSec = AppColors.textSecondary;
+    final textPri = AppColors.textPrimary;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

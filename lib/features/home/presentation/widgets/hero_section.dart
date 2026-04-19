@@ -52,10 +52,10 @@ class _HeroSectionState extends State<HeroSection> with SingleTickerProviderStat
         position: _slide,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: const [
-            RepaintBoundary(child: _IdentityBlock()),
-            SizedBox(height: AppSpacing.xl),
-            RepaintBoundary(child: _AboutBlock()),
+          children: [
+            const RepaintBoundary(child: _IdentityBlock()),
+            const SizedBox(height: AppSpacing.xxl), // Increased from xl for more breath
+            const RepaintBoundary(child: _AboutBlock()),
           ],
         ),
       ),
@@ -72,9 +72,8 @@ class _IdentityBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final textSec = AppColors.textSecondary;
+    final border = AppColors.border;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,20 +85,20 @@ class _IdentityBlock extends StatelessWidget {
         const SizedBox(height: 12),
 
         LayoutBuilder(builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 420;
+          final isMobile = AppSpacing.isMobile(context);
           final sectionGap = isMobile ? AppSpacing.lg : AppSpacing.xxl;
-          final isMobileDevice = AppSpacing.isMobile(context);
           
           final avatar = Magnet(
-            displacement: isMobileDevice ? 0.0 : 0.1,
+            displacement: isMobile ? 0.0 : 0.1,
             child: MonofolioCornersBox(
               padding: const EdgeInsets.all(4),
               child: Container(
                 width: isMobile ? double.infinity : 160,
-                height: isMobile ? 320 : 200, // Slightly taller on mobile for impact
+                height: isMobile ? 240 : 200, // Adjusted mobile height
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight,
+                  color: AppColors.surfaceElev,
                   border: Border.all(color: border),
+                  borderRadius: AppRadius.subtle,
                 ),
                 child: RepaintBoundary(
                   child: ColorFiltered(
@@ -114,9 +113,7 @@ class _IdentityBlock extends StatelessWidget {
                       fit: isMobile ? BoxFit.cover : BoxFit.cover,
                       width: isMobile ? double.infinity : null,
                       cacheWidth: 800, // Higher res for profile
-                      skeletonColor: isDark
-                          ? AppColors.surfaceElevDark
-                          : AppColors.surfaceElevLight,
+                      skeletonColor: AppColors.surfaceElev,
                       errorIconColor: textSec.withValues(alpha: 0.5),
                     ),
                   ),
@@ -160,7 +157,7 @@ class _IdentityBlock extends StatelessWidget {
             return Column(
               children: [
                 avatar,
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.lg),
                 details,
               ],
             );
@@ -200,14 +197,13 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isCompact = MediaQuery.sizeOf(context).width < 430;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final isMobile = AppSpacing.isMobile(context);
+    final textSec = AppColors.textSecondary;
+    final textPri = AppColors.textPrimary;
+    final accent = AppColors.accent;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       child: Row(
         children: [
           SizedBox(
@@ -215,8 +211,8 @@ class _DetailRow extends StatelessWidget {
             child: Text(index, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec)),
           ),
           SizedBox(
-            width: isCompact ? 64 : 80,
-            child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 2.0)),
+            width: isMobile ? 60 : 80,
+            child: Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 2.0, fontSize: isMobile ? 10 : 11)),
           ),
           Expanded(
             child: Row(
@@ -338,20 +334,20 @@ class _AboutBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark  = Theme.of(context).brightness == Brightness.dark;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final pad = AppSpacing.isMobile(context) ? 16.0 : 24.0;
+    final pad     = AppSpacing.isMobile(context) ? 16.0 : 24.0;
 
     return MonofolioCornersBox(
       padding: EdgeInsets.all(pad),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = constraints.maxWidth < 560;
+          final isMobile = AppSpacing.isMobile(context);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isCompact) ...[
+              if (isMobile) ...[
                 const SectionHeader('I love what I do.'),
                 const SizedBox(height: 8),
                 const _ResumePulsingButton(),
@@ -381,7 +377,7 @@ class _AboutBlock extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           LayoutBuilder(builder: (context, constraints) {
-            final isShort = constraints.maxWidth < 400;
+            final isVeryShort = constraints.maxWidth < 380;
             return Wrap(
               spacing: 12,
               runSpacing: 12,
@@ -390,19 +386,19 @@ class _AboutBlock extends StatelessWidget {
                   svgAsset: 'assets/icons/github.svg',
                   label: 'GitHub',
                   url: PortfolioConfig.githubUrl,
-                  isFullWidth: isShort,
+                  isFullWidth: isVeryShort,
                 ),
                 _SocialLink(
                   svgAsset: 'assets/icons/linkedin.svg',
                   label: 'LinkedIn',
                   url: PortfolioConfig.linkedinUrl,
-                  isFullWidth: isShort,
+                  isFullWidth: isVeryShort,
                 ),
                 _SocialLink(
                   svgAsset: 'assets/icons/x.svg',
                   label: 'X / Twitter',
                   url: PortfolioConfig.twitterUrl,
-                  isFullWidth: isShort,
+                  isFullWidth: isVeryShort,
                 ),
               ],
             );
@@ -441,11 +437,11 @@ class _SocialLinkState extends State<_SocialLink> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final active = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final idle   = isDark ? AppColors.textSecDark     : AppColors.textSecLight;
-    final border = isDark ? AppColors.borderDark      : AppColors.borderLight;
-    final hoverBg= isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final active   = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final idle     = isDark ? AppColors.textSecDark     : AppColors.textSecLight;
+    final border   = isDark ? AppColors.borderDark      : AppColors.borderLight;
+    final hoverBg  = isDark ? AppColors.surfaceHoverDark: AppColors.surfaceHoverLight;
 
     // easeOutCubic — snappy hover response
     const kCurve = Cubic(0.33, 1.0, 0.68, 1.0);
@@ -467,6 +463,7 @@ class _SocialLinkState extends State<_SocialLink> {
               color: _hovered ? active : border,
               width: _hovered ? 1 : 1,
             ),
+            borderRadius: AppRadius.subtle,
           ),
           child: Row(
             mainAxisSize: widget.isFullWidth ? MainAxisSize.max : MainAxisSize.min,
@@ -541,9 +538,8 @@ class _ResumePulsingButtonState extends State<_ResumePulsingButton> with SingleT
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textPri = AppColors.textPrimary;
+    final accent = AppColors.accent;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,

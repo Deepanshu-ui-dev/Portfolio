@@ -27,9 +27,8 @@ class GalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final padding = AppSpacing.horizontalPadding(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return GridBackground(
       child: Scaffold(
@@ -179,8 +178,7 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final border = AppColors.border;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -206,9 +204,7 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
                   assetPath: widget.imagePath,
                   fit: BoxFit.cover,
                   cacheWidth: 450,
-                  skeletonColor: isDark
-                      ? AppColors.surfaceElevDark
-                      : AppColors.surfaceElevLight,
+                  skeletonColor: AppColors.surfaceElev,
                   errorWidget: const Center(child: Icon(LucideIcons.imageOff)),
                 ),
                 // Black and white filter fading out on hover
@@ -227,9 +223,7 @@ class _GalleryImageCardState extends State<_GalleryImageCard> {
                         assetPath: widget.imagePath,
                         fit: BoxFit.cover,
                         cacheWidth: 450,
-                        skeletonColor: isDark
-                            ? AppColors.surfaceElevDark
-                            : AppColors.surfaceElevLight,
+                        skeletonColor: AppColors.surfaceElev,
                         errorWidget:
                             const Center(child: Icon(LucideIcons.imageOff)),
                       ),

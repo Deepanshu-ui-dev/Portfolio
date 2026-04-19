@@ -22,11 +22,9 @@ class _GridPainter extends CustomPainter {
   final bool isDark;
   const _GridPainter({required this.isDark});
 
-  // Pre-resolved dot colors — pulled from the updated AppColors tokens.
-  // Dark: surfaceElevDark (#1C1C1F) gives just enough lift over bgDark.
-  // Light: border2Light (#C4C4BF) is the darkest neutral that stays soft.
-  static const _dotDark  = Color(0xFF1C1C1F);
-  static const _dotLight = Color(0xFFC4C4BF);
+  // Pre-resolved dot colors pulled from the Obsidian & Citron tokens.
+  static Color get _dotDark  => AppColors.surfaceElevDark;
+  static Color get _dotLight => AppColors.border2Light;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -34,7 +32,7 @@ class _GridPainter extends CustomPainter {
     canvas.drawRect(
       Offset.zero & size,
       Paint()
-        ..color = isDark ? AppColors.bgDark : AppColors.bgLight
+        ..color = Color.lerp(AppColors.background, AppColors.surface, 0.5)!
         ..style = PaintingStyle.fill,
     );
 

@@ -78,18 +78,14 @@ class _FloatingNavBarState extends State<FloatingNavBar>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // ── Color tokens (chanhdai.com Zinc scale, mapped to our theme) ──────
-    // Dark: zinc-950 bg, zinc-800 border, zinc-700 hover fill, zinc-400 idle
-    // Light: white bg, zinc-200 border, zinc-100 hover fill, zinc-500 idle
-    final navBg      = isDark ? const Color(0xFF0D0D0F) : const Color(0xFFFFFFFF);
-    final navBorder  = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
-    final hoverFill  = isDark ? const Color(0xFF1C1C1F) : const Color(0xFFF4F4F5);
-    final activeFill = isDark ? const Color(0xFF161618) : const Color(0xFFF0F0F0);
-    final accent     = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final idleIcon   = isDark ? const Color(0xFF71717A) : const Color(0xFFA1A1AA);// zinc-500
-    final hoverIcon  = isDark ? const Color(0xFFD4D4D8) : const Color(0xFF3F3F46);// zinc-300/700
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final navBg      = isDark ? AppColors.surfaceDark     : AppColors.surfaceLight;
+    final navBorder  = isDark ? AppColors.borderDark      : AppColors.borderLight;
+    final hoverFill  = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final activeFill = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final accent     = isDark ? AppColors.accentDark      : AppColors.accentLight;
+    final idleIcon   = isDark ? AppColors.textSecDark     : AppColors.textSecLight;
+    final hoverIcon  = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return FadeTransition(
       opacity: _entranceFade,
@@ -106,7 +102,7 @@ class _FloatingNavBarState extends State<FloatingNavBar>
                   child: Container(
                     decoration: BoxDecoration(
                       color: navBg.withValues(alpha: isDark ? 0.90 : 0.95),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: AppRadius.card,
                       border: Border.all(color: navBorder, width: 0.5),
                       boxShadow: [
                         BoxShadow(
@@ -149,7 +145,7 @@ class _FloatingNavBarState extends State<FloatingNavBar>
                                     : isHovered
                                         ? hoverFill
                                         : Colors.transparent,
-                                borderRadius: BorderRadius.circular(7),
+                                borderRadius: AppRadius.subtle,
                                 border: isActive
                                     ? Border.all(color: navBorder, width: 0.5)
                                     : null,

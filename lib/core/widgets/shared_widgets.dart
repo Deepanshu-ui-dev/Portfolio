@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:redacted/redacted.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 export 'skeleton_loaders.dart';
 export 'magnet.dart';
 export 'grid_background.dart';
+import 'lamp_theme_switcher.dart';
 
 /// ── Dashed Divider ──────────────────────────────────────────
 class DashedDivider extends StatelessWidget {
@@ -154,8 +157,7 @@ class DashedBorderContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = color ?? (isDark ? AppColors.borderDark : AppColors.borderLight);
+    final c = color ?? AppColors.border;
     return CustomPaint(
       painter: _DashedBorderPainter(color: c),
       child: Padding(padding: padding, child: child),
@@ -224,8 +226,7 @@ class MonofolioCorner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final c = color ?? (isDark ? AppColors.border2Dark : AppColors.border2Light);
+    final c = color ?? AppColors.border2;
     return Container(
       width: 10,
       height: 10,
@@ -329,10 +330,8 @@ class _SectionHeaderState extends State<SectionHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final accent = AppColors.accent;
+    final textSec = AppColors.textSecondary;
 
     // ── Numbered eyebrow style [ 01 ] TITLE ─────────────────────────────
     if (widget.index != null) {
@@ -383,7 +382,7 @@ class _SectionHeaderState extends State<SectionHeader> {
                 duration: const Duration(milliseconds: 220),
                 curve: kCurve,
                 style: (Theme.of(context).textTheme.labelLarge ?? const TextStyle()).copyWith(
-                  color: _hovered ? accent : textColor,
+                  color: _hovered ? accent : AppColors.textPrimary,
                   letterSpacing: 2.0,
                   fontWeight: FontWeight.w700,
                   fontSize: 11,
@@ -431,7 +430,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
   bool _hovered = false;
 
   // easeOutQuint approximation — smooth, premium expand feel
-  static const _kExpandCurve = Cubic(0.23, 1.0, 0.32, 1.0);
+  static const _kExpandCurve = Cubic(0.22, 1.0, 0.36, 1.0);
 
   @override
   void initState() {
@@ -439,7 +438,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
     _expanded = widget.initiallyExpanded;
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 260),
+      duration: const Duration(milliseconds: 160), // Snappier
       value: _expanded ? 1.0 : 0.0,
     );
     _heightAnim = CurvedAnimation(parent: _ctrl, curve: _kExpandCurve);
@@ -460,13 +459,13 @@ class _CollapsibleCardState extends State<CollapsibleCard>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final surfaceEl = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final tagBg = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final surface  = isDark ? AppColors.surfaceDark    : AppColors.surfaceLight;
+    final surfaceEl= isDark ? AppColors.surfaceElevDark: AppColors.surfaceElevLight;
+    final border   = isDark ? AppColors.borderDark     : AppColors.borderLight;
+    final textSec  = isDark ? AppColors.textSecDark    : AppColors.textSecLight;
+    final tagBg    = isDark ? AppColors.surfaceElevDark: AppColors.surfaceElevLight;
+    final accent   = isDark ? AppColors.accentDark     : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -478,8 +477,8 @@ class _CollapsibleCardState extends State<CollapsibleCard>
         transform: Matrix4.translationValues(0, _hovered ? -1.5 : 0.0, 0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
+          borderRadius: BorderRadius.zero,
           border: Border(
-            // Left accent stripe — expands to 2px on hover or when expanded
             left: BorderSide(
               color: (_hovered || _expanded) ? accent : border,
               width: (_hovered || _expanded) ? 2 : 1,
@@ -488,7 +487,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
             bottom: BorderSide(color: border, width: 1),
             right: BorderSide(color: border, width: 1),
           ),
-          boxShadow: _hovered 
+          boxShadow: _hovered
               ? [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
@@ -545,7 +544,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                       const SizedBox(width: 10),
                       AnimatedRotation(
                         turns: _expanded ? 0.5 : 0,
-                        duration: const Duration(milliseconds: 260),
+                        duration: const Duration(milliseconds: 160),
                         curve: _kExpandCurve,
                         child: Icon(LucideIcons.chevronDown, size: 14, color: _expanded ? accent : textSec),
                       ),
@@ -603,6 +602,7 @@ class _CollapsibleCardState extends State<CollapsibleCard>
                                         decoration: BoxDecoration(
                                           color: tagBg,
                                           border: Border.all(color: border, width: 1),
+                                          borderRadius: AppRadius.subtle,
                                         ),
                                         child: Text(t,
                                             style: Theme.of(context)
@@ -738,13 +738,11 @@ class _CursorState extends State<_Cursor> with SingleTickerProviderStateMixin {
 
 // ─── Portfolio Footer ─────────────────────────────────
 class PortfolioFooter extends StatefulWidget {
-  final bool isDark;
   final VoidCallback onToggleTheme;
   final bool isTransitioning;
 
   const PortfolioFooter({
     super.key,
-    required this.isDark,
     required this.onToggleTheme,
     this.isTransitioning = false,
   });
@@ -755,73 +753,253 @@ class PortfolioFooter extends StatefulWidget {
 
 class _PortfolioFooterState extends State<PortfolioFooter> {
   bool _creditHovered = false;
+  int _visitCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAndIncrementVisitCount();
+  }
+
+  Future<void> _loadAndIncrementVisitCount() async {
+    try {
+      const key = 'portfolio_visit_count';
+      final prefs = await _getPrefs();
+      final count = (prefs?.getInt(key) ?? 0) + 1;
+      await prefs?.setInt(key, count);
+      if (mounted) setState(() => _visitCount = count);
+    } catch (_) {}
+  }
+
+  dynamic _prefsInstance;
+  Future<dynamic> _getPrefs() async {
+    try {
+      if (_prefsInstance != null) return _prefsInstance;
+      final prefs = await _SharedPrefsHelper.getInstance();
+      _prefsInstance = prefs;
+      return prefs;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = widget.isDark;
-    final bgColor     = isDark ? AppColors.bgDark        : AppColors.bgLight;
-    final borderColor = isDark ? AppColors.borderDark     : AppColors.borderLight;
-    final textTerColor= isDark ? AppColors.textTerDark    : AppColors.textTerLight;
-    final accentColor = isDark ? AppColors.accentDark     : AppColors.accentLight;
-    final creditColor = _creditHovered ? accentColor
-        : (isDark ? AppColors.textSecDark : AppColors.textSecLight);
+    final isDark       = Theme.of(context).brightness == Brightness.dark;
+    final bgColor      = isDark ? AppColors.bgDark      : AppColors.bgLight;
+    final borderColor  = isDark ? AppColors.borderDark  : AppColors.borderLight;
+    final textTerColor = isDark ? AppColors.textTerDark  : AppColors.textTerLight;
+    final accentColor  = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final textSecColor = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
+    final creditColor  = _creditHovered ? accentColor : textSecColor;
+    final isMobile = AppSpacing.isMobile(context);
 
-    return RepaintBoundary(
-      child: Container(
-        color: bgColor,
-        width: double.infinity,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Gradient-fade top divider — elegant fade from transparent center out
-            _FadeRuleDivider(borderColor: borderColor),
-
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacing.horizontalPadding(context),
-                vertical: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    '© 2026 — Deepanshu',
-                    style: TextStyle(
-                      color: textTerColor,
-                      fontFamily: 'monospace',
-                      fontSize: 10,
-                      letterSpacing: 0.4,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  // Hover-accent credit text
-                  MouseRegion(
-                    onEnter: (_) => setState(() => _creditHovered = true),
-                    onExit:  (_) => setState(() => _creditHovered = false),
-                    child: AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                      style: TextStyle(
-                        color: creditColor,
-                        fontFamily: 'monospace',
-                        fontSize: 10,
-                        letterSpacing: 0.4,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      child: const Text('Built with 🤍'),
-                    ),
-                  ),
-                ],
-              ),
+    return Container(
+      color: bgColor,
+      width: double.infinity,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _FadeRuleDivider(borderColor: borderColor),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.horizontalPadding(context),
+              vertical: isMobile ? 24 : 18,
             ),
-          ],
-        ),
+            child: isMobile
+                ? _MobileFooterContent(
+                    visitCount: _visitCount,
+                    accentColor: accentColor,
+                    textTerColor: textTerColor,
+                    creditColor: creditColor,
+                    onCreditHover: (v) => setState(() => _creditHovered = v),
+                  )
+                : _DesktopFooterContent(
+                    visitCount: _visitCount,
+                    accentColor: accentColor,
+                    textTerColor: textTerColor,
+                    creditColor: creditColor,
+                    onCreditHover: (v) => setState(() => _creditHovered = v),
+                  ),
+          ),
+        ],
       ),
     );
   }
 }
+
+/// A simple wrapper that accesses SharedPreferences via dynamic invocation
+/// to avoid a direct import dependency in shared_widgets.dart
+class _SharedPrefsHelper {
+  static SharedPreferences? _instance;
+  static Future<SharedPreferences?> getInstance() async {
+    if (_instance != null) return _instance;
+    try {
+      final prefs = await _SharedPrefsAccess.get();
+      _instance = prefs;
+      return prefs;
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class _SharedPrefsAccess {
+  static Future<SharedPreferences?> get() async {
+    try {
+      return await SharedPreferences.getInstance();
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+// ─── Desktop Footer Content ─────────────────────────────────
+class _DesktopFooterContent extends StatelessWidget {
+  final int visitCount;
+  final Color accentColor;
+  final Color textTerColor;
+  final Color creditColor;
+  final ValueChanged<bool> onCreditHover;
+
+  const _DesktopFooterContent({
+    required this.visitCount,
+    required this.accentColor,
+    required this.textTerColor,
+    required this.creditColor,
+    required this.onCreditHover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // ── Left/Center: Visitor badge ─────────────────────────────
+        if (visitCount > 0) _VisitorBadge(
+          count: visitCount,
+          accentColor: accentColor,
+          textTerColor: textTerColor,
+        ),
+        const Spacer(),
+        // ── Right: Copyright + credit ─────────────────────────
+        MouseRegion(
+          onEnter: (_) => onCreditHover(true),
+          onExit:  (_) => onCreditHover(false),
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            style: TextStyle(
+              color: creditColor,
+              fontFamily: 'monospace',
+              fontSize: 9,
+              letterSpacing: 0.4,
+              fontWeight: FontWeight.w500,
+            ),
+            child: const Text('© 2026 Deepanshu · Built with 🤍'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Mobile Footer Content ─────────────────────────────────
+class _MobileFooterContent extends StatelessWidget {
+  final int visitCount;
+  final Color accentColor;
+  final Color textTerColor;
+  final Color creditColor;
+  final ValueChanged<bool> onCreditHover;
+
+  const _MobileFooterContent({
+    required this.visitCount,
+    required this.accentColor,
+    required this.textTerColor,
+    required this.creditColor,
+    required this.onCreditHover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (visitCount > 0) ...[
+          _VisitorBadge(
+            count: visitCount,
+            accentColor: accentColor,
+            textTerColor: textTerColor,
+          ),
+        ],
+        const Spacer(),
+        Text(
+          '© 2026 Deepanshu',
+          style: TextStyle(
+            color: textTerColor,
+            fontFamily: 'monospace',
+            fontSize: 9,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+// ─── Visitor Badge ────────────────────────────────────────
+class _VisitorBadge extends StatelessWidget {
+  final int count;
+  final Color accentColor;
+  final Color textTerColor;
+  const _VisitorBadge({
+    required this.count,
+    required this.accentColor,
+    required this.textTerColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 5,
+          height: 5,
+          decoration: BoxDecoration(
+            color: accentColor,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          '${_formatCount(count)} VISITS',
+          style: TextStyle(
+            color: textTerColor,
+            fontFamily: 'monospace',
+            fontSize: 8,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatCount(int n) {
+    if (n >= 1000) return '${(n / 1000).toStringAsFixed(1)}K';
+    return n.toString().padLeft(3, '0');
+  }
+}
+
 
 /// Gradient-fade horizontal divider.
 /// Rather than a plain dashed line, the border color fades in from the

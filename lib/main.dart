@@ -22,6 +22,7 @@ import 'core/widgets/floating_nav_bar.dart';
 import 'core/widgets/shared_widgets.dart';
 import 'core/widgets/lamp_theme_switcher.dart';
 import 'core/widgets/circular_reveal_transition.dart';
+import 'core/widgets/cat_cursor_follower.dart';
 
 // ── Screens ──────────────────────────────────────────────────
 import 'features/home/presentation/screens/home_screen.dart';
@@ -165,91 +166,97 @@ class _AppShellState extends ConsumerState<_AppShell>
 
   @override
   Widget build(BuildContext context) {
-    final brightness = ref.watch(effectiveThemeProvider);
-    final isDark = brightness == Brightness.dark;
+    ref.watch(themeSyncProvider); // Sync global AppColors state
 
-    return GridBackground(
-      child: Scaffold(
-        extendBody: true,
-        body: RepaintBoundary(
-          child: Stack(
-            children: [
-              CircularRevealTransition(
-                child: SizedBox.expand(
-                  child: GestureDetector(
-                    onHorizontalDragEnd: (details) {
-                      if (details.primaryVelocity == null) return;
-                      if (details.primaryVelocity! < -500) {
-                        if (_idx < _screens.length - 1) _openTab(_idx + 1);
-                      } else if (details.primaryVelocity! > 500) {
-                        if (_idx > 0) _openTab(_idx - 1);
-                      }
-                    },
-                    child: Stack(
-                      children: [
-                        for (int i = 0; i < _screens.length; i++)
-                          if (_screens[i] != null)
-                            Offstage(
-                              offstage: _idx != i,
-                              child: TickerMode(
-                                enabled: _idx == i,
-                                child: RepaintBoundary(
-                                  child: AnimatedScale(
-                                    scale: _idx == i ? 1.0 : 0.98,
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeOutCubic,
-                                    child: AnimatedOpacity(
-                                      key: _screenKeys[i],
-                                      opacity: _idx == i ? 1.0 : 0.0,
-                                      duration: const Duration(milliseconds: 300),
-                                      curve: Curves.easeOutCubic,
-                                      child: AnimatedSlide(
-                                        offset: _idx == i
-                                            ? Offset.zero
-                                            : const Offset(0, 0.02),
-                                        duration: const Duration(milliseconds: 300),
-                                        curve: Curves.easeOutCubic,
-                                        child: _screens[i]!,
+    return CatCursorFollower(
+      child: GridBackground(
+        child: Scaffold(
+          body: RepaintBoundary(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // ── Main Content Area ───────────────────────────
+                    Expanded(
+                      child: CircularRevealTransition(
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                              onHorizontalDragEnd: (details) {
+                                if (details.primaryVelocity == null) return;
+                                if (details.primaryVelocity! < -500) {
+                                  if (_idx < _screens.length - 1) _openTab(_idx + 1);
+                                } else if (details.primaryVelocity! > 500) {
+                                  if (_idx > 0) _openTab(_idx - 1);
+                                }
+                              },
+                              child: Stack(
+                                children: [
+                                  for (int i = 0; i < _screens.length; i++)
+                                    if (_screens[i] != null)
+                                      Offstage(
+                                        offstage: _idx != i,
+                                        child: TickerMode(
+                                          enabled: _idx == i,
+                                          child: RepaintBoundary(
+                                            child: AnimatedScale(
+                                              scale: _idx == i ? 1.0 : 0.98,
+                                              duration: const Duration(milliseconds: 300),
+                                              curve: Curves.easeOutCubic,
+                                              child: AnimatedOpacity(
+                                                key: _screenKeys[i],
+                                                opacity: _idx == i ? 1.0 : 0.0,
+                                                duration: const Duration(milliseconds: 300),
+                                                curve: Curves.easeOutCubic,
+                                                child: AnimatedSlide(
+                                                  offset: _idx == i
+                                                      ? Offset.zero
+                                                      : const Offset(0, 0.02),
+                                                  duration: const Duration(milliseconds: 300),
+                                                  curve: Curves.easeOutCubic,
+                                                  child: _screens[i]!,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // ── Floating Nav Bar ───────────────────────────
+                            Positioned(
+                              bottom: 24,
+                              left: 0,
+                              right: 0,
+                              child: RepaintBoundary(
+                                child: FloatingNavBar(
+                                  currentIndex: _idx,
+                                  onTap: _openTab,
                                 ),
                               ),
                             ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
-                          child: RepaintBoundary(
-                            child: PortfolioFooter(
-                              isDark: isDark,
-                              onToggleTheme: () =>
-                                  ref.read(themeModeProvider.notifier).toggle(),
-                            ),
-                          ),
+                          ],
                         ),
-                        Positioned(
-                          bottom: 60,
-                          left: 0,
-                          right: 0,
-                          child: RepaintBoundary(
-                            child: FloatingNavBar(
-                              currentIndex: _idx,
-                              onTap: _openTab,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+
+                    // ── Footer ──────────────────────────────────────
+                    PortfolioFooter(
+                      onToggleTheme: () =>
+                          ref.read(themeModeProvider.notifier).toggle(),
+                    ),
+                  ],
                 ),
-              ),
-              const Positioned(
-                top: 0,
-                right: 20,
-                child: LampThemeSwitcher(),
-              ),
-            ],
+                // ── Standalone Lamp ───────────────────────────
+                const Positioned(
+                  top: 0,
+                  right: 20,
+                  child: LampThemeSwitcher(),
+                ),
+              ],
+            ),
           ),
         ),
       ),

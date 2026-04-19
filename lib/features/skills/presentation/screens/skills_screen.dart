@@ -201,9 +201,8 @@ class _SkillsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,9 +277,8 @@ class _SkillSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -319,8 +317,9 @@ class _SkillSection extends StatelessWidget {
 
         // ── Skill card grid ──
         LayoutBuilder(builder: (context, constraints) {
-          final cols =
-              (constraints.maxWidth / 130).floor().clamp(3, 5);
+          final cols = (constraints.maxWidth / (constraints.maxWidth < 400 ? 110 : 130))
+              .floor()
+              .clamp(constraints.maxWidth < 360 ? 2 : 3, 5);
           final w = constraints.maxWidth / cols;
           return Wrap(
             spacing: 0,
@@ -365,16 +364,14 @@ class _SkillCardState extends State<_SkillCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final border2 = isDark ? AppColors.border2Dark : AppColors.border2Light;
-    final surfaceEl =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final brand = _hex(widget.skill.hex);
+    final isDark  = Theme.of(context).brightness == Brightness.dark;
+    final border  = isDark ? AppColors.borderDark   : AppColors.borderLight;
+    final border2 = isDark ? AppColors.border2Dark  : AppColors.border2Light;
+    final surfaceEl= isDark ? AppColors.surfaceElevDark: AppColors.surfaceElevLight;
+    final textSec = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
+    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final accent  = isDark ? AppColors.accentDark   : AppColors.accentLight;
+    final brand   = _hex(widget.skill.hex);
 
     final greySlug = isDark ? '666666' : '888888';
     
@@ -403,11 +400,10 @@ class _SkillCardState extends State<_SkillCard> {
             decoration: BoxDecoration(
               color: _hovered
                   ? (widget.skill.highlight
-                      ? (isDark
-                          ? const Color(0xFF1A2A1A)
-                          : const Color(0xFFE8F5E9))
+                      ? AppColors.accent.withValues(alpha: 0.1)
                       : surfaceEl)
                   : Colors.transparent,
+              borderRadius: AppRadius.subtle,
             ),
             child: Stack(
               alignment: Alignment.center,
@@ -628,9 +624,10 @@ class _PhiloRowState extends State<_PhiloRow> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final isDark  = Theme.of(context).brightness == Brightness.dark;
+    final textSec = isDark ? AppColors.textSecDark  : AppColors.textSecLight;
+    final textPri = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final accent  = isDark ? AppColors.accentDark   : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -638,7 +635,7 @@ class _PhiloRowState extends State<_PhiloRow> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         margin: const EdgeInsets.only(bottom: 2),
-        transform: Matrix4.identity()..translate(_hovered ? 10.0 : 0.0, 0.0),
+        transform: Matrix4.translationValues((_hovered ? 10.0 : 0.0), 0.0, 0.0),
         decoration: BoxDecoration(
           border: Border(
             left: BorderSide(
@@ -665,7 +662,7 @@ class _PhiloRowState extends State<_PhiloRow> {
                   style: Theme.of(context)
                       .textTheme
                       .bodyMedium
-                      ?.copyWith(height: 1.7, color: _hovered ? (isDark ? Colors.white : Colors.black) : textSec),
+                      ?.copyWith(height: 1.7, color: _hovered ? textPri : textSec),
                 ),
               ),
             ],

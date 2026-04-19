@@ -341,16 +341,8 @@ class _LampThemeSwitcherState extends ConsumerState<LampThemeSwitcher>
               duration: const Duration(milliseconds: 350),
               curve: Curves.easeOutQuart,
               builder: (context, t, _) {
-                final textMuted = Color.lerp(
-                  AppColors.textMutedLight,
-                  AppColors.textMutedDark,
-                  t,
-                )!;
-                final border2 = Color.lerp(
-                  AppColors.border2Light,
-                  AppColors.border2Dark,
-                  t,
-                )!;
+                final textMuted = AppColors.textSecondary;
+                final border2 = AppColors.border2;
 
                 return CustomPaint(
                   painter: _LampPainter(

@@ -123,9 +123,8 @@ class _ProjectsHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final textSec = AppColors.textSecondary;
+    final accent = AppColors.accent;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,8 +199,7 @@ class _FilterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final textSec = AppColors.textSecondary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -225,13 +223,11 @@ class _FilterSection extends StatelessWidget {
               _FilterChip(
                 label: 'All',
                 isActive: active == null,
-                isDark: isDark,
                 onTap: () => onSelect('__all__'),
               ),
               ...tags.map((t) => _FilterChip(
                     label: t,
                     isActive: active == t,
-                    isDark: isDark,
                     onTap: () => onSelect(t),
                   )),
             ],
@@ -245,13 +241,11 @@ class _FilterSection extends StatelessWidget {
 class _FilterChip extends StatefulWidget {
   final String label;
   final bool isActive;
-  final bool isDark;
   final VoidCallback onTap;
 
   const _FilterChip({
     required this.label,
     required this.isActive,
-    required this.isDark,
     required this.onTap,
   });
 
@@ -264,12 +258,11 @@ class _FilterChipState extends State<_FilterChip> {
 
   @override
   Widget build(BuildContext context) {
-    final border =
-        widget.isDark ? const Color.fromARGB(255, 105, 105, 105) : AppColors.borderLight;
-    final accent =
-        widget.isDark ? const Color.fromRGBO(16, 185, 129, 1) : AppColors.accentLight;
-    final textSec =
-        widget.isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final accent = AppColors.accent;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final textSec  = isDark ? AppColors.textSecDark     : AppColors.textSecLight;
+    final surface  = isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final bg       = isDark ? AppColors.bgDark          : AppColors.bgLight;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -279,13 +272,14 @@ class _FilterChipState extends State<_FilterChip> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 130),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: widget.isActive
                 ? accent
                 : _hov
                     ? textSec
-                    : border.withValues(alpha: 0.5),
+                    : surface,
+            borderRadius: BorderRadius.zero,
           ),
           child: Text(
             widget.label.toUpperCase(),
@@ -294,10 +288,10 @@ class _FilterChipState extends State<_FilterChip> {
                   letterSpacing: 1.5,
                   fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
                   color: widget.isActive
-                      ? (widget.isDark ? AppColors.bgDark : Colors.white)
+                      ? (isDark ? AppColors.bgDark : Colors.white)
                       : _hov
-                          ? textSec
-                          : border,
+                          ? (isDark ? AppColors.bgDark : Colors.white)
+                          : textSec,
                 ),
           ),
         ),
@@ -318,7 +312,7 @@ class _ProjectGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       const spacing = 12.0;
-      final isWide = constraints.maxWidth > 520;
+      final isWide = constraints.maxWidth > AppSpacing.mobileMax;
 
       final List<Widget> children = [];
       for (int i = 0; i < projects.length; i++) {
@@ -407,14 +401,13 @@ class _ProjectCardState extends State<_ProjectCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final border2 = isDark ? AppColors.border2Dark : AppColors.border2Light;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final surfaceEl =
-        isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final border   = isDark ? AppColors.borderDark  : AppColors.borderLight;
+    final border2  = isDark ? AppColors.border2Dark : AppColors.border2Light;
+    final surface  = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final surfaceEl= isDark ? AppColors.surfaceElevDark : AppColors.surfaceElevLight;
     final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final accent   = isDark ? AppColors.accentDark  : AppColors.accentLight;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -423,11 +416,13 @@ class _ProjectCardState extends State<_ProjectCard> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         transform: Matrix4.identity()
-          ..translate(0.0, _hovered ? -4.0 : 0.0)
-          ..scale(_hovered ? 1.015 : 1.0, _hovered ? 1.015 : 1.0),
+          ..translate(0.0, _hovered ? -4.0 : 0.0, 0.0)
+          ..scale(_hovered ? 1.015 : 1.0, _hovered ? 1.015 : 1.0, 1.0),
         decoration: BoxDecoration(
           color: _hovered ? surfaceEl : surface,
           border: Border.all(color: _hovered ? border2 : border, width: 1),
+          // SHARP CORNERS — unified with Home screen for editorial look
+          borderRadius: BorderRadius.zero,
           boxShadow: _hovered
               ? [
                   BoxShadow(
@@ -441,7 +436,7 @@ class _ProjectCardState extends State<_ProjectCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _BrowserMock(isDark: isDark),
+            const _BrowserMock(),
             Padding(
               padding: const EdgeInsets.all(14),
               child: Column(
@@ -465,8 +460,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 7, vertical: 3),
-                          decoration:
-                              BoxDecoration(border: Border.all(color: accent)),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: accent),
+                            borderRadius: AppRadius.borderRadiusXs,
+                          ),
                           child: Text(
                             widget.project.badge!,
                             style: Theme.of(context)
@@ -502,9 +499,10 @@ class _ProjectCardState extends State<_ProjectCard> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 7, vertical: 3),
-                                  color: isDark
-                                      ? AppColors.surfaceElevDark
-                                      : AppColors.surfaceElevLight,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceElev,
+                                    borderRadius: AppRadius.subtle,
+                                  ),
                                   child: Text(
                                     t,
                                     style: Theme.of(context)
@@ -545,17 +543,17 @@ class _ProjectCardState extends State<_ProjectCard> {
 // ─────────────────────────────────────────────────────────────
 
 class _BrowserMock extends StatelessWidget {
-  final bool isDark;
-  const _BrowserMock({required this.isDark});
+  const _BrowserMock();
 
   @override
   Widget build(BuildContext context) {
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final surface = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final blockA = isDark
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final border   = isDark ? AppColors.borderDark  : AppColors.borderLight;
+    final surface  = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
+    final blockA   = isDark
         ? AppColors.surfaceElevDark.withValues(alpha: 0.6)
         : AppColors.surfaceElevLight;
-    final blockB = isDark
+    final blockB   = isDark
         ? AppColors.surfaceElevDark.withValues(alpha: 0.35)
         : AppColors.borderLight;
 
@@ -649,10 +647,8 @@ class _LinkBtnState extends State<_LinkBtn> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
-    final textPri =
-        isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final accent = AppColors.accent;
+    final textPri = AppColors.textPrimary;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -675,6 +671,7 @@ class _LinkBtnState extends State<_LinkBtn> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               border: Border.all(color: accent),
+              borderRadius: AppRadius.subtle,
               color: _hovered ? accent.withValues(alpha: 0.12) : Colors.transparent,
             ),
             child: Row(
@@ -695,8 +692,6 @@ class _LinkBtnState extends State<_LinkBtn> {
     );
   }
 }
-
-
 
 // ─────────────────────────────────────────────────────────────
 // OPEN SOURCE SECTION  — numbered rows, same as Achievements
@@ -751,8 +746,7 @@ class _OSRowState extends State<_OSRow> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final accent = isDark ? AppColors.accentDark : AppColors.accentLight;
+    final accent = AppColors.accent;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -806,9 +800,8 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textSec = isDark ? AppColors.textSecDark : AppColors.textSecLight;
+    final border = AppColors.border;
+    final textSec = AppColors.textSecondary;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 56),
@@ -817,11 +810,8 @@ class _EmptyState extends StatelessWidget {
         Icon(Icons.folder_off_outlined, size: 24, color: border),
         const SizedBox(height: 10),
         Text(
-          'No projects match that filter.',
-          style: Theme.of(context)
-              .textTheme
-              .bodyMedium
-              ?.copyWith(color: textSec),
+          'NO MATCHING PROJECTS',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(color: textSec, letterSpacing: 2),
         ),
       ]),
     );
